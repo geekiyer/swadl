@@ -16,12 +16,12 @@ export default function QuickLog() {
   const { type } = useLocalSearchParams<{ type: string }>();
 
   return (
-    <View className="flex-1 bg-white pt-16 px-6">
+    <View className="flex-1 bg-midnight pt-16 px-6">
       <TouchableOpacity onPress={() => router.back()} className="mb-4">
-        <Text className="text-blue-600 text-base">Back</Text>
+        <Text className="text-amber text-base font-body-medium">Back</Text>
       </TouchableOpacity>
 
-      <Text className="text-2xl font-bold mb-6">
+      <Text className="text-2xl font-display text-white mb-6" style={{ letterSpacing: -1 }}>
         {TITLES[type ?? ""] ?? "Log"}
       </Text>
 

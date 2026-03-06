@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import { Text } from "react-native";
 import { useProfile } from "../../lib/queries";
+import { colors } from "../../constants/theme";
 
 export default function TabsLayout() {
   const { data: profile } = useProfile();
@@ -10,7 +11,17 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-        tabBarActiveTintColor: "#2563eb",
+        headerStyle: { backgroundColor: colors.midnight },
+        headerTintColor: colors.white,
+        headerTitleStyle: { fontFamily: "Outfit_600SemiBold" },
+        tabBarActiveTintColor: colors.amber,
+        tabBarInactiveTintColor: colors.ash,
+        tabBarLabelStyle: { fontFamily: "Outfit_500Medium" },
+        tabBarStyle: {
+          backgroundColor: colors.navyCard,
+          borderTopColor: colors.navyBorder,
+        },
+        animation: "none",
       }}
     >
       <Tabs.Screen

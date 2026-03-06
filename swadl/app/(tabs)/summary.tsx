@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useBabies, useSummary, type SummaryData } from "../../lib/queries";
+import { colors } from "../../constants/theme";
 import { useUnitStore, displayVolume } from "../../lib/store";
 import { UnitToggle } from "../../components/UnitToggle";
 
@@ -101,7 +102,7 @@ export default function Summary() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-midnight">
       <View className="px-4 pt-4 pb-10">
         <View className="flex-row items-center justify-between mb-3">
           <View />
@@ -111,23 +112,23 @@ export default function Summary() {
         {/* Date Picker */}
         <View className="flex-row items-center justify-between mb-5">
           <TouchableOpacity
-            className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
+            className="w-10 h-10 rounded-full bg-navy-raise items-center justify-center"
             onPress={() => shiftDate(-1)}
           >
-            <Text className="text-lg text-gray-600">{"\u2039"}</Text>
+            <Text className="text-lg text-ash">{"\u2039"}</Text>
           </TouchableOpacity>
-          <Text className="text-base font-semibold">
+          <Text className="text-base font-body-semibold text-white">
             {isToday ? "Today" : displayDate(date)}
           </Text>
           <TouchableOpacity
             className={`w-10 h-10 rounded-full items-center justify-center ${
-              isToday ? "bg-gray-50" : "bg-gray-100"
+              isToday ? "bg-navy-card" : "bg-navy-raise"
             }`}
             onPress={() => shiftDate(1)}
             disabled={isToday}
           >
             <Text
-              className={`text-lg ${isToday ? "text-gray-300" : "text-gray-600"}`}
+              className={`text-lg ${isToday ? "text-navy-border" : "text-ash"}`}
             >
               {"\u203A"}
             </Text>
@@ -136,46 +137,46 @@ export default function Summary() {
 
         {isLoading ? (
           <View className="py-20 items-center">
-            <ActivityIndicator size="large" color="#2563eb" />
+            <ActivityIndicator size="large" color={colors.amber} />
           </View>
         ) : summary ? (
           <>
             {/* Feeding Summary */}
-            <View className="bg-gray-50 rounded-xl p-4 mb-4">
-              <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Feeding
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
-                  <Text className="text-2xl font-bold">{summary.feedCount}</Text>
-                  <Text className="text-xs text-gray-400">feeds</Text>
+                  <Text className="text-2xl text-white font-display">{summary.feedCount}</Text>
+                  <Text className="text-xs text-ash">feeds</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl font-bold">
+                  <Text className="text-2xl text-white font-display">
                     {displayVolume(summary.feedTotalOz, unit).split(" ")[0]}
                   </Text>
-                  <Text className="text-xs text-gray-400">{unit}</Text>
+                  <Text className="text-xs text-ash">{unit}</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl font-bold">
+                  <Text className="text-2xl text-white font-display">
                     {summary.feedTotalMin}
                   </Text>
-                  <Text className="text-xs text-gray-400">min</Text>
+                  <Text className="text-xs text-ash">min</Text>
                 </View>
               </View>
-              <View className="border-t border-gray-200 pt-2 mt-1">
+              <View className="border-t border-navy-border pt-2 mt-1">
                 {Object.entries(summary.feedByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-gray-600">
+                  <Text key={type} className="text-sm text-ash">
                     {type}: {count}
                   </Text>
                 ))}
                 {summary.avgTimeBetweenFeeds != null && (
-                  <Text className="text-sm text-gray-600">
+                  <Text className="text-sm text-ash">
                     Avg {summary.avgTimeBetweenFeeds} min between feeds
                   </Text>
                 )}
                 {summary.avgOzPerBottle != null && (
-                  <Text className="text-sm text-gray-600">
+                  <Text className="text-sm text-ash">
                     Avg {displayVolume(summary.avgOzPerBottle, unit)} per bottle
                   </Text>
                 )}
@@ -184,51 +185,51 @@ export default function Summary() {
 
             {/* Pump Summary */}
             {summary.pumpCount > 0 && (
-              <View className="bg-gray-50 rounded-xl p-4 mb-4">
-                <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+              <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+                <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                   Pumping
                 </Text>
                 <View className="flex-row justify-between">
                   <View className="items-center flex-1">
-                    <Text className="text-2xl font-bold">
+                    <Text className="text-2xl text-white font-display">
                       {summary.pumpCount}
                     </Text>
-                    <Text className="text-xs text-gray-400">sessions</Text>
+                    <Text className="text-xs text-ash">sessions</Text>
                   </View>
                   <View className="items-center flex-1">
-                    <Text className="text-2xl font-bold">
+                    <Text className="text-2xl text-white font-display">
                       {displayVolume(summary.pumpTotalOz, unit).split(" ")[0]}
                     </Text>
-                    <Text className="text-xs text-gray-400">{unit}</Text>
+                    <Text className="text-xs text-ash">{unit}</Text>
                   </View>
                   <View className="items-center flex-1">
-                    <Text className="text-2xl font-bold">
+                    <Text className="text-2xl text-white font-display">
                       {summary.pumpTotalMin}
                     </Text>
-                    <Text className="text-xs text-gray-400">min</Text>
+                    <Text className="text-xs text-ash">min</Text>
                   </View>
                 </View>
               </View>
             )}
 
             {/* Diaper Summary */}
-            <View className="bg-gray-50 rounded-xl p-4 mb-4">
-              <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Diapers
               </Text>
-              <Text className="text-2xl font-bold mb-1">
+              <Text className="text-2xl text-white font-display mb-1">
                 {summary.diaperCount}
               </Text>
               <View className="flex-row flex-wrap gap-x-4">
                 {Object.entries(summary.diaperByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-gray-600">
+                  <Text key={type} className="text-sm text-ash">
                     {type}: {count}
                   </Text>
                 ))}
               </View>
               {summary.lowWetWarning && (
-                <View className="bg-yellow-50 rounded-lg p-2 mt-2">
-                  <Text className="text-sm text-yellow-700">
+                <View className="bg-navy-raise rounded-lg p-2 mt-2">
+                  <Text className="text-sm text-amber">
                     {"\u26A0\uFE0F"} Fewer than 4 wet diapers — consider
                     checking hydration
                   </Text>
@@ -237,33 +238,33 @@ export default function Summary() {
             </View>
 
             {/* Sleep Summary */}
-            <View className="bg-gray-50 rounded-xl p-4 mb-4">
-              <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Sleep
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
-                  <Text className="text-2xl font-bold">
+                  <Text className="text-2xl text-white font-display">
                     {Math.round((summary.sleepTotalMin / 60) * 10) / 10}
                   </Text>
-                  <Text className="text-xs text-gray-400">hours</Text>
+                  <Text className="text-xs text-ash">hours</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl font-bold">{summary.napCount}</Text>
-                  <Text className="text-xs text-gray-400">naps</Text>
+                  <Text className="text-2xl text-white font-display">{summary.napCount}</Text>
+                  <Text className="text-xs text-ash">naps</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl font-bold">
+                  <Text className="text-2xl text-white font-display">
                     {summary.longestStretchMin}
                   </Text>
-                  <Text className="text-xs text-gray-400">min longest</Text>
+                  <Text className="text-xs text-ash">min longest</Text>
                 </View>
               </View>
-              <View className="border-t border-gray-200 pt-2 mt-1">
-                <Text className="text-sm text-gray-600">
+              <View className="border-t border-navy-border pt-2 mt-1">
+                <Text className="text-sm text-ash">
                   Night (7PM-7AM): {Math.round(summary.nightSleepMin)} min
                 </Text>
-                <Text className="text-sm text-gray-600">
+                <Text className="text-sm text-ash">
                   Day (7AM-7PM): {Math.round(summary.daySleepMin)} min
                 </Text>
               </View>
@@ -271,56 +272,56 @@ export default function Summary() {
 
             {/* Activity Log */}
             <View className="mb-4">
-              <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Activity Log
               </Text>
               {summary.activityLog.length > 0 ? (
-                <View className="bg-gray-50 rounded-xl overflow-hidden">
+                <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden">
                   {summary.activityLog.map((item, i) => (
                     <View
                       key={item.id}
                       className={`flex-row items-center px-4 py-3 ${
-                        i > 0 ? "border-t border-gray-200" : ""
+                        i > 0 ? "border-t border-navy-border" : ""
                       }`}
                     >
                       <Text className="text-base mr-3">
                         {ICONS[item.kind]}
                       </Text>
                       <View className="flex-1">
-                        <Text className="text-sm font-medium">
+                        <Text className="text-sm font-body-medium text-white">
                           {item.label}
                         </Text>
-                        <Text className="text-xs text-gray-400">
+                        <Text className="text-xs text-ash">
                           {item.loggedBy}
                           {item.detail ? ` \u00B7 ${item.detail}` : ""}
                         </Text>
                       </View>
-                      <Text className="text-xs text-gray-400">
+                      <Text className="text-xs text-ash">
                         {formatTime(item.timestamp)}
                       </Text>
                     </View>
                   ))}
                 </View>
               ) : (
-                <View className="bg-gray-50 rounded-xl p-4 items-center">
-                  <Text className="text-gray-400">No activity logged</Text>
+                <View className="bg-navy-card border border-navy-border rounded-2xl p-4 items-center">
+                  <Text className="text-ash">No activity logged</Text>
                 </View>
               )}
             </View>
 
             {/* Share */}
             <TouchableOpacity
-              className="border border-gray-300 rounded-xl py-4"
+              className="border border-navy-border rounded-2xl py-4"
               onPress={handleShare}
             >
-              <Text className="text-center font-semibold text-base text-gray-700">
+              <Text className="text-center font-body-semibold text-base text-ash">
                 Share Summary
               </Text>
             </TouchableOpacity>
           </>
         ) : (
           <View className="py-20 items-center">
-            <Text className="text-gray-400">No data available</Text>
+            <Text className="text-ash">No data available</Text>
           </View>
         )}
       </View>

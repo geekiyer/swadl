@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import Animated from "react-native-reanimated";
+import { usePressSpring } from "../hooks/usePressSpring";
 
 const MOODS = [
-  { key: "happy", label: "Happy", icon: ":-)" },
-  { key: "fussy", label: "Fussy", icon: ":-(" },
-  { key: "sleepy", label: "Sleepy", icon: "(-.-)" },
-  { key: "calm", label: "Calm", icon: "(-)" },
+  { key: "happy", label: "Happy", icon: "\u{1F60A}" },
+  { key: "sleepy", label: "Sleepy", icon: "\u{1F634}" },
+  { key: "fussy", label: "Fussy", icon: "\u{1F61F}" },
+  { key: "calm", label: "Calm", icon: "\u{1F60C}" },
 ] as const;
 
 type Mood = (typeof MOODS)[number]["key"];
@@ -15,29 +17,59 @@ interface MoodPickerProps {
   onMoodChange?: (mood: Mood) => void;
 }
 
+function MoodButton({
+  mood,
+  selected,
+  onPress,
+}: {
+  mood: (typeof MOODS)[number];
+  selected: boolean;
+  onPress: () => void;
+}) {
+  const { animStyle, handlers } = usePressSpring();
+
+  return (
+    <Animated.View style={animStyle} className="flex-1">
+      <Pressable
+        className={`py-3 px-2 rounded-xl border items-center ${
+          selected
+            ? "bg-navy-raise border-amber"
+            : "bg-navy-raise border-navy-border"
+        }`}
+        onPress={onPress}
+        {...handlers}
+      >
+        <Text className="text-xl">{mood.icon}</Text>
+        <Text
+          className={`text-[10px] mt-1 font-body-semibold ${
+            selected ? "text-honey" : "text-ash"
+          }`}
+        >
+          {mood.label}
+        </Text>
+      </Pressable>
+    </Animated.View>
+  );
+}
+
 export function MoodPicker({ currentMood, onMoodChange }: MoodPickerProps) {
   const [selected, setSelected] = useState<Mood>(currentMood ?? "calm");
 
-  function cycleMood() {
-    const currentIndex = MOODS.findIndex((m) => m.key === selected);
-    const nextIndex = (currentIndex + 1) % MOODS.length;
-    const next = MOODS[nextIndex].key;
-    setSelected(next);
-    onMoodChange?.(next);
+  function selectMood(mood: Mood) {
+    setSelected(mood);
+    onMoodChange?.(mood);
   }
 
-  const current = MOODS.find((m) => m.key === selected)!;
-
   return (
-    <TouchableOpacity
-      className="bg-blue-50 rounded-xl px-4 py-3 items-center"
-      onPress={cycleMood}
-      activeOpacity={0.7}
-    >
-      <Text className="text-2xl">{current.icon}</Text>
-      <Text className="text-xs text-blue-600 mt-1 font-medium">
-        {current.label}
-      </Text>
-    </TouchableOpacity>
+    <View className="flex-row gap-3">
+      {MOODS.map((mood) => (
+        <MoodButton
+          key={mood.key}
+          mood={mood}
+          selected={selected === mood.key}
+          onPress={() => selectMood(mood.key)}
+        />
+      ))}
+    </View>
   );
 }

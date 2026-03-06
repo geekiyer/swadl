@@ -1,5 +1,8 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { router } from "expo-router";
+import { useCallback } from "react";
+import { View, Text, ScrollView, Pressable } from "react-native";
+import Animated from "react-native-reanimated";
+import { router, useFocusEffect } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { StatusCard } from "../../components/StatusCard";
 import { MoodPicker } from "../../components/MoodPicker";
 import { TaskItem } from "../../components/TaskItem";
@@ -18,6 +21,8 @@ import {
 } from "../../lib/queries";
 import { useCareMode } from "../../lib/careMode";
 import { useUnitStore, displayVolume } from "../../lib/store";
+import { usePressSpring } from "../../hooks/usePressSpring";
+import { shadows } from "../../constants/theme";
 
 function timeAgo(dateStr: string | undefined | null): string {
   if (!dateStr) return "No data";
@@ -38,6 +43,7 @@ function formatTime(dateStr: string): string {
 }
 
 export default function Dashboard() {
+  const queryClient = useQueryClient();
   const { data: profile } = useProfile();
   const { data: babies } = useBabies();
   const baby = babies?.[0]; // Default to first baby (multi-baby selector in header for Phase 2)
@@ -54,57 +60,98 @@ export default function Dashboard() {
   const unit = useUnitStore((s) => s.unit);
   useDashboardRealtime();
 
+  // Refetch dashboard data whenever screen comes into focus (e.g. returning from a logger)
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
+      queryClient.invalidateQueries({ queryKey: ["latest-diaper"] });
+      queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
+      queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+      queryClient.invalidateQueries({ queryKey: ["next-tasks"] });
+    }, [queryClient])
+  );
+
   const isTogether = careMode === "together";
   const caregiverName = activeShift?.caregiver_display_name;
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-midnight">
       <View className="px-4 pt-4 pb-8">
         {/* Header */}
         <View className="mb-6">
-          <Text className="text-2xl font-bold">
+          <Text className="text-2xl text-white font-display" style={{ letterSpacing: -1 }}>
             {baby ? baby.name : "Dashboard"}
           </Text>
-          <Text className="text-gray-400 text-sm mt-0.5">
+          <Text className="text-ash text-sm mt-0.5 font-body">
             Hi, {profile?.display_name ?? "there"}
           </Text>
+        </View>
+
+        {/* Quick Log buttons — above the fold for one-handed access */}
+        <View className="flex-row justify-between mb-5 gap-2">
+          <Pressable
+            className="bg-amber rounded-xl px-4 py-3 flex-1 items-center"
+            onPress={() => router.push("/log/feed")}
+            style={shadows.amber}
+          >
+            <Text className="text-midnight font-body-semibold">Feed</Text>
+          </Pressable>
+          <Pressable
+            className="bg-honey rounded-xl px-4 py-3 flex-1 items-center"
+            onPress={() => router.push("/log/diaper")}
+          >
+            <Text className="text-midnight font-body-semibold">Diaper</Text>
+          </Pressable>
+          <Pressable
+            className="bg-info rounded-xl px-4 py-3 flex-1 items-center"
+            onPress={() => router.push("/log/sleep")}
+          >
+            <Text className="text-midnight font-body-semibold">Sleep</Text>
+          </Pressable>
+          <Pressable
+            className="bg-ember rounded-xl px-4 py-3 flex-1 items-center"
+            onPress={() => router.push("/log/pump")}
+          >
+            <Text className="text-white font-body-semibold">Pump</Text>
+          </Pressable>
         </View>
 
         {/* Together mode: Activity Feed | Shifts/Nanny mode: Shift Banner */}
         {isTogether ? (
           <View className="mb-5">
             <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+              <Text className="text-[11px] text-ash uppercase font-body-semibold" style={{ letterSpacing: 2.5 }}>
                 Recent Activity
               </Text>
-              <TouchableOpacity onPress={() => router.push("/briefing")}>
-                <Text className="text-sm text-blue-600">Daily Briefing</Text>
-              </TouchableOpacity>
+              <Pressable onPress={() => router.push("/briefing")}>
+                <Text className="text-sm text-amber font-body-semibold">Daily Briefing</Text>
+              </Pressable>
             </View>
             <ActivityFeed babyId={baby?.id} />
           </View>
         ) : (
-          <TouchableOpacity
-            className="bg-blue-50 rounded-xl p-4 mb-5 flex-row items-center justify-between"
+          <Pressable
+            className="bg-navy-card border border-navy-border rounded-2xl p-5 mb-5 flex-row items-center justify-between"
             onPress={() => router.push("/briefing")}
-            activeOpacity={0.7}
+            style={shadows.sm}
           >
             <View>
-              <Text className="text-xs text-blue-500 uppercase tracking-wide font-medium">
+              <Text className="text-[11px] text-amber uppercase font-body-bold" style={{ letterSpacing: 2 }}>
                 On Shift
               </Text>
-              <Text className="text-base font-semibold mt-0.5">
+              <Text className="text-base font-body-semibold text-white mt-0.5">
                 {caregiverName ?? "No one"}
               </Text>
             </View>
-            <View className="bg-blue-600 rounded-lg px-3 py-2">
-              <Text className="text-white text-sm font-medium">Hand Off</Text>
+            <View className="bg-amber rounded-xl px-4 py-2">
+              <Text className="text-midnight text-sm font-body-semibold">Hand Off</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         )}
 
         {/* Status Cards */}
-        <View className="flex-row mb-5">
+        <View className="flex-row mb-3">
           <StatusCard
             title="Last Fed"
             value={timeAgo(latestFeed?.started_at)}
@@ -123,14 +170,14 @@ export default function Dashboard() {
             subtitle={latestSleep?.location ?? undefined}
             onPress={() => router.push("/log/sleep")}
           />
+        </View>
+        <View className="flex-row mb-5">
           <StatusCard
             title="Last Diaper"
             value={timeAgo(latestDiaper?.logged_at)}
             subtitle={latestDiaper?.type ?? undefined}
             onPress={() => router.push("/log/diaper")}
           />
-        </View>
-        <View className="flex-row mb-5">
           <StatusCard
             title="Last Pump"
             value={
@@ -151,7 +198,7 @@ export default function Dashboard() {
 
         {/* Mood Picker */}
         <View className="mb-5">
-          <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+          <Text className="text-[11px] text-ash uppercase font-body-bold mb-2">
             Current Mood
           </Text>
           <MoodPicker />
@@ -160,12 +207,12 @@ export default function Dashboard() {
         {/* Next Tasks */}
         <View>
           <View className="flex-row items-center justify-between mb-2">
-            <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+            <Text className="text-[11px] text-ash uppercase font-body-bold">
               Next Tasks
             </Text>
-            <TouchableOpacity onPress={() => router.push("/(tabs)/chores")}>
-              <Text className="text-sm text-blue-600">View All</Text>
-            </TouchableOpacity>
+            <Pressable onPress={() => router.push("/(tabs)/chores")}>
+              <Text className="text-sm text-amber font-body-semibold">View All</Text>
+            </Pressable>
           </View>
 
           {nextTasks && nextTasks.length > 0 ? (
@@ -182,39 +229,12 @@ export default function Dashboard() {
               );
             })
           ) : (
-            <View className="bg-gray-50 rounded-lg p-4 items-center">
-              <Text className="text-gray-400">All caught up!</Text>
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 items-center">
+              <Text className="text-ash">All caught up!</Text>
             </View>
           )}
         </View>
 
-        {/* Quick Log FAB area */}
-        <View className="flex-row flex-wrap justify-around mt-6 pt-4 border-t border-gray-100 gap-y-3">
-          <TouchableOpacity
-            className="bg-blue-600 rounded-full px-5 py-3"
-            onPress={() => router.push("/log/feed")}
-          >
-            <Text className="text-white font-medium">Log Feed</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-green-600 rounded-full px-5 py-3"
-            onPress={() => router.push("/log/diaper")}
-          >
-            <Text className="text-white font-medium">Log Diaper</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-purple-600 rounded-full px-5 py-3"
-            onPress={() => router.push("/log/sleep")}
-          >
-            <Text className="text-white font-medium">Log Sleep</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="bg-pink-600 rounded-full px-5 py-3"
-            onPress={() => router.push("/log/pump")}
-          >
-            <Text className="text-white font-medium">Log Pump</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </ScrollView>
   );

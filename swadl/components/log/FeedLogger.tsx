@@ -14,6 +14,7 @@ import { useBabies } from "../../lib/queries";
 import { FORMULA_BRANDS } from "../../constants/formula-brands";
 import { useUnitStore, parseInputToOz } from "../../lib/store";
 import { UnitToggle } from "../UnitToggle";
+import { colors } from "../../constants/theme";
 
 type FeedCategory = "breastfeed" | "bottle";
 type BreastSide = "breast_left" | "breast_right";
@@ -105,6 +106,7 @@ export function FeedLogger() {
       Alert.alert("Error", error.message);
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       router.back();
     }
   }
@@ -137,6 +139,7 @@ export function FeedLogger() {
       Alert.alert("Error", error.message);
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       router.back();
     }
   }
@@ -146,20 +149,20 @@ export function FeedLogger() {
     return (
       <View className="gap-3">
         <TouchableOpacity
-          className="bg-blue-50 rounded-xl px-6 py-6 items-center"
+          className="bg-navy-card border border-navy-border rounded-2xl px-6 py-6 items-center"
           onPress={() => setCategory("breastfeed")}
         >
-          <Text className="text-blue-600 font-bold text-lg">Breastfeed</Text>
-          <Text className="text-blue-400 text-sm mt-1">
+          <Text className="text-amber font-body-bold text-lg">Breastfeed</Text>
+          <Text className="text-ash text-sm mt-1">
             Timer for left or right
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-orange-50 rounded-xl px-6 py-6 items-center"
+          className="bg-navy-card border border-navy-border rounded-2xl px-6 py-6 items-center"
           onPress={() => setCategory("bottle")}
         >
-          <Text className="text-orange-600 font-bold text-lg">Bottle</Text>
-          <Text className="text-orange-400 text-sm mt-1">
+          <Text className="text-ember font-body-bold text-lg">Bottle</Text>
+          <Text className="text-ash text-sm mt-1">
             Formula or breastmilk
           </Text>
         </TouchableOpacity>
@@ -173,33 +176,33 @@ export function FeedLogger() {
     if (!side) {
       return (
         <View>
-          <Text className="text-gray-500 mb-4">Which side?</Text>
+          <Text className="text-ash mb-4">Which side?</Text>
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className="bg-blue-50 rounded-xl px-6 py-5 items-center flex-1"
+              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => {
                 setSide("breast_left");
                 startTimer();
               }}
             >
-              <Text className="text-blue-600 font-semibold text-base">
+              <Text className="text-amber font-body-semibold text-base">
                 Left
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="bg-blue-50 rounded-xl px-6 py-5 items-center flex-1"
+              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => {
                 setSide("breast_right");
                 startTimer();
               }}
             >
-              <Text className="text-blue-600 font-semibold text-base">
+              <Text className="text-amber font-body-semibold text-base">
                 Right
               </Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="mt-4 py-3" onPress={resetAll}>
-            <Text className="text-gray-500 text-center">Back</Text>
+            <Text className="text-ash text-center">Back</Text>
           </TouchableOpacity>
         </View>
       );
@@ -209,36 +212,36 @@ export function FeedLogger() {
     return (
       <View>
         <View className="items-center">
-          <Text className="text-5xl font-bold mb-2 font-mono">
+          <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1 }}>
             {formatElapsed(elapsed)}
           </Text>
-          <Text className="text-gray-400 mb-6">
+          <Text className="text-ash mb-6">
             {side === "breast_left" ? "Left breast" : "Right breast"}
           </Text>
 
           {timing ? (
             <TouchableOpacity
-              className="bg-red-500 rounded-full px-8 py-4 mb-4"
+              className="bg-ember rounded-2xl px-8 py-4 mb-4"
               onPress={stopTimer}
             >
-              <Text className="text-white font-semibold text-base">
+              <Text className="text-white font-body-semibold text-base">
                 Stop Timer
               </Text>
             </TouchableOpacity>
           ) : elapsed > 0 ? (
             <TouchableOpacity
-              className="bg-blue-600 rounded-lg py-4 px-8 mb-4"
+              className="bg-amber rounded-xl py-4 px-8 mb-4"
               onPress={saveBreast}
               disabled={saving}
             >
-              <Text className="text-white font-semibold text-base">
+              <Text className="text-midnight font-body-semibold text-base">
                 {saving ? "Saving..." : "Save"}
               </Text>
             </TouchableOpacity>
           ) : null}
         </View>
         <TouchableOpacity className="mt-2 py-3" onPress={resetAll}>
-          <Text className="text-gray-500 text-center">Cancel</Text>
+          <Text className="text-ash text-center">Cancel</Text>
         </TouchableOpacity>
       </View>
     );
@@ -250,27 +253,27 @@ export function FeedLogger() {
     if (!bottleContent) {
       return (
         <View>
-          <Text className="text-gray-500 mb-4">What's in the bottle?</Text>
+          <Text className="text-ash mb-4">What's in the bottle?</Text>
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
-              className="bg-orange-50 rounded-xl px-6 py-5 items-center flex-1"
+              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => setBottleContent("formula")}
             >
-              <Text className="text-orange-600 font-semibold text-base">
+              <Text className="text-ember font-body-semibold text-base">
                 Formula
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="bg-orange-50 rounded-xl px-6 py-5 items-center flex-1"
+              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => setBottleContent("breastmilk")}
             >
-              <Text className="text-orange-600 font-semibold text-base">
+              <Text className="text-ember font-body-semibold text-base">
                 Breastmilk
               </Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="mt-2 py-3" onPress={resetAll}>
-            <Text className="text-gray-500 text-center">Back</Text>
+            <Text className="text-ash text-center">Back</Text>
           </TouchableOpacity>
         </View>
       );
@@ -286,10 +289,11 @@ export function FeedLogger() {
 
       return (
         <View className="flex-1">
-          <Text className="text-gray-500 mb-3">Pick a formula brand</Text>
+          <Text className="text-ash mb-3">Pick a formula brand</Text>
           <TextInput
-            className="border border-gray-300 rounded-lg px-4 py-3 mb-3 text-base"
+            className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-3 text-base text-white"
             placeholder="Search brands..."
+            placeholderTextColor={colors.ash}
             value={brandSearch}
             onChangeText={setBrandSearch}
             autoFocus
@@ -301,17 +305,17 @@ export function FeedLogger() {
             style={{ maxHeight: 350 }}
             renderItem={({ item }) => (
               <TouchableOpacity
-                className="py-3 px-2 border-b border-gray-100"
+                className="py-3 px-2 border-b border-navy-border"
                 onPress={() => {
                   setFormulaBrand(item);
                   setBrandSearch("");
                 }}
               >
-                <Text className="text-base">{item}</Text>
+                <Text className="text-base text-white">{item}</Text>
               </TouchableOpacity>
             )}
             ListEmptyComponent={
-              <Text className="text-gray-400 text-center py-4">
+              <Text className="text-ash text-center py-4">
                 No brands found
               </Text>
             }
@@ -320,7 +324,7 @@ export function FeedLogger() {
             className="mt-3 py-3"
             onPress={() => setBottleContent(null)}
           >
-            <Text className="text-gray-500 text-center">Back</Text>
+            <Text className="text-ash text-center">Back</Text>
           </TouchableOpacity>
         </View>
       );
@@ -330,7 +334,7 @@ export function FeedLogger() {
     return (
       <View>
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-sm text-gray-400">
+          <Text className="text-sm text-ash">
             {bottleContent === "formula"
               ? `Formula - ${formulaBrand}`
               : "Breastmilk"}{" "}
@@ -339,12 +343,13 @@ export function FeedLogger() {
           <UnitToggle />
         </View>
 
-        <Text className="text-sm font-medium text-gray-700 mb-1">
+        <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
           Amount ({unit})
         </Text>
         <TextInput
-          className="border border-gray-300 rounded-lg px-4 py-3 mb-6 text-base"
+          className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
           placeholder={unit === "oz" ? "e.g. 4" : "e.g. 120"}
+          placeholderTextColor={colors.ash}
           value={amountOz}
           onChangeText={setAmountOz}
           keyboardType="decimal-pad"
@@ -352,11 +357,11 @@ export function FeedLogger() {
         />
 
         <TouchableOpacity
-          className={`rounded-lg py-4 ${amountOz ? "bg-orange-500" : "bg-gray-300"}`}
+          className={`rounded-xl py-4 ${amountOz ? "bg-amber" : "bg-navy-raise border border-navy-border"}`}
           onPress={saveBottle}
           disabled={!amountOz || saving}
         >
-          <Text className="text-white text-center font-semibold text-base">
+          <Text className={`text-center font-body-semibold text-base ${amountOz ? "text-midnight" : "text-ash"}`}>
             {saving ? "Saving..." : "Save"}
           </Text>
         </TouchableOpacity>
@@ -372,7 +377,7 @@ export function FeedLogger() {
             setAmountOz("");
           }}
         >
-          <Text className="text-gray-500 text-center">
+          <Text className="text-ash text-center">
             {bottleContent === "formula" ? "Change brand" : "Change type"}
           </Text>
         </TouchableOpacity>

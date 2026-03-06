@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Link, router } from "expo-router";
 import { supabase } from "../../lib/supabase";
+import { colors } from "../../constants/theme";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -22,40 +23,42 @@ export default function Signup() {
   }
 
   return (
-    <View className="flex-1 justify-center px-6 bg-white">
-      <Text className="text-3xl font-bold text-center mb-8">
+    <View className="flex-1 justify-center px-6 bg-midnight">
+      <Text className="text-3xl text-center mb-8 text-white font-display" style={{ letterSpacing: -1 }}>
         Create Account
       </Text>
 
       <TextInput
-        className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
         placeholder="Email"
+        placeholderTextColor={colors.ash}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
       />
       <TextInput
-        className="border border-gray-300 rounded-lg px-4 py-3 mb-6 text-base"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
         placeholder="Password"
+        placeholderTextColor={colors.ash}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
       <TouchableOpacity
-        className="bg-blue-600 rounded-lg py-4 mb-4"
+        className="bg-amber rounded-2xl py-4 mb-4"
         onPress={handleSignup}
         disabled={loading}
       >
-        <Text className="text-white text-center font-semibold text-base">
+        <Text className="text-midnight text-center font-body-semibold text-base">
           {loading ? "Creating account..." : "Sign Up"}
         </Text>
       </TouchableOpacity>
 
       <Link href="/(auth)/login" asChild>
         <TouchableOpacity>
-          <Text className="text-blue-600 text-center text-base">
+          <Text className="text-amber text-center text-base">
             Already have an account? Sign In
           </Text>
         </TouchableOpacity>

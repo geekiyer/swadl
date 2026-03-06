@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
 import { useRecentActivity, type ActivityItem } from "../lib/queries";
+import { shadows } from "../constants/theme";
 
 const ICONS: Record<ActivityItem["kind"], string> = {
   feed: "\u{1F37C}",
@@ -23,30 +24,30 @@ export function ActivityFeed({ babyId }: { babyId: string | undefined }) {
 
   if (!items || items.length === 0) {
     return (
-      <View className="bg-gray-50 rounded-xl p-4 items-center">
-        <Text className="text-gray-400">No recent activity</Text>
+      <View className="bg-navy-card border border-navy-border rounded-2xl p-5 items-center" style={shadows.sm}>
+        <Text className="text-ash font-body">No recent activity</Text>
       </View>
     );
   }
 
   return (
-    <View className="bg-gray-50 rounded-xl overflow-hidden">
+    <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden" style={shadows.sm}>
       {items.map((item, i) => (
         <View
           key={item.id}
           className={`flex-row items-center px-4 py-3 ${
-            i > 0 ? "border-t border-gray-200" : ""
+            i > 0 ? "border-t border-navy-border" : ""
           }`}
         >
           <Text className="text-lg mr-3">{ICONS[item.kind]}</Text>
           <View className="flex-1">
-            <Text className="text-sm font-medium">{item.label}</Text>
-            <Text className="text-xs text-gray-400">
+            <Text className="text-sm font-body-semibold text-white">{item.label}</Text>
+            <Text className="text-xs text-ash font-body">
               {item.loggedBy}
               {item.detail ? ` · ${item.detail}` : ""}
             </Text>
           </View>
-          <Text className="text-xs text-gray-400">{timeLabel(item.timestamp)}</Text>
+          <Text className="text-xs text-ash font-mono">{timeLabel(item.timestamp)}</Text>
         </View>
       ))}
     </View>

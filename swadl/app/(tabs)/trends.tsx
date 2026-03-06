@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { useBabies, useTrends, type TrendDay } from "../../lib/queries";
+import { colors } from "../../constants/theme";
 
 const RANGES = [
   { key: 7, label: "7 days" },
@@ -87,11 +88,11 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
   const avgMax = Math.max(...avgValues, 1);
 
   return (
-    <View className="bg-gray-50 rounded-xl p-4 mb-4">
-      <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+    <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+      <Text className="text-[11px] text-ash uppercase font-body-bold mb-1">
         Feeding Trend
       </Text>
-      <Text className="text-xs text-gray-400 mb-3">
+      <Text className="text-xs text-ash mb-3">
         Daily {hasOz ? "oz (bottle)" : "feed count"}
       </Text>
 
@@ -100,7 +101,7 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
           <Bar
             key={day.date}
             height={hasOz ? day.feedOz : day.feedCount}
-            color="#3b82f6"
+            color={colors.amber}
             maxHeight={maxVal}
           />
         ))}
@@ -114,7 +115,7 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
             style={{
               flex: 1,
               height: 2,
-              backgroundColor: "#ef4444",
+              backgroundColor: colors.ember,
               opacity: 0.6,
               borderRadius: 1,
             }}
@@ -131,7 +132,7 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
             (data.length > 14 && i % 5 === 0);
           return (
             <View key={day.date} style={{ flex: 1, alignItems: "center" }}>
-              <Text className="text-[9px] text-gray-400">
+              <Text className="text-[9px] text-ash">
                 {show ? shortDate(day.date) : ""}
               </Text>
             </View>
@@ -141,12 +142,12 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
 
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm bg-blue-500" />
-          <Text className="text-xs text-gray-500">Daily</Text>
+          <View className="w-3 h-3 rounded-sm bg-amber" />
+          <Text className="text-xs text-ash">Daily</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-1 rounded-sm bg-red-500 opacity-60" />
-          <Text className="text-xs text-gray-500">Rolling avg</Text>
+          <View className="w-3 h-1 rounded-sm bg-ember opacity-60" />
+          <Text className="text-xs text-ash">Rolling avg</Text>
         </View>
       </View>
     </View>
@@ -160,11 +161,11 @@ function SleepChart({ data }: { data: TrendDay[] }) {
   );
 
   return (
-    <View className="bg-gray-50 rounded-xl p-4 mb-4">
-      <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+    <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+      <Text className="text-[11px] text-ash uppercase font-body-bold mb-1">
         Sleep Trend
       </Text>
-      <Text className="text-xs text-gray-400 mb-3">
+      <Text className="text-xs text-ash mb-3">
         Night vs. nap hours per day
       </Text>
 
@@ -174,8 +175,8 @@ function SleepChart({ data }: { data: TrendDay[] }) {
             key={day.date}
             bottom={day.nightSleepHrs}
             top={day.napHrs}
-            bottomColor="#1e40af"
-            topColor="#93c5fd"
+            bottomColor={colors.navyBorder}
+            topColor={colors.honey}
             maxHeight={maxHrs}
           />
         ))}
@@ -190,7 +191,7 @@ function SleepChart({ data }: { data: TrendDay[] }) {
             (data.length > 14 && i % 5 === 0);
           return (
             <View key={day.date} style={{ flex: 1, alignItems: "center" }}>
-              <Text className="text-[9px] text-gray-400">
+              <Text className="text-[9px] text-ash">
                 {show ? shortDate(day.date) : ""}
               </Text>
             </View>
@@ -200,12 +201,12 @@ function SleepChart({ data }: { data: TrendDay[] }) {
 
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#1e40af" }} />
-          <Text className="text-xs text-gray-500">Night</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.navyBorder }} />
+          <Text className="text-xs text-ash">Night</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#93c5fd" }} />
-          <Text className="text-xs text-gray-500">Naps</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.honey }} />
+          <Text className="text-xs text-ash">Naps</Text>
         </View>
       </View>
     </View>
@@ -216,11 +217,11 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
   const maxCount = Math.max(...data.map((d) => d.diaperCount), 1);
 
   return (
-    <View className="bg-gray-50 rounded-xl p-4 mb-4">
-      <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+    <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+      <Text className="text-[11px] text-ash uppercase font-body-bold mb-1">
         Diaper Trend
       </Text>
-      <Text className="text-xs text-gray-400 mb-3">Daily diaper count</Text>
+      <Text className="text-xs text-ash mb-3">Daily diaper count</Text>
 
       <View style={{ height: CHART_HEIGHT }} className="flex-row items-end gap-0.5">
         {data.map((day) => {
@@ -231,13 +232,12 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
               : 2;
           const wetH = total > 0 ? (day.diaperWet / total) * totalH : 1;
           const dirtyH = total > 0 ? (day.diaperDirty / total) * totalH : 1;
-          // Overlap for "both" — just stack wet then dirty
           return (
             <StackedBar
               key={day.date}
               bottom={day.diaperWet}
               top={day.diaperDirty}
-              bottomColor="#eab308"
+              bottomColor={colors.honey}
               topColor="#92400e"
               maxHeight={maxCount}
             />
@@ -254,7 +254,7 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
             (data.length > 14 && i % 5 === 0);
           return (
             <View key={day.date} style={{ flex: 1, alignItems: "center" }}>
-              <Text className="text-[9px] text-gray-400">
+              <Text className="text-[9px] text-ash">
                 {show ? shortDate(day.date) : ""}
               </Text>
             </View>
@@ -264,12 +264,12 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
 
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#eab308" }} />
-          <Text className="text-xs text-gray-500">Wet</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.honey }} />
+          <Text className="text-xs text-ash">Wet</Text>
         </View>
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#92400e" }} />
-          <Text className="text-xs text-gray-500">Dirty</Text>
+          <Text className="text-xs text-ash">Dirty</Text>
         </View>
       </View>
     </View>
@@ -287,11 +287,11 @@ function PumpChart({ data }: { data: TrendDay[] }) {
   );
 
   return (
-    <View className="bg-gray-50 rounded-xl p-4 mb-4">
-      <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
+    <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+      <Text className="text-[11px] text-ash uppercase font-body-bold mb-1">
         Pump Trend
       </Text>
-      <Text className="text-xs text-gray-400 mb-3">
+      <Text className="text-xs text-ash mb-3">
         Daily {hasOz ? "oz pumped" : "pump sessions"}
       </Text>
 
@@ -300,7 +300,7 @@ function PumpChart({ data }: { data: TrendDay[] }) {
           <Bar
             key={day.date}
             height={hasOz ? day.pumpOz : day.pumpCount}
-            color="#ec4899"
+            color={colors.ember}
             maxHeight={maxVal}
           />
         ))}
@@ -314,7 +314,7 @@ function PumpChart({ data }: { data: TrendDay[] }) {
             (data.length > 14 && i % 5 === 0);
           return (
             <View key={day.date} style={{ flex: 1, alignItems: "center" }}>
-              <Text className="text-[9px] text-gray-400">
+              <Text className="text-[9px] text-ash">
                 {show ? shortDate(day.date) : ""}
               </Text>
             </View>
@@ -324,8 +324,8 @@ function PumpChart({ data }: { data: TrendDay[] }) {
 
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#ec4899" }} />
-          <Text className="text-xs text-gray-500">Daily</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.ember }} />
+          <Text className="text-xs text-ash">Daily</Text>
         </View>
       </View>
     </View>
@@ -340,21 +340,21 @@ export default function Trends() {
   const { data: trendData, isLoading } = useTrends(baby?.id, range);
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-midnight">
       <View className="px-4 pt-4 pb-10">
         {/* Range Selector */}
-        <View className="flex-row bg-gray-100 rounded-lg p-1 mb-5">
+        <View className="flex-row bg-navy-raise rounded-lg p-1 mb-5 border border-navy-border">
           {RANGES.map((r) => (
             <TouchableOpacity
               key={r.key}
               className={`flex-1 py-2 rounded-md items-center ${
-                range === r.key ? "bg-white shadow-sm" : ""
+                range === r.key ? "bg-navy-card" : ""
               }`}
               onPress={() => setRange(r.key as 7 | 14 | 30)}
             >
               <Text
-                className={`text-sm font-medium ${
-                  range === r.key ? "text-blue-600" : "text-gray-500"
+                className={`text-sm font-body-medium ${
+                  range === r.key ? "text-amber" : "text-ash"
                 }`}
               >
                 {r.label}
@@ -365,7 +365,7 @@ export default function Trends() {
 
         {isLoading ? (
           <View className="py-20 items-center">
-            <ActivityIndicator size="large" color="#2563eb" />
+            <ActivityIndicator size="large" color={colors.amber} />
           </View>
         ) : trendData && trendData.length > 0 ? (
           <>
@@ -374,13 +374,13 @@ export default function Trends() {
             <SleepChart data={trendData} />
             <DiaperChart data={trendData} />
 
-            <Text className="text-xs text-gray-400 text-center mt-2">
+            <Text className="text-xs text-ash text-center mt-2">
               Tap a bar to view that day's summary (coming soon)
             </Text>
           </>
         ) : (
           <View className="py-20 items-center">
-            <Text className="text-gray-400">
+            <Text className="text-ash">
               No data yet. Start logging to see trends!
             </Text>
           </View>

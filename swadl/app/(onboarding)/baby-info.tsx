@@ -9,6 +9,7 @@ import {
 import { router } from "expo-router";
 import { useOnboardingStore, useAuthStore } from "../../lib/store";
 import { supabase } from "../../lib/supabase";
+import { colors } from "../../constants/theme";
 
 const FEEDING_OPTIONS = [
   { key: "breast", label: "Breastfeeding" },
@@ -33,54 +34,58 @@ export default function BabyInfo() {
   const isValid = name.trim() && dob.trim() && feedingMethod;
 
   return (
-    <View className="flex-1 bg-white px-6 pt-16">
-      <Text className="text-sm text-blue-600 font-medium mb-2">
+    <View className="flex-1 bg-midnight px-6 pt-16">
+      <Text className="text-xs text-amber font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
         Step 1 of 3
       </Text>
-      <Text className="text-2xl font-bold mb-2">Tell us about your baby</Text>
-      <Text className="text-gray-500 mb-8">
+      <Text className="text-2xl text-white font-display mb-2" style={{ letterSpacing: -0.5 }}>
+        Tell us about your baby
+      </Text>
+      <Text className="text-ash font-body mb-8">
         We'll use this to personalize your experience.
       </Text>
 
-      <Text className="text-sm font-medium text-gray-700 mb-1">
+      <Text className="text-xs font-body-semibold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
         Baby's Name
       </Text>
       <TextInput
-        className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white font-body"
         placeholder="e.g. Emma"
+        placeholderTextColor={colors.ash}
         value={name}
         onChangeText={setName}
         autoFocus
       />
 
-      <Text className="text-sm font-medium text-gray-700 mb-1">
+      <Text className="text-xs font-body-semibold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
         Date of Birth
       </Text>
       <TextInput
-        className="border border-gray-300 rounded-lg px-4 py-3 mb-6 text-base"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white font-mono"
         placeholder="YYYY-MM-DD"
+        placeholderTextColor={colors.ash}
         value={dob}
         onChangeText={setDob}
         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
       />
 
-      <Text className="text-sm font-medium text-gray-700 mb-2">
+      <Text className="text-xs font-body-semibold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
         Feeding Method
       </Text>
       <View className="flex-row flex-wrap gap-2 mb-8">
         {FEEDING_OPTIONS.map((option) => (
           <TouchableOpacity
             key={option.key}
-            className={`px-4 py-3 rounded-lg border ${
+            className={`px-4 py-3 rounded-xl border ${
               feedingMethod === option.key
-                ? "bg-blue-600 border-blue-600"
-                : "bg-white border-gray-300"
+                ? "bg-amber border-amber"
+                : "bg-navy-card border-navy-border"
             }`}
             onPress={() => setFeedingMethod(option.key)}
           >
             <Text
-              className={`font-medium ${
-                feedingMethod === option.key ? "text-white" : "text-gray-700"
+              className={`font-body-semibold ${
+                feedingMethod === option.key ? "text-midnight" : "text-ash"
               }`}
             >
               {option.label}
@@ -90,11 +95,11 @@ export default function BabyInfo() {
       </View>
 
       <TouchableOpacity
-        className={`rounded-lg py-4 ${isValid ? "bg-blue-600" : "bg-gray-300"}`}
+        className={`rounded-2xl py-4 ${isValid ? "bg-amber" : "bg-navy-raise border border-navy-border"}`}
         onPress={handleNext}
         disabled={!isValid}
       >
-        <Text className="text-white text-center font-semibold text-base">
+        <Text className={`text-center font-body-semibold text-base ${isValid ? "text-midnight" : "text-ash"}`}>
           Next
         </Text>
       </TouchableOpacity>
@@ -107,7 +112,7 @@ export default function BabyInfo() {
           router.replace("/(auth)/login");
         }}
       >
-        <Text className="text-gray-400 text-center text-sm">
+        <Text className="text-ash text-center text-sm font-body">
           Sign out
         </Text>
       </TouchableOpacity>

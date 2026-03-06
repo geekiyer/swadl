@@ -1,35 +1,36 @@
 import { View, Text, Pressable } from "react-native";
 import { useUnitStore } from "../lib/store";
+import { colors } from "../constants/theme";
 
 export function UnitToggle() {
   const { unit, toggleUnit } = useUnitStore();
 
   return (
     <Pressable
-      className="flex-row bg-gray-100 rounded-md p-0.5 self-end"
+      className="flex-row bg-navy-raise rounded-lg p-0.5 self-end border border-navy-border"
       onPress={toggleUnit}
     >
       <View
-        className={`px-2.5 py-1 rounded ${
-          unit === "oz" ? "bg-white" : ""
+        className={`px-3 py-1 rounded-md ${
+          unit === "oz" ? "bg-navy-card" : ""
         }`}
       >
         <Text
-          className={`text-xs font-medium ${
-            unit === "oz" ? "text-blue-600" : "text-gray-400"
+          className={`text-xs font-body-bold ${
+            unit === "oz" ? "text-amber" : "text-ash"
           }`}
         >
           oz
         </Text>
       </View>
       <View
-        className={`px-2.5 py-1 rounded ${
-          unit === "ml" ? "bg-white" : ""
+        className={`px-3 py-1 rounded-md ${
+          unit === "ml" ? "bg-navy-card" : ""
         }`}
       >
         <Text
-          className={`text-xs font-medium ${
-            unit === "ml" ? "text-blue-600" : "text-gray-400"
+          className={`text-xs font-body-bold ${
+            unit === "ml" ? "text-amber" : "text-ash"
           }`}
         >
           ml

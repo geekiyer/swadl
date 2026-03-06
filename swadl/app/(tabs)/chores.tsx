@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { colors } from "../../constants/theme";
 import {
   View,
   Text,
@@ -8,8 +9,9 @@ import {
   Modal,
   TextInput,
   ScrollView,
-  Animated,
+  Pressable,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import {
   Swipeable,
   GestureHandlerRootView,
@@ -25,6 +27,8 @@ import {
   type ChoreWithStatus,
 } from "../../lib/queries";
 import { useCareMode } from "../../lib/careMode";
+import { usePressSpring } from "../../hooks/usePressSpring";
+import { shadows } from "../../constants/theme";
 
 const CATEGORIES = [
   { key: "feeding_prep", label: "Feeding Prep" },
@@ -57,6 +61,7 @@ export default function Chores() {
   const deleteChore = useDeleteChore();
 
   const isTogether = careMode === "together";
+  const { animStyle: fabAnimStyle, handlers: fabHandlers } = usePressSpring();
 
   const [tab, setTab] = useState<"today" | "all">("today");
   const [showAdd, setShowAdd] = useState(false);
@@ -158,26 +163,26 @@ export default function Chores() {
       return (
         <View className="flex-row">
           <TouchableOpacity
-            className="bg-blue-600 justify-center px-5"
+            className="bg-amber justify-center px-5"
             onPress={() => handleSelfClaim(item)}
           >
-            <Text className="text-white font-semibold text-sm">I got it</Text>
+            <Text className="text-midnight font-body-semibold text-sm">I got it</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="bg-red-500 justify-center px-5"
+            className="bg-danger justify-center px-5"
             onPress={() => handleDelete(item)}
           >
-            <Text className="text-white font-semibold text-sm">Delete</Text>
+            <Text className="text-white font-body-semibold text-sm">Delete</Text>
           </TouchableOpacity>
         </View>
       );
     }
     return (
       <TouchableOpacity
-        className="bg-red-500 justify-center px-6"
+        className="bg-danger justify-center px-6"
         onPress={() => handleDelete(item)}
       >
-        <Text className="text-white font-semibold text-sm">Delete</Text>
+        <Text className="text-white font-body-semibold text-sm">Delete</Text>
       </TouchableOpacity>
     );
   }
@@ -186,19 +191,19 @@ export default function Chores() {
     const recurrence = item.recurrence as Record<string, string>;
     return (
       <Swipeable renderRightActions={() => renderRightActions(item)}>
-        <View className="flex-row items-center bg-white border-b border-gray-100 px-4 py-3">
+        <View className="flex-row items-center bg-navy-card border-b border-navy-border px-4 py-3">
           {/* Complete button */}
           <TouchableOpacity
             className={`w-7 h-7 rounded-full border-2 mr-3 items-center justify-center ${
               item.completed_today
-                ? "bg-green-500 border-green-500"
-                : "border-gray-300"
+                ? "bg-success border-success"
+                : "border-navy-border"
             }`}
             onPress={() => handleComplete(item)}
             disabled={item.completed_today}
           >
             {item.completed_today && (
-              <Text className="text-white text-xs font-bold">✓</Text>
+              <Text className="text-white text-xs font-body-bold">✓</Text>
             )}
           </TouchableOpacity>
 
@@ -207,14 +212,14 @@ export default function Chores() {
             <Text
               className={`text-base ${
                 item.completed_today
-                  ? "text-gray-400 line-through"
-                  : "font-medium"
+                  ? "text-ash line-through"
+                  : "font-body-medium text-white"
               }`}
             >
               {item.title}
             </Text>
             <View className="flex-row items-center mt-0.5">
-              <Text className="text-xs text-gray-400">
+              <Text className="text-xs text-ash">
                 {recurrence?.type === "daily"
                   ? "Daily"
                   : recurrence?.type === "every-x-days"
@@ -225,7 +230,7 @@ export default function Chores() {
                 {recurrence?.time ? ` at ${recurrence.time}` : ""}
               </Text>
               {item.assignee_name && (
-                <Text className="text-xs text-blue-500 ml-2">
+                <Text className="text-xs text-honey ml-2">
                   {item.assignee_name}
                 </Text>
               )}
@@ -236,14 +241,14 @@ export default function Chores() {
           {isTogether ? (
             <TouchableOpacity
               className={`px-3 py-1.5 rounded-md ${
-                item.assigned_to === profile?.id ? "bg-green-100" : "bg-blue-100"
+                item.assigned_to === profile?.id ? "bg-navy-raise" : "bg-navy-raise"
               }`}
               onPress={() => handleSelfClaim(item)}
               disabled={item.assigned_to === profile?.id}
             >
               <Text
-                className={`text-xs font-medium ${
-                  item.assigned_to === profile?.id ? "text-green-600" : "text-blue-600"
+                className={`text-xs font-body-medium ${
+                  item.assigned_to === profile?.id ? "text-success" : "text-amber"
                 }`}
               >
                 {item.assigned_to === profile?.id ? "Mine" : "I got it"}
@@ -251,10 +256,10 @@ export default function Chores() {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              className="px-3 py-1.5 rounded-md bg-gray-100"
+              className="px-3 py-1.5 rounded-md bg-navy-raise"
               onPress={() => setAssigningChore(item)}
             >
-              <Text className="text-xs text-gray-600">Assign</Text>
+              <Text className="text-xs text-ash">Assign</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -263,25 +268,25 @@ export default function Chores() {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1 bg-white">
+    <GestureHandlerRootView className="flex-1 bg-midnight">
       {/* Tab Bar */}
-      <View className="flex-row border-b border-gray-200 px-4">
+      <View className="flex-row border-b border-navy-border px-4">
         <TouchableOpacity
-          className={`py-3 mr-6 ${tab === "today" ? "border-b-2 border-blue-600" : ""}`}
+          className={`py-3 mr-6 ${tab === "today" ? "border-b-2 border-amber" : ""}`}
           onPress={() => setTab("today")}
         >
           <Text
-            className={`text-base font-medium ${tab === "today" ? "text-blue-600" : "text-gray-500"}`}
+            className={`text-base font-body-medium ${tab === "today" ? "text-amber" : "text-ash"}`}
           >
             Today
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className={`py-3 ${tab === "all" ? "border-b-2 border-blue-600" : ""}`}
+          className={`py-3 ${tab === "all" ? "border-b-2 border-amber" : ""}`}
           onPress={() => setTab("all")}
         >
           <Text
-            className={`text-base font-medium ${tab === "all" ? "text-blue-600" : "text-gray-500"}`}
+            className={`text-base font-body-medium ${tab === "all" ? "text-amber" : "text-ash"}`}
           >
             All Chores
           </Text>
@@ -294,15 +299,15 @@ export default function Chores() {
         keyExtractor={(item) => item.id}
         renderItem={renderChoreItem}
         renderSectionHeader={({ section: { title } }) => (
-          <View className="bg-gray-50 px-4 py-2">
-            <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+          <View className="bg-navy-deep px-4 py-2">
+            <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
               {title}
             </Text>
           </View>
         )}
         ListEmptyComponent={
           <View className="flex-1 justify-center items-center py-20">
-            <Text className="text-gray-400 text-base">
+            <Text className="text-ash text-base">
               {tab === "today" ? "All done for today!" : "No chores yet"}
             </Text>
           </View>
@@ -310,12 +315,22 @@ export default function Chores() {
       />
 
       {/* Add Button */}
-      <TouchableOpacity
-        className="absolute bottom-6 right-6 bg-blue-600 w-14 h-14 rounded-full items-center justify-center shadow-lg"
-        onPress={() => setShowAdd(true)}
+      <Animated.View
+        style={[
+          fabAnimStyle,
+          shadows.amber,
+          { position: "absolute", bottom: 24, right: 24 },
+        ]}
       >
-        <Text className="text-white text-2xl font-light">+</Text>
-      </TouchableOpacity>
+        <Pressable
+          onPressIn={fabHandlers.onPressIn}
+          onPressOut={fabHandlers.onPressOut}
+          onPress={() => setShowAdd(true)}
+          className="bg-amber w-14 h-14 rounded-full items-center justify-center"
+        >
+          <Text className="text-midnight text-2xl font-body">+</Text>
+        </Pressable>
+      </Animated.View>
 
       {/* Assign Modal */}
       <Modal
@@ -329,29 +344,29 @@ export default function Chores() {
           activeOpacity={1}
           onPress={() => setAssigningChore(null)}
         >
-          <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-            <Text className="text-lg font-bold mb-4">
+          <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
+            <Text className="text-lg font-body-bold text-white mb-4">
               Assign: {assigningChore?.title}
             </Text>
 
             <TouchableOpacity
-              className="py-3 border-b border-gray-100"
+              className="py-3 border-b border-navy-border"
               onPress={() =>
                 assigningChore && handleAssign(assigningChore.id, null)
               }
             >
-              <Text className="text-base text-gray-500">Unassigned</Text>
+              <Text className="text-base text-ash">Unassigned</Text>
             </TouchableOpacity>
 
             {members?.map((member) => (
               <TouchableOpacity
                 key={member.id}
-                className="py-3 border-b border-gray-100"
+                className="py-3 border-b border-navy-border"
                 onPress={() =>
                   assigningChore && handleAssign(assigningChore.id, member.id)
                 }
               >
-                <Text className="text-base">
+                <Text className="text-base text-white">
                   {member.display_name}
                   {assigningChore?.assigned_to === member.id ? " (current)" : ""}
                 </Text>
@@ -362,7 +377,7 @@ export default function Chores() {
               className="mt-4 py-3"
               onPress={() => setAssigningChore(null)}
             >
-              <Text className="text-gray-500 text-center">Cancel</Text>
+              <Text className="text-ash text-center">Cancel</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -381,41 +396,42 @@ export default function Chores() {
           onPress={() => setShowAdd(false)}
         >
           <TouchableOpacity activeOpacity={1}>
-            <ScrollView className="bg-white rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
-              <Text className="text-lg font-bold mb-4">Add Chore</Text>
+            <ScrollView className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
+              <Text className="text-lg font-body-bold text-white mb-4">Add Chore</Text>
 
               {/* Title */}
-              <Text className="text-sm font-medium text-gray-700 mb-1">
+              <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
                 Title
               </Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                 placeholder="e.g. Sanitize bottles"
+                placeholderTextColor={colors.ash}
                 value={newTitle}
                 onChangeText={setNewTitle}
                 autoFocus
               />
 
               {/* Category */}
-              <Text className="text-sm font-medium text-gray-700 mb-2">
+              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Category
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-4">
                 {CATEGORIES.map((cat) => (
                   <TouchableOpacity
                     key={cat.key}
-                    className={`px-3 py-2 rounded-lg border ${
+                    className={`px-3 py-2 rounded-xl border ${
                       newCategory === cat.key
-                        ? "bg-blue-600 border-blue-600"
-                        : "border-gray-300"
+                        ? "bg-amber border-amber"
+                        : "border-navy-border bg-navy-raise"
                     }`}
                     onPress={() => setNewCategory(cat.key)}
                   >
                     <Text
                       className={`text-sm ${
                         newCategory === cat.key
-                          ? "text-white font-medium"
-                          : "text-gray-600"
+                          ? "text-midnight font-body-medium"
+                          : "text-ash"
                       }`}
                     >
                       {cat.label}
@@ -425,25 +441,25 @@ export default function Chores() {
               </View>
 
               {/* Recurrence */}
-              <Text className="text-sm font-medium text-gray-700 mb-2">
+              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Recurrence
               </Text>
               <View className="flex-row gap-2 mb-4">
                 {RECURRENCE_OPTIONS.map((opt) => (
                   <TouchableOpacity
                     key={opt.key}
-                    className={`px-4 py-2 rounded-lg border flex-1 items-center ${
+                    className={`px-4 py-2 rounded-xl border flex-1 items-center ${
                       newRecurrence === opt.key
-                        ? "bg-blue-600 border-blue-600"
-                        : "border-gray-300"
+                        ? "bg-amber border-amber"
+                        : "border-navy-border bg-navy-raise"
                     }`}
                     onPress={() => setNewRecurrence(opt.key)}
                   >
                     <Text
                       className={`text-sm ${
                         newRecurrence === opt.key
-                          ? "text-white font-medium"
-                          : "text-gray-600"
+                          ? "text-midnight font-body-medium"
+                          : "text-ash"
                       }`}
                     >
                       {opt.label}
@@ -455,12 +471,13 @@ export default function Chores() {
               {/* Interval days (for every-x-days) */}
               {newRecurrence === "every-x-days" && (
                 <>
-                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Every how many days?
                   </Text>
                   <TextInput
-                    className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                     placeholder="e.g. 3"
+                    placeholderTextColor={colors.ash}
                     value={newIntervalDays}
                     onChangeText={setNewIntervalDays}
                     keyboardType="number-pad"
@@ -471,12 +488,13 @@ export default function Chores() {
               {/* Time (optional) */}
               {newRecurrence !== "one-time" && (
                 <>
-                  <Text className="text-sm font-medium text-gray-700 mb-1">
+                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Time (optional)
                   </Text>
                   <TextInput
-                    className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                     placeholder="e.g. 20:00"
+                    placeholderTextColor={colors.ash}
                     value={newTime}
                     onChangeText={setNewTime}
                   />
@@ -485,13 +503,13 @@ export default function Chores() {
 
               {/* Save */}
               <TouchableOpacity
-                className={`rounded-lg py-4 mb-3 ${
-                  newTitle.trim() ? "bg-blue-600" : "bg-gray-300"
+                className={`rounded-2xl py-4 mb-3 ${
+                  newTitle.trim() ? "bg-amber" : "bg-navy-raise border border-navy-border"
                 }`}
                 onPress={handleAddChore}
                 disabled={!newTitle.trim() || createChore.isPending}
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <Text className={`text-center font-body-semibold text-base ${newTitle.trim() ? "text-midnight" : "text-ash"}`}>
                   {createChore.isPending ? "Adding..." : "Add Chore"}
                 </Text>
               </TouchableOpacity>
@@ -500,7 +518,7 @@ export default function Chores() {
                 className="py-3 mb-4"
                 onPress={() => setShowAdd(false)}
               >
-                <Text className="text-gray-500 text-center">Cancel</Text>
+                <Text className="text-ash text-center">Cancel</Text>
               </TouchableOpacity>
             </ScrollView>
           </TouchableOpacity>

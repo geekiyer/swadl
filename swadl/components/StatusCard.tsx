@@ -1,4 +1,8 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
+import Animated from "react-native-reanimated";
+import { View, Text } from "react-native";
+import { usePressSpring } from "../hooks/usePressSpring";
+import { shadows } from "../constants/theme";
 
 interface StatusCardProps {
   title: string;
@@ -8,19 +12,23 @@ interface StatusCardProps {
 }
 
 export function StatusCard({ title, value, subtitle, onPress }: StatusCardProps) {
+  const { animStyle, handlers } = usePressSpring();
+
   return (
-    <TouchableOpacity
-      className="bg-gray-50 rounded-xl p-4 flex-1 mx-1"
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <Text className="text-xs text-gray-500 uppercase tracking-wide">
-        {title}
-      </Text>
-      <Text className="text-lg font-semibold mt-1">{value}</Text>
-      {subtitle && (
-        <Text className="text-sm text-gray-400 mt-0.5">{subtitle}</Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={[animStyle, shadows.sm]} className="flex-1 mx-1">
+      <Pressable
+        className="bg-navy-card border border-navy-border rounded-2xl p-5"
+        onPress={onPress}
+        {...handlers}
+      >
+        <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+          {title}
+        </Text>
+        <Text className="text-lg text-white mt-1 font-display" style={{ letterSpacing: -0.5 }}>{value}</Text>
+        {subtitle && (
+          <Text className="text-sm text-ash mt-0.5 font-body">{subtitle}</Text>
+        )}
+      </Pressable>
+    </Animated.View>
   );
 }

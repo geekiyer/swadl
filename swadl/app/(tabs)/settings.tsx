@@ -18,6 +18,7 @@ import {
   useUpdateProfile,
 } from "../../lib/queries";
 import { useAuthStore } from "../../lib/store";
+import { colors } from "../../constants/theme";
 
 const FEEDING_OPTIONS = [
   { key: "breast", label: "Breast" },
@@ -161,68 +162,68 @@ export default function Settings() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-white">
+    <ScrollView className="flex-1 bg-midnight">
       <View className="px-6 pt-4 pb-10">
         {/* Baby Profile */}
-        <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2 mt-4">
+        <Text className="text-[11px] text-ash uppercase font-body-bold mb-2 mt-4" style={{ letterSpacing: 2 }}>
           Baby Profile
         </Text>
         <TouchableOpacity
-          className="bg-gray-50 rounded-xl p-4 mb-6"
+          className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-6"
           onPress={openEditBaby}
         >
           <View className="flex-row justify-between items-center">
             <View>
-              <Text className="text-lg font-semibold">
+              <Text className="text-lg font-body-semibold text-white">
                 {baby?.name ?? "—"}
               </Text>
-              <Text className="text-sm text-gray-400 mt-0.5">
+              <Text className="text-sm text-ash mt-0.5">
                 Born {baby?.date_of_birth ?? "—"} ·{" "}
                 {baby?.feeding_method ?? "—"}
               </Text>
             </View>
-            <Text className="text-blue-600 text-sm">Edit</Text>
+            <Text className="text-amber text-sm">Edit</Text>
           </View>
         </TouchableOpacity>
 
         {/* Your Profile */}
-        <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-2">
+        <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
           Your Profile
         </Text>
         <TouchableOpacity
-          className="bg-gray-50 rounded-xl p-4 mb-6"
+          className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-6"
           onPress={openEditName}
         >
           <View className="flex-row justify-between items-center">
             <View>
-              <Text className="text-base font-medium">
+              <Text className="text-base font-body-medium text-white">
                 {profile?.display_name ?? "—"}
               </Text>
-              <Text className="text-sm text-gray-400 mt-0.5">
+              <Text className="text-sm text-ash mt-0.5">
                 Role: {profile?.role ?? "—"}
               </Text>
             </View>
-            <Text className="text-blue-600 text-sm">Edit</Text>
+            <Text className="text-amber text-sm">Edit</Text>
           </View>
         </TouchableOpacity>
 
         {/* Household Members */}
         <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+          <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
             Household Members
           </Text>
           {isAdmin && (
             <TouchableOpacity onPress={() => setShowInvite(true)}>
-              <Text className="text-blue-600 text-sm">+ Invite</Text>
+              <Text className="text-amber text-sm">+ Invite</Text>
             </TouchableOpacity>
           )}
         </View>
-        <View className="bg-gray-50 rounded-xl mb-6 overflow-hidden">
+        <View className="bg-navy-card border border-navy-border rounded-2xl mb-6 overflow-hidden">
           {members?.map((member, i) => (
             <TouchableOpacity
               key={member.id}
               className={`flex-row justify-between items-center p-4 ${
-                i > 0 ? "border-t border-gray-200" : ""
+                i > 0 ? "border-t border-navy-border" : ""
               }`}
               onPress={() =>
                 isAdmin && member.id !== profile?.id
@@ -232,16 +233,16 @@ export default function Settings() {
               disabled={!isAdmin || member.id === profile?.id}
             >
               <View>
-                <Text className="text-base font-medium">
+                <Text className="text-base font-body-medium text-white">
                   {member.display_name}
                   {member.id === profile?.id ? " (you)" : ""}
                 </Text>
-                <Text className="text-sm text-gray-400 mt-0.5">
+                <Text className="text-sm text-ash mt-0.5">
                   {member.role}
                 </Text>
               </View>
               {isAdmin && member.id !== profile?.id && (
-                <Text className="text-blue-600 text-sm">Change role</Text>
+                <Text className="text-amber text-sm">Change role</Text>
               )}
             </TouchableOpacity>
           ))}
@@ -249,10 +250,10 @@ export default function Settings() {
 
         {/* Sign Out */}
         <TouchableOpacity
-          className="border border-red-300 rounded-xl py-4 mt-4"
+          className="border border-danger rounded-2xl py-4 mt-4"
           onPress={handleSignOut}
         >
-          <Text className="text-red-500 text-center font-semibold text-base">
+          <Text className="text-danger text-center font-body-semibold text-base">
             Sign Out
           </Text>
         </TouchableOpacity>
@@ -271,47 +272,48 @@ export default function Settings() {
           onPress={() => setEditBaby(false)}
         >
           <TouchableOpacity activeOpacity={1}>
-            <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-              <Text className="text-lg font-bold mb-4">Edit Baby Profile</Text>
+            <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
+              <Text className="text-lg font-body-bold text-white mb-4">Edit Baby Profile</Text>
 
-              <Text className="text-sm font-medium text-gray-700 mb-1">
+              <Text className="text-xs text-ash uppercase font-body-bold mb-1" style={{ letterSpacing: 2 }}>
                 Name
               </Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                 value={babyName}
                 onChangeText={setBabyName}
               />
 
-              <Text className="text-sm font-medium text-gray-700 mb-1">
+              <Text className="text-xs text-ash uppercase font-body-bold mb-1" style={{ letterSpacing: 2 }}>
                 Date of Birth
               </Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                 value={babyDob}
                 onChangeText={setBabyDob}
                 placeholder="YYYY-MM-DD"
+                placeholderTextColor={colors.ash}
               />
 
-              <Text className="text-sm font-medium text-gray-700 mb-2">
+              <Text className="text-xs text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Feeding Method
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-6">
                 {FEEDING_OPTIONS.map((opt) => (
                   <TouchableOpacity
                     key={opt.key}
-                    className={`px-4 py-2.5 rounded-lg border ${
+                    className={`px-4 py-2.5 rounded-xl border ${
                       babyFeeding === opt.key
-                        ? "bg-blue-600 border-blue-600"
-                        : "border-gray-300"
+                        ? "bg-amber border-amber"
+                        : "border-navy-border bg-navy-raise"
                     }`}
                     onPress={() => setBabyFeeding(opt.key)}
                   >
                     <Text
                       className={`text-sm ${
                         babyFeeding === opt.key
-                          ? "text-white font-medium"
-                          : "text-gray-600"
+                          ? "text-midnight font-body-medium"
+                          : "text-ash"
                       }`}
                     >
                       {opt.label}
@@ -321,11 +323,11 @@ export default function Settings() {
               </View>
 
               <TouchableOpacity
-                className="bg-blue-600 rounded-lg py-4 mb-3"
+                className="bg-amber rounded-2xl py-4 mb-3"
                 onPress={saveBaby}
                 disabled={updateBaby.isPending}
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <Text className="text-midnight text-center font-body-semibold text-base">
                   {updateBaby.isPending ? "Saving..." : "Save"}
                 </Text>
               </TouchableOpacity>
@@ -333,7 +335,7 @@ export default function Settings() {
                 className="py-3"
                 onPress={() => setEditBaby(false)}
               >
-                <Text className="text-gray-500 text-center">Cancel</Text>
+                <Text className="text-ash text-center">Cancel</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -353,20 +355,20 @@ export default function Settings() {
           onPress={() => setEditName(false)}
         >
           <TouchableOpacity activeOpacity={1}>
-            <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-              <Text className="text-lg font-bold mb-4">Edit Your Name</Text>
+            <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
+              <Text className="text-lg font-body-bold text-white mb-4">Edit Your Name</Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-6 text-base"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
                 value={displayName}
                 onChangeText={setDisplayName}
                 autoFocus
               />
               <TouchableOpacity
-                className="bg-blue-600 rounded-lg py-4 mb-3"
+                className="bg-amber rounded-2xl py-4 mb-3"
                 onPress={saveName}
                 disabled={updateProfile.isPending}
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <Text className="text-midnight text-center font-body-semibold text-base">
                   {updateProfile.isPending ? "Saving..." : "Save"}
                 </Text>
               </TouchableOpacity>
@@ -374,7 +376,7 @@ export default function Settings() {
                 className="py-3"
                 onPress={() => setEditName(false)}
               >
-                <Text className="text-gray-500 text-center">Cancel</Text>
+                <Text className="text-ash text-center">Cancel</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -393,18 +395,18 @@ export default function Settings() {
           activeOpacity={1}
           onPress={() => setEditingMember(null)}
         >
-          <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-            <Text className="text-lg font-bold mb-4">
+          <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
+            <Text className="text-lg font-body-bold text-white mb-4">
               Change Role: {editingMember?.display_name}
             </Text>
 
             {ROLES.map((role) => (
               <TouchableOpacity
                 key={role.key}
-                className={`flex-row justify-between items-center p-4 rounded-lg mb-2 border ${
+                className={`flex-row justify-between items-center p-4 rounded-xl mb-2 border ${
                   editingMember?.role === role.key
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200"
+                    ? "border-amber bg-navy-raise"
+                    : "border-navy-border"
                 }`}
                 onPress={() =>
                   editingMember &&
@@ -412,11 +414,11 @@ export default function Settings() {
                 }
               >
                 <View>
-                  <Text className="text-base font-medium">{role.label}</Text>
-                  <Text className="text-sm text-gray-400">{role.desc}</Text>
+                  <Text className="text-base font-body-medium text-white">{role.label}</Text>
+                  <Text className="text-sm text-ash">{role.desc}</Text>
                 </View>
                 {editingMember?.role === role.key && (
-                  <Text className="text-blue-600 text-sm font-medium">
+                  <Text className="text-amber text-sm font-body-medium">
                     Current
                   </Text>
                 )}
@@ -427,7 +429,7 @@ export default function Settings() {
               className="mt-2 py-3"
               onPress={() => setEditingMember(null)}
             >
-              <Text className="text-gray-500 text-center">Cancel</Text>
+              <Text className="text-ash text-center">Cancel</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -446,14 +448,15 @@ export default function Settings() {
           onPress={() => setShowInvite(false)}
         >
           <TouchableOpacity activeOpacity={1}>
-            <View className="bg-white rounded-t-2xl px-6 pt-6 pb-10">
-              <Text className="text-lg font-bold mb-2">Invite Member</Text>
-              <Text className="text-gray-500 mb-4">
+            <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
+              <Text className="text-lg font-body-bold text-white mb-2">Invite Member</Text>
+              <Text className="text-ash mb-4">
                 They'll join your household when they sign up.
               </Text>
               <TextInput
-                className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                 placeholder="Email address"
+                placeholderTextColor={colors.ash}
                 value={inviteEmail}
                 onChangeText={setInviteEmail}
                 autoCapitalize="none"
@@ -461,43 +464,43 @@ export default function Settings() {
                 autoFocus
               />
 
-              <Text className="text-sm font-medium text-gray-700 mb-2">
+              <Text className="text-xs text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Role
               </Text>
               <View className="mb-6">
                 {ROLES.map((role) => (
                   <TouchableOpacity
                     key={role.key}
-                    className={`flex-row items-center p-3 rounded-lg mb-1.5 border ${
+                    className={`flex-row items-center p-3 rounded-xl mb-1.5 border ${
                       inviteRole === role.key
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200"
+                        ? "border-amber bg-navy-raise"
+                        : "border-navy-border"
                     }`}
                     onPress={() => setInviteRole(role.key)}
                   >
                     <View className={`w-4 h-4 rounded-full border-2 mr-3 items-center justify-center ${
-                      inviteRole === role.key ? "border-blue-600" : "border-gray-300"
+                      inviteRole === role.key ? "border-amber" : "border-navy-border"
                     }`}>
                       {inviteRole === role.key && (
-                        <View className="w-2 h-2 rounded-full bg-blue-600" />
+                        <View className="w-2 h-2 rounded-full bg-amber" />
                       )}
                     </View>
                     <View>
-                      <Text className="text-sm font-medium">{role.label}</Text>
-                      <Text className="text-xs text-gray-400">{role.desc}</Text>
+                      <Text className="text-sm font-body-medium text-white">{role.label}</Text>
+                      <Text className="text-xs text-ash">{role.desc}</Text>
                     </View>
                   </TouchableOpacity>
                 ))}
               </View>
 
               <TouchableOpacity
-                className={`rounded-lg py-4 mb-3 ${
-                  inviteEmail.trim() ? "bg-blue-600" : "bg-gray-300"
+                className={`rounded-2xl py-4 mb-3 ${
+                  inviteEmail.trim() ? "bg-amber" : "bg-navy-raise border border-navy-border"
                 }`}
                 onPress={handleInvite}
                 disabled={!inviteEmail.trim()}
               >
-                <Text className="text-white text-center font-semibold text-base">
+                <Text className={`text-center font-body-semibold text-base ${inviteEmail.trim() ? "text-midnight" : "text-ash"}`}>
                   Send Invite
                 </Text>
               </TouchableOpacity>
@@ -505,7 +508,7 @@ export default function Settings() {
                 className="py-3"
                 onPress={() => setShowInvite(false)}
               >
-                <Text className="text-gray-500 text-center">Cancel</Text>
+                <Text className="text-ash text-center">Cancel</Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>

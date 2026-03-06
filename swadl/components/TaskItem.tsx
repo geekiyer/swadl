@@ -1,4 +1,7 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Pressable, View, Text, TouchableOpacity } from "react-native";
+import Animated from "react-native-reanimated";
+import { usePressSpring } from "../hooks/usePressSpring";
+import { PRESS_SCALE_DENSE } from "../constants/animation";
 
 interface TaskItemProps {
   title: string;
@@ -15,25 +18,29 @@ export function TaskItem({
   onComplete,
   onPress,
 }: TaskItemProps) {
+  const { animStyle, handlers } = usePressSpring(PRESS_SCALE_DENSE);
+
   return (
-    <TouchableOpacity
-      className="flex-row items-center bg-white border border-gray-100 rounded-lg p-3 mb-2"
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <TouchableOpacity
-        className="w-6 h-6 rounded-full border-2 border-gray-300 mr-3"
-        onPress={onComplete}
-      />
-      <View className="flex-1">
-        <Text className="text-base font-medium">{title}</Text>
-        <View className="flex-row mt-0.5">
-          {time && <Text className="text-sm text-gray-400">{time}</Text>}
-          {assignee && (
-            <Text className="text-sm text-blue-500 ml-2">{assignee}</Text>
-          )}
+    <Animated.View style={animStyle} className="mb-2">
+      <Pressable
+        className="flex-row items-center bg-navy-raise border border-navy-border rounded-xl p-3.5"
+        onPress={onPress}
+        {...handlers}
+      >
+        <TouchableOpacity
+          className="w-5 h-5 rounded-md border-2 border-navy-border mr-3"
+          onPress={onComplete}
+        />
+        <View className="flex-1">
+          <Text className="text-sm font-body-semibold text-white">{title}</Text>
+          <View className="flex-row mt-0.5">
+            {time && <Text className="text-xs text-ash font-mono">{time}</Text>}
+            {assignee && (
+              <Text className="text-xs text-honey ml-2 font-body-medium">{assignee}</Text>
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </Pressable>
+    </Animated.View>
   );
 }

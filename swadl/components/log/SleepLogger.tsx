@@ -38,6 +38,7 @@ export function SleepLogger() {
       Alert.alert("Error", error.message);
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       router.back();
     }
   }
@@ -61,6 +62,7 @@ export function SleepLogger() {
       Alert.alert("Error", error.message);
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
       router.back();
     }
   }
@@ -71,20 +73,20 @@ export function SleepLogger() {
 
     return (
       <View className="items-center">
-        <Text className="text-gray-500 mb-2">Currently sleeping</Text>
-        <Text className="text-4xl font-bold mb-1">
+        <Text className="text-ash mb-2">Currently sleeping</Text>
+        <Text className="text-4xl font-mono-bold text-white mb-1" style={{ letterSpacing: -1 }}>
           {Math.floor(mins / 60)}h {mins % 60}m
         </Text>
-        <Text className="text-gray-400 mb-6">
+        <Text className="text-ash mb-6">
           in {latestSleep.location}
         </Text>
 
         <TouchableOpacity
-          className="bg-purple-600 rounded-lg py-4 px-8"
+          className="bg-amber rounded-2xl py-4 px-8"
           onPress={logWakeUp}
           disabled={saving}
         >
-          <Text className="text-white font-semibold text-base">
+          <Text className="text-midnight font-body-semibold text-base">
             {saving ? "Saving..." : "Woke Up"}
           </Text>
         </TouchableOpacity>
@@ -94,16 +96,16 @@ export function SleepLogger() {
 
   return (
     <View>
-      <Text className="text-gray-500 mb-4">Where did they fall asleep?</Text>
+      <Text className="text-ash mb-4">Where did they fall asleep?</Text>
       <View className="flex-row flex-wrap gap-3">
         {LOCATIONS.map((loc) => (
           <TouchableOpacity
             key={loc.key}
-            className="bg-purple-50 rounded-xl px-6 py-5 items-center flex-1 min-w-[140px]"
+            className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
             onPress={() => logFellAsleep(loc.key)}
             disabled={saving}
           >
-            <Text className="text-purple-700 font-semibold text-base">
+            <Text className="text-amber font-body-semibold text-base">
               {loc.label}
             </Text>
           </TouchableOpacity>
