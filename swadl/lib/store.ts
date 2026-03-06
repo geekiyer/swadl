@@ -78,6 +78,41 @@ export function parseInputToOz(value: string, unit: VolumeUnit): number {
 }
 
 // ============================================================
+// Offline Queue
+// ============================================================
+
+export interface QueuedLogEntry {
+  id: string;
+  table: "feed_logs" | "diaper_logs" | "sleep_logs" | "pump_logs";
+  payload: Record<string, unknown>;
+  createdAt: string;
+}
+
+interface OfflineQueueState {
+  queue: QueuedLogEntry[];
+  push: (entry: QueuedLogEntry) => void;
+  remove: (id: string) => void;
+  clear: () => void;
+}
+
+export const useOfflineQueue = create<OfflineQueueState>()(
+  persist(
+    (set) => ({
+      queue: [],
+      push: (entry) =>
+        set((state) => ({ queue: [...state.queue, entry] })),
+      remove: (id) =>
+        set((state) => ({ queue: state.queue.filter((e) => e.id !== id) })),
+      clear: () => set({ queue: [] }),
+    }),
+    {
+      name: "offline-queue",
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+
+// ============================================================
 // Onboarding
 // ============================================================
 

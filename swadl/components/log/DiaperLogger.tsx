@@ -32,7 +32,11 @@ const CONSISTENCIES = [
   { key: "hard", label: "Hard" },
 ] as const;
 
-export function DiaperLogger() {
+interface DiaperLoggerProps {
+  onSuccess?: () => void;
+}
+
+export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const queryClient = useQueryClient();
@@ -84,7 +88,7 @@ export function DiaperLogger() {
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-diaper"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      router.back();
+      onSuccess ? onSuccess() : router.back();
     }
   }
 

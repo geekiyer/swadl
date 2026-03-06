@@ -12,6 +12,8 @@ import { colors } from "../../constants/theme";
 import { useUnitStore, displayVolume } from "../../lib/store";
 import { UnitToggle } from "../../components/UnitToggle";
 
+type ViewMode = "day" | "week";
+
 function formatDate(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -28,6 +30,14 @@ function displayDate(dateStr: string): string {
   });
 }
 
+function displayDateRange(start: string, end: string): string {
+  const s = new Date(start + "T12:00:00");
+  const e = new Date(end + "T12:00:00");
+  const sStr = s.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const eStr = e.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return `${sStr} - ${eStr}`;
+}
+
 function formatTime(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString([], {
     hour: "numeric",
@@ -35,11 +45,24 @@ function formatTime(dateStr: string): string {
   });
 }
 
-const ICONS: Record<string, string> = {
-  feed: "\u{1F37C}",
-  diaper: "\u{1F9F7}",
-  sleep: "\u{1F634}",
-  pump: "\u{1F95B}",
+function getWeekStart(dateStr: string): string {
+  const d = new Date(dateStr + "T12:00:00");
+  const day = d.getDay();
+  d.setDate(d.getDate() - day);
+  return formatDate(d);
+}
+
+function getWeekEnd(weekStartStr: string): string {
+  const d = new Date(weekStartStr + "T12:00:00");
+  d.setDate(d.getDate() + 6);
+  return formatDate(d);
+}
+
+const DOT_COLORS: Record<string, string> = {
+  feed: colors.amber,
+  diaper: colors.honey,
+  sleep: colors.info,
+  pump: colors.ember,
 };
 
 export default function Summary() {
@@ -48,19 +71,36 @@ export default function Summary() {
 
   const unit = useUnitStore((s) => s.unit);
   const [date, setDate] = useState(() => formatDate(new Date()));
-  const { data: summary, isLoading } = useSummary(baby?.id, date);
+  const [viewMode, setViewMode] = useState<ViewMode>("day");
+
+  const weekStart = getWeekStart(date);
+  const weekEnd = getWeekEnd(weekStart);
+
+  const { data: summary, isLoading } = useSummary(
+    baby?.id,
+    viewMode === "day" ? date : weekStart,
+    viewMode === "week" ? weekEnd : undefined
+  );
 
   function shiftDate(offset: number) {
     const d = new Date(date + "T12:00:00");
-    d.setDate(d.getDate() + offset);
+    if (viewMode === "week") {
+      d.setDate(d.getDate() + offset * 7);
+    } else {
+      d.setDate(d.getDate() + offset);
+    }
     setDate(formatDate(d));
   }
 
-  const isToday = date === formatDate(new Date());
+  const today = formatDate(new Date());
+  const isToday = viewMode === "day" ? date === today : weekStart <= today && weekEnd >= today;
 
   function buildShareText(s: SummaryData): string {
+    const header = viewMode === "day"
+      ? `${baby?.name ?? "Baby"} - ${displayDate(date)}`
+      : `${baby?.name ?? "Baby"} - ${displayDateRange(weekStart, weekEnd)}`;
     const lines = [
-      `${baby?.name ?? "Baby"} - ${displayDate(date)}`,
+      header,
       "",
       "FEEDING",
       `${s.feedCount} feeds · ${displayVolume(s.feedTotalOz, unit)} · ${s.feedTotalMin} min`,
@@ -80,7 +120,7 @@ export default function Summary() {
       ...Object.entries(s.diaperByType).map(
         ([type, count]) => `  ${type}: ${count}`
       ),
-      s.lowWetWarning ? "  \u26A0\uFE0F Low wet diaper count" : "",
+      s.lowWetWarning ? "  Warning: Low wet diaper count" : "",
       "",
       "SLEEP",
       `${Math.round(s.sleepTotalMin / 60 * 10) / 10} hrs total · ${s.napCount} nap(s)`,
@@ -109,6 +149,38 @@ export default function Summary() {
           <UnitToggle />
         </View>
 
+        {/* Day / Week Toggle */}
+        <View className="flex-row bg-navy-card border border-navy-border rounded-xl p-1 mb-4">
+          <TouchableOpacity
+            className={`flex-1 py-2 rounded-lg items-center ${
+              viewMode === "day" ? "bg-amber" : ""
+            }`}
+            onPress={() => setViewMode("day")}
+          >
+            <Text
+              className={`text-sm font-body-semibold ${
+                viewMode === "day" ? "text-midnight" : "text-ash"
+              }`}
+            >
+              Day
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`flex-1 py-2 rounded-lg items-center ${
+              viewMode === "week" ? "bg-amber" : ""
+            }`}
+            onPress={() => setViewMode("week")}
+          >
+            <Text
+              className={`text-sm font-body-semibold ${
+                viewMode === "week" ? "text-midnight" : "text-ash"
+              }`}
+            >
+              Week
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Date Picker */}
         <View className="flex-row items-center justify-between mb-5">
           <TouchableOpacity
@@ -118,7 +190,11 @@ export default function Summary() {
             <Text className="text-lg text-ash">{"\u2039"}</Text>
           </TouchableOpacity>
           <Text className="text-base font-body-semibold text-white">
-            {isToday ? "Today" : displayDate(date)}
+            {viewMode === "day"
+              ? isToday
+                ? "Today"
+                : displayDate(date)
+              : displayDateRange(weekStart, weekEnd)}
           </Text>
           <TouchableOpacity
             className={`w-10 h-10 rounded-full items-center justify-center ${
@@ -148,35 +224,35 @@ export default function Summary() {
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-display">{summary.feedCount}</Text>
-                  <Text className="text-xs text-ash">feeds</Text>
+                  <Text className="text-2xl text-white font-mono-bold">{summary.feedCount}</Text>
+                  <Text className="text-xs text-ash font-body">feeds</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-display">
+                  <Text className="text-2xl text-white font-mono-bold">
                     {displayVolume(summary.feedTotalOz, unit).split(" ")[0]}
                   </Text>
-                  <Text className="text-xs text-ash">{unit}</Text>
+                  <Text className="text-xs text-ash font-body">{unit}</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-display">
+                  <Text className="text-2xl text-white font-mono-bold">
                     {summary.feedTotalMin}
                   </Text>
-                  <Text className="text-xs text-ash">min</Text>
+                  <Text className="text-xs text-ash font-body">min</Text>
                 </View>
               </View>
               <View className="border-t border-navy-border pt-2 mt-1">
                 {Object.entries(summary.feedByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-ash">
+                  <Text key={type} className="text-sm text-ash font-body">
                     {type}: {count}
                   </Text>
                 ))}
                 {summary.avgTimeBetweenFeeds != null && (
-                  <Text className="text-sm text-ash">
+                  <Text className="text-sm text-ash font-body">
                     Avg {summary.avgTimeBetweenFeeds} min between feeds
                   </Text>
                 )}
                 {summary.avgOzPerBottle != null && (
-                  <Text className="text-sm text-ash">
+                  <Text className="text-sm text-ash font-body">
                     Avg {displayVolume(summary.avgOzPerBottle, unit)} per bottle
                   </Text>
                 )}
@@ -191,22 +267,22 @@ export default function Summary() {
                 </Text>
                 <View className="flex-row justify-between">
                   <View className="items-center flex-1">
-                    <Text className="text-2xl text-white font-display">
+                    <Text className="text-2xl text-white font-mono-bold">
                       {summary.pumpCount}
                     </Text>
-                    <Text className="text-xs text-ash">sessions</Text>
+                    <Text className="text-xs text-ash font-body">sessions</Text>
                   </View>
                   <View className="items-center flex-1">
-                    <Text className="text-2xl text-white font-display">
+                    <Text className="text-2xl text-white font-mono-bold">
                       {displayVolume(summary.pumpTotalOz, unit).split(" ")[0]}
                     </Text>
-                    <Text className="text-xs text-ash">{unit}</Text>
+                    <Text className="text-xs text-ash font-body">{unit}</Text>
                   </View>
                   <View className="items-center flex-1">
-                    <Text className="text-2xl text-white font-display">
+                    <Text className="text-2xl text-white font-mono-bold">
                       {summary.pumpTotalMin}
                     </Text>
-                    <Text className="text-xs text-ash">min</Text>
+                    <Text className="text-xs text-ash font-body">min</Text>
                   </View>
                 </View>
               </View>
@@ -217,21 +293,20 @@ export default function Summary() {
               <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Diapers
               </Text>
-              <Text className="text-2xl text-white font-display mb-1">
+              <Text className="text-2xl text-white font-mono-bold mb-1">
                 {summary.diaperCount}
               </Text>
               <View className="flex-row flex-wrap gap-x-4">
                 {Object.entries(summary.diaperByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-ash">
+                  <Text key={type} className="text-sm text-ash font-body">
                     {type}: {count}
                   </Text>
                 ))}
               </View>
               {summary.lowWetWarning && (
-                <View className="bg-navy-raise rounded-lg p-2 mt-2">
-                  <Text className="text-sm text-amber">
-                    {"\u26A0\uFE0F"} Fewer than 4 wet diapers — consider
-                    checking hydration
+                <View className="bg-navy-raise rounded-lg p-2 mt-2 border-l-[3px] border-amber">
+                  <Text className="text-sm text-amber font-body">
+                    Fewer than 4 wet diapers — consider checking hydration
                   </Text>
                 </View>
               )}
@@ -244,27 +319,27 @@ export default function Summary() {
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-display">
+                  <Text className="text-2xl text-white font-mono-bold">
                     {Math.round((summary.sleepTotalMin / 60) * 10) / 10}
                   </Text>
-                  <Text className="text-xs text-ash">hours</Text>
+                  <Text className="text-xs text-ash font-body">hours</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-display">{summary.napCount}</Text>
-                  <Text className="text-xs text-ash">naps</Text>
+                  <Text className="text-2xl text-white font-mono-bold">{summary.napCount}</Text>
+                  <Text className="text-xs text-ash font-body">naps</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-display">
+                  <Text className="text-2xl text-white font-mono-bold">
                     {summary.longestStretchMin}
                   </Text>
-                  <Text className="text-xs text-ash">min longest</Text>
+                  <Text className="text-xs text-ash font-body">min longest</Text>
                 </View>
               </View>
               <View className="border-t border-navy-border pt-2 mt-1">
-                <Text className="text-sm text-ash">
+                <Text className="text-sm text-ash font-body">
                   Night (7PM-7AM): {Math.round(summary.nightSleepMin)} min
                 </Text>
-                <Text className="text-sm text-ash">
+                <Text className="text-sm text-ash font-body">
                   Day (7AM-7PM): {Math.round(summary.daySleepMin)} min
                 </Text>
               </View>
@@ -284,19 +359,20 @@ export default function Summary() {
                         i > 0 ? "border-t border-navy-border" : ""
                       }`}
                     >
-                      <Text className="text-base mr-3">
-                        {ICONS[item.kind]}
-                      </Text>
+                      <View
+                        className="w-2 h-2 rounded-full mr-3"
+                        style={{ backgroundColor: DOT_COLORS[item.kind] ?? colors.ash }}
+                      />
                       <View className="flex-1">
                         <Text className="text-sm font-body-medium text-white">
                           {item.label}
                         </Text>
-                        <Text className="text-xs text-ash">
+                        <Text className="text-xs text-ash font-body">
                           {item.loggedBy}
                           {item.detail ? ` \u00B7 ${item.detail}` : ""}
                         </Text>
                       </View>
-                      <Text className="text-xs text-ash">
+                      <Text className="text-xs text-ash font-mono">
                         {formatTime(item.timestamp)}
                       </Text>
                     </View>
@@ -304,7 +380,7 @@ export default function Summary() {
                 </View>
               ) : (
                 <View className="bg-navy-card border border-navy-border rounded-2xl p-4 items-center">
-                  <Text className="text-ash">No activity logged</Text>
+                  <Text className="text-ash font-body">No activity logged</Text>
                 </View>
               )}
             </View>
@@ -315,13 +391,13 @@ export default function Summary() {
               onPress={handleShare}
             >
               <Text className="text-center font-body-semibold text-base text-ash">
-                Share Summary
+                Share for Pediatrician
               </Text>
             </TouchableOpacity>
           </>
         ) : (
           <View className="py-20 items-center">
-            <Text className="text-ash">No data available</Text>
+            <Text className="text-ash font-body">No data available</Text>
           </View>
         )}
       </View>

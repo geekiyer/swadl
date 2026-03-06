@@ -24,7 +24,11 @@ const SIDES = [
 type PumpType = (typeof PUMP_TYPES)[number]["key"];
 type Side = (typeof SIDES)[number]["key"];
 
-export function PumpLogger() {
+interface PumpLoggerProps {
+  onSuccess?: () => void;
+}
+
+export function PumpLogger({ onSuccess }: PumpLoggerProps) {
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const { data: latestPump } = useLatestPump(baby?.id);
@@ -154,7 +158,7 @@ export function PumpLogger() {
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      router.back();
+      onSuccess ? onSuccess() : router.back();
     }
   }
 

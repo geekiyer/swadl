@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import { useRecentActivity, type ActivityItem } from "../lib/queries";
-import { shadows } from "../constants/theme";
+import { shadows, colors } from "../constants/theme";
 
-const ICONS: Record<ActivityItem["kind"], string> = {
-  feed: "\u{1F37C}",
-  diaper: "\u{1F9F7}",
-  sleep: "\u{1F634}",
-  pump: "\u{1F95B}",
+const DOT_COLORS: Record<ActivityItem["kind"], string> = {
+  feed: colors.amber,
+  diaper: colors.honey,
+  sleep: colors.info,
+  pump: colors.ember,
 };
 
 function timeLabel(dateStr: string): string {
@@ -39,15 +39,20 @@ export function ActivityFeed({ babyId }: { babyId: string | undefined }) {
             i > 0 ? "border-t border-navy-border" : ""
           }`}
         >
-          <Text className="text-lg mr-3">{ICONS[item.kind]}</Text>
+          <View
+            className="w-2 h-2 rounded-full mr-3"
+            style={{ backgroundColor: DOT_COLORS[item.kind] }}
+          />
           <View className="flex-1">
-            <Text className="text-sm font-body-semibold text-white">{item.label}</Text>
-            <Text className="text-xs text-ash font-body">
-              {item.loggedBy}
-              {item.detail ? ` · ${item.detail}` : ""}
+            <Text className="text-sm text-white">
+              <Text className="font-body-semibold">{item.loggedBy}</Text>
+              <Text className="font-body"> {item.label}</Text>
             </Text>
+            {item.detail ? (
+              <Text className="text-xs text-ash font-body mt-0.5">{item.detail}</Text>
+            ) : null}
           </View>
-          <Text className="text-xs text-ash font-mono">{timeLabel(item.timestamp)}</Text>
+          <Text className="text-xs text-ash font-mono ml-2">{timeLabel(item.timestamp)}</Text>
         </View>
       ))}
     </View>

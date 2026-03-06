@@ -20,7 +20,11 @@ type FeedCategory = "breastfeed" | "bottle";
 type BreastSide = "breast_left" | "breast_right";
 type BottleContent = "formula" | "breastmilk";
 
-export function FeedLogger() {
+interface FeedLoggerProps {
+  onSuccess?: () => void;
+}
+
+export function FeedLogger({ onSuccess }: FeedLoggerProps) {
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const queryClient = useQueryClient();
@@ -107,7 +111,7 @@ export function FeedLogger() {
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      router.back();
+      onSuccess ? onSuccess() : router.back();
     }
   }
 
@@ -140,7 +144,7 @@ export function FeedLogger() {
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      router.back();
+      onSuccess ? onSuccess() : router.back();
     }
   }
 

@@ -345,7 +345,7 @@ function ShiftHandoffView() {
 }
 
 export default function Briefing() {
-  const { data: careMode, isLoading } = useCareMode();
+  const { careMode, isLoading } = useCareMode();
 
   if (isLoading) {
     return (
@@ -355,7 +355,7 @@ export default function Briefing() {
     );
   }
 
-  if (careMode === "together") {
+  if (careMode.isTogether) {
     return <DailyBriefingView />;
   }
 

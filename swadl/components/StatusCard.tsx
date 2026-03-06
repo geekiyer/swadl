@@ -1,33 +1,58 @@
-import { Pressable } from "react-native";
+import { Pressable, View, Text } from "react-native";
 import Animated from "react-native-reanimated";
-import { View, Text } from "react-native";
 import { usePressSpring } from "../hooks/usePressSpring";
 import { shadows } from "../constants/theme";
+import type { LucideIcon } from "lucide-react-native";
 
 interface StatusCardProps {
-  title: string;
+  icon: LucideIcon;
+  iconBgColor: string;
+  iconColor: string;
+  label: string;
   value: string;
-  subtitle?: string;
+  timeAgo: string;
   onPress?: () => void;
 }
 
-export function StatusCard({ title, value, subtitle, onPress }: StatusCardProps) {
+export function StatusCard({
+  icon: Icon,
+  iconBgColor,
+  iconColor,
+  label,
+  value,
+  timeAgo,
+  onPress,
+}: StatusCardProps) {
   const { animStyle, handlers } = usePressSpring();
 
   return (
     <Animated.View style={[animStyle, shadows.sm]} className="flex-1 mx-1">
       <Pressable
-        className="bg-navy-card border border-navy-border rounded-2xl p-5"
+        className="bg-navy-card border border-navy-border rounded-2xl p-4"
         onPress={onPress}
         {...handlers}
       >
-        <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
-          {title}
+        <View
+          className="w-8 h-8 rounded-lg items-center justify-center mb-2"
+          style={{ backgroundColor: iconBgColor }}
+        >
+          <Icon size={18} strokeWidth={1.5} color={iconColor} />
+        </View>
+        <Text
+          className="text-[11px] text-ash uppercase font-body-bold"
+          style={{ letterSpacing: 2 }}
+        >
+          {label}
         </Text>
-        <Text className="text-lg text-white mt-1 font-display" style={{ letterSpacing: -0.5 }}>{value}</Text>
-        {subtitle && (
-          <Text className="text-sm text-ash mt-0.5 font-body">{subtitle}</Text>
-        )}
+        <Text
+          className="text-base text-white mt-1 font-body-semibold"
+          style={{ letterSpacing: -0.3 }}
+        >
+          {value}
+        </Text>
+        <Text className="text-xs text-amber mt-0.5 font-mono">
+          {timeAgo}
+        </Text>
       </Pressable>
     </Animated.View>
   );

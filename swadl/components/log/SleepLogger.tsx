@@ -15,7 +15,11 @@ const LOCATIONS = [
 
 type SleepLocation = (typeof LOCATIONS)[number]["key"];
 
-export function SleepLogger() {
+interface SleepLoggerProps {
+  onSuccess?: () => void;
+}
+
+export function SleepLogger({ onSuccess }: SleepLoggerProps) {
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const { data: latestSleep } = useLatestSleep(baby?.id);
@@ -39,7 +43,7 @@ export function SleepLogger() {
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      router.back();
+      onSuccess ? onSuccess() : router.back();
     }
   }
 
@@ -63,7 +67,7 @@ export function SleepLogger() {
     } else {
       queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
       queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      router.back();
+      onSuccess ? onSuccess() : router.back();
     }
   }
 

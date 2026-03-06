@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { colors } from "../../constants/theme";
 import {
   View,
   Text,
@@ -12,10 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import Animated from "react-native-reanimated";
-import {
-  Swipeable,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
+import { Swipeable } from "react-native-gesture-handler";
 import {
   useAllChores,
   useCompleteChore,
@@ -28,7 +24,8 @@ import {
 } from "../../lib/queries";
 import { useCareMode } from "../../lib/careMode";
 import { usePressSpring } from "../../hooks/usePressSpring";
-import { shadows } from "../../constants/theme";
+import { shadows, colors } from "../../constants/theme";
+import { Plus } from "lucide-react-native";
 
 const CATEGORIES = [
   { key: "feeding_prep", label: "Feeding Prep" },
@@ -54,13 +51,13 @@ export default function Chores() {
   const { data: chores } = useAllChores();
   const { data: members } = useHouseholdMembers();
   const { data: profile } = useProfile();
-  const { data: careMode } = useCareMode();
+  const { careMode } = useCareMode();
   const completeChore = useCompleteChore();
   const assignChore = useAssignChore();
   const createChore = useCreateChore();
   const deleteChore = useDeleteChore();
 
-  const isTogether = careMode === "together";
+  const isTogether = careMode.isTogether;
   const { animStyle: fabAnimStyle, handlers: fabHandlers } = usePressSpring();
 
   const [tab, setTab] = useState<"today" | "all">("today");
@@ -268,7 +265,7 @@ export default function Chores() {
   }
 
   return (
-    <GestureHandlerRootView className="flex-1 bg-midnight">
+    <View className="flex-1 bg-midnight">
       {/* Tab Bar */}
       <View className="flex-row border-b border-navy-border px-4">
         <TouchableOpacity
@@ -328,7 +325,7 @@ export default function Chores() {
           onPress={() => setShowAdd(true)}
           className="bg-amber w-14 h-14 rounded-full items-center justify-center"
         >
-          <Text className="text-midnight text-2xl font-body">+</Text>
+          <Plus size={26} strokeWidth={1.5} color={colors.midnight} />
         </Pressable>
       </Animated.View>
 
@@ -524,6 +521,6 @@ export default function Chores() {
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
-    </GestureHandlerRootView>
+    </View>
   );
 }

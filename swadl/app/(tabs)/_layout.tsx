@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
-import { Text } from "react-native";
 import { useProfile } from "../../lib/queries";
 import { colors } from "../../constants/theme";
+import { TabBar } from "../../components/TabBar";
 
 export default function TabsLayout() {
   const { data: profile } = useProfile();
@@ -9,56 +9,23 @@ export default function TabsLayout() {
 
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: true,
         headerStyle: { backgroundColor: colors.midnight },
         headerTintColor: colors.white,
         headerTitleStyle: { fontFamily: "Outfit_600SemiBold" },
-        tabBarActiveTintColor: colors.amber,
-        tabBarInactiveTintColor: colors.ash,
-        tabBarLabelStyle: { fontFamily: "Outfit_500Medium" },
-        tabBarStyle: {
-          backgroundColor: colors.navyCard,
-          borderTopColor: colors.navyBorder,
-        },
         animation: "none",
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Dashboard",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 20 }}>&#x1F3E0;</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="summary"
-        options={{
-          title: "Summary",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 20 }}>&#x1F4CB;</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="trends"
-        options={{
-          title: "Trends",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 20 }}>&#x1F4C8;</Text>
-          ),
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: "Home" }} />
+      <Tabs.Screen name="summary" options={{ title: "Summary" }} />
+      <Tabs.Screen name="trends" options={{ title: "Trends" }} />
       <Tabs.Screen
         name="chores"
         options={{
           title: "Chores",
           href: isRestricted ? null : "/(tabs)/chores",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 20 }}>&#x2705;</Text>
-          ),
         }}
       />
       <Tabs.Screen
@@ -66,9 +33,6 @@ export default function TabsLayout() {
         options={{
           title: "Settings",
           href: isRestricted ? null : "/(tabs)/settings",
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 20 }}>&#x2699;</Text>
-          ),
         }}
       />
     </Tabs>

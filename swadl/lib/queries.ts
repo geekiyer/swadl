@@ -866,14 +866,16 @@ export interface SummaryData {
 
 export function useSummary(
   babyId: string | undefined,
-  dateStr: string // YYYY-MM-DD
+  dateStr: string, // YYYY-MM-DD (start date)
+  endDateStr?: string // YYYY-MM-DD (optional end date for week view)
 ) {
+  const effectiveEnd = endDateStr ?? dateStr;
   return useQuery({
-    queryKey: ["summary", babyId, dateStr],
+    queryKey: ["summary", babyId, dateStr, effectiveEnd],
     enabled: !!babyId,
     queryFn: async () => {
       const dayStart = new Date(`${dateStr}T00:00:00`);
-      const dayEnd = new Date(`${dateStr}T23:59:59.999`);
+      const dayEnd = new Date(`${effectiveEnd}T23:59:59.999`);
       const since = dayStart.toISOString();
       const until = dayEnd.toISOString();
 

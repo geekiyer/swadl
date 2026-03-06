@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
-import Animated from "react-native-reanimated";
 import { router, useFocusEffect } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { StatusCard } from "../../components/StatusCard";
@@ -13,16 +12,14 @@ import {
   useLatestFeed,
   useLatestDiaper,
   useLatestSleep,
-  useLatestPump,
   useActiveShift,
   useNextTasks,
   useCompleteChore,
   useDashboardRealtime,
 } from "../../lib/queries";
 import { useCareMode } from "../../lib/careMode";
-import { useUnitStore, displayVolume } from "../../lib/store";
-import { usePressSpring } from "../../hooks/usePressSpring";
-import { shadows } from "../../constants/theme";
+import { shadows, colors } from "../../constants/theme";
+import { Baby, Moon, Droplets } from "lucide-react-native";
 
 function timeAgo(dateStr: string | undefined | null): string {
   if (!dateStr) return "No data";
@@ -35,13 +32,6 @@ function timeAgo(dateStr: string | undefined | null): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
 export default function Dashboard() {
   const queryClient = useQueryClient();
   const { data: profile } = useProfile();
@@ -51,13 +41,11 @@ export default function Dashboard() {
   const { data: latestFeed } = useLatestFeed(baby?.id);
   const { data: latestDiaper } = useLatestDiaper(baby?.id);
   const { data: latestSleep } = useLatestSleep(baby?.id);
-  const { data: latestPump } = useLatestPump(baby?.id);
-  const { data: careMode } = useCareMode();
+  const { careMode } = useCareMode();
   const { data: activeShift } = useActiveShift();
   const { data: nextTasks } = useNextTasks(3);
   const completeChore = useCompleteChore();
 
-  const unit = useUnitStore((s) => s.unit);
   useDashboardRealtime();
 
   // Refetch dashboard data whenever screen comes into focus (e.g. returning from a logger)
@@ -72,7 +60,7 @@ export default function Dashboard() {
     }, [queryClient])
   );
 
-  const isTogether = careMode === "together";
+  const isTogether = careMode.isTogether;
   const caregiverName = activeShift?.caregiver_display_name;
 
   return (
@@ -150,49 +138,46 @@ export default function Dashboard() {
           </Pressable>
         )}
 
-        {/* Status Cards */}
-        <View className="flex-row mb-3">
+        {/* Status Cards — 3-column: feed, sleep, diaper */}
+        <View className="flex-row mb-5">
           <StatusCard
-            title="Last Fed"
-            value={timeAgo(latestFeed?.started_at)}
-            subtitle={latestFeed?.type?.replace("_", " ") ?? undefined}
+            icon={Baby}
+            iconBgColor="rgba(245, 158, 11, 0.15)"
+            iconColor={colors.amber}
+            label="Last Fed"
+            value={latestFeed?.type?.replace("_", " ") ?? "No data"}
+            timeAgo={timeAgo(latestFeed?.started_at)}
             onPress={() => router.push("/log/feed")}
           />
           <StatusCard
-            title="Last Sleep"
+            icon={Moon}
+            iconBgColor="rgba(90, 200, 250, 0.15)"
+            iconColor={colors.info}
+            label="Last Sleep"
             value={
               latestSleep?.ended_at
-                ? timeAgo(latestSleep.ended_at)
+                ? latestSleep.location ?? "Awake"
                 : latestSleep?.started_at
                   ? "Sleeping"
                   : "No data"
             }
-            subtitle={latestSleep?.location ?? undefined}
+            timeAgo={
+              latestSleep?.ended_at
+                ? timeAgo(latestSleep.ended_at)
+                : latestSleep?.started_at
+                  ? timeAgo(latestSleep.started_at)
+                  : ""
+            }
             onPress={() => router.push("/log/sleep")}
           />
-        </View>
-        <View className="flex-row mb-5">
           <StatusCard
-            title="Last Diaper"
-            value={timeAgo(latestDiaper?.logged_at)}
-            subtitle={latestDiaper?.type ?? undefined}
+            icon={Droplets}
+            iconBgColor="rgba(251, 191, 36, 0.15)"
+            iconColor={colors.honey}
+            label="Last Diaper"
+            value={latestDiaper?.type ?? "No data"}
+            timeAgo={timeAgo(latestDiaper?.logged_at)}
             onPress={() => router.push("/log/diaper")}
-          />
-          <StatusCard
-            title="Last Pump"
-            value={
-              latestPump?.ended_at
-                ? timeAgo(latestPump.ended_at)
-                : latestPump?.started_at
-                  ? "Pumping"
-                  : "No data"
-            }
-            subtitle={
-              latestPump?.amount_oz
-                ? displayVolume(latestPump.amount_oz, unit)
-                : latestPump?.pump_type?.replace("_", " ") ?? undefined
-            }
-            onPress={() => router.push("/log/pump")}
           />
         </View>
 
