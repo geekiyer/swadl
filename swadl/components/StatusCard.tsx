@@ -29,6 +29,7 @@ export function StatusCard({
     <Animated.View style={[animStyle, shadows.sm]} className="flex-1 mx-1">
       <Pressable
         className="bg-navy-card border border-navy-border rounded-2xl p-4"
+        style={{ height: 140 }}
         onPress={onPress}
         {...handlers}
       >

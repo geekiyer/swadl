@@ -10,6 +10,7 @@ import {
   Share,
 } from "react-native";
 import { router } from "expo-router";
+import { Baby, Moon, Droplets, Heart, CheckCircle, Clock } from "lucide-react-native";
 import { HandoffBriefing } from "../components/HandoffBriefing";
 import {
   useHandoffBriefing,
@@ -88,59 +89,95 @@ function DailyBriefingView() {
         </Text>
 
         {totals && (
-          <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-5">
+          <View className="gap-3 mb-5">
             {/* Feeds */}
-            <View>
-              <Text className="text-[11px] text-ash uppercase font-body-semibold tracking-[1.5px]">
-                Feeding
-              </Text>
-              <Text className="text-2xl text-white font-display mt-1">{totals.feeds}</Text>
-              <Text className="text-sm text-ash mt-0.5">
-                {totals.feedBreakdown}
-                {totals.totalOz > 0 ? ` · ${displayVolume(totals.totalOz, unit)}` : ""}
-                {totals.totalFeedMin > 0 ? ` · ${totals.totalFeedMin} min` : ""}
-              </Text>
-            </View>
-
-            {/* Diapers */}
-            <View className="mt-4 pt-4 border-t border-navy-border">
-              <Text className="text-[11px] text-ash uppercase font-body-semibold tracking-[1.5px]">
-                Diapers
-              </Text>
-              <Text className="text-2xl text-white font-display mt-1">{totals.diapers}</Text>
-              <Text className="text-sm text-ash mt-0.5">
-                {totals.diaperBreakdown}
-              </Text>
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 flex-row items-start">
+              <View
+                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
+                style={{ backgroundColor: `${colors.amber}22` }}
+              >
+                <Baby size={20} strokeWidth={1.5} color={colors.amber} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                  Feeding
+                </Text>
+                <Text className="text-2xl text-white font-display mt-0.5" style={{ letterSpacing: -1 }}>
+                  {totals.feeds} feed{totals.feeds !== 1 ? "s" : ""}
+                </Text>
+                <Text className="text-sm text-ash mt-0.5">
+                  {totals.feedBreakdown}
+                  {totals.totalOz > 0 ? ` · ${displayVolume(totals.totalOz, unit)}` : ""}
+                  {totals.totalFeedMin > 0 ? ` · ${totals.totalFeedMin} min` : ""}
+                </Text>
+              </View>
             </View>
 
             {/* Sleep */}
-            <View className="mt-4 pt-4 border-t border-navy-border">
-              <Text className="text-[11px] text-ash uppercase font-body-semibold tracking-[1.5px]">
-                Sleep
-              </Text>
-              <Text className="text-2xl text-white font-display mt-1">
-                {totals.naps} nap{totals.naps !== 1 ? "s" : ""}
-              </Text>
-              <Text className="text-sm text-ash mt-0.5">
-                ~{totals.totalSleepMin} min total
-                {totals.currentlySleeping ? " · Currently sleeping" : ""}
-              </Text>
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 flex-row items-start">
+              <View
+                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
+                style={{ backgroundColor: `${colors.info}22` }}
+              >
+                <Moon size={20} strokeWidth={1.5} color={colors.info} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                  Sleep
+                </Text>
+                <Text className="text-2xl text-white font-display mt-0.5" style={{ letterSpacing: -1 }}>
+                  {totals.naps} nap{totals.naps !== 1 ? "s" : ""}
+                </Text>
+                <Text className="text-sm text-ash mt-0.5">
+                  ~{totals.totalSleepMin} min total
+                  {totals.currentlySleeping ? " · Currently sleeping" : ""}
+                </Text>
+              </View>
+            </View>
+
+            {/* Diapers */}
+            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 flex-row items-start">
+              <View
+                className="w-10 h-10 rounded-xl items-center justify-center mr-3"
+                style={{ backgroundColor: `${colors.honey}22` }}
+              >
+                <Droplets size={20} strokeWidth={1.5} color={colors.honey} />
+              </View>
+              <View className="flex-1">
+                <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                  Diapers
+                </Text>
+                <Text className="text-2xl text-white font-display mt-0.5" style={{ letterSpacing: -1 }}>
+                  {totals.diapers} change{totals.diapers !== 1 ? "s" : ""}
+                </Text>
+                <Text className="text-sm text-ash mt-0.5">
+                  {totals.diaperBreakdown}
+                </Text>
+              </View>
             </View>
 
             {/* Pumping */}
             {totals.pumpSessions > 0 && (
-              <View className="mt-4 pt-4 border-t border-navy-border">
-                <Text className="text-[11px] text-ash uppercase font-body-semibold tracking-[1.5px]">
-                  Pumping
-                </Text>
-                <Text className="text-2xl text-white font-display mt-1">
-                  {totals.pumpSessions} session{totals.pumpSessions !== 1 ? "s" : ""}
-                </Text>
-                <Text className="text-sm text-ash mt-0.5">
-                  {totals.pumpTotalOz > 0 ? displayVolume(totals.pumpTotalOz, unit) : ""}
-                  {totals.pumpTotalOz > 0 && totals.pumpTotalMin > 0 ? " · " : ""}
-                  {totals.pumpTotalMin > 0 ? `${totals.pumpTotalMin} min` : ""}
-                </Text>
+              <View className="bg-navy-card border border-navy-border rounded-2xl p-4 flex-row items-start">
+                <View
+                  className="w-10 h-10 rounded-xl items-center justify-center mr-3"
+                  style={{ backgroundColor: `${colors.ember}22` }}
+                >
+                  <Heart size={20} strokeWidth={1.5} color={colors.ember} />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                    Pumping
+                  </Text>
+                  <Text className="text-2xl text-white font-display mt-0.5" style={{ letterSpacing: -1 }}>
+                    {totals.pumpSessions} session{totals.pumpSessions !== 1 ? "s" : ""}
+                  </Text>
+                  <Text className="text-sm text-ash mt-0.5">
+                    {totals.pumpTotalOz > 0 ? displayVolume(totals.pumpTotalOz, unit) : ""}
+                    {totals.pumpTotalOz > 0 && totals.pumpTotalMin > 0 ? " · " : ""}
+                    {totals.pumpTotalMin > 0 ? `${totals.pumpTotalMin} min` : ""}
+                  </Text>
+                </View>
               </View>
             )}
           </View>
@@ -148,27 +185,32 @@ function DailyBriefingView() {
 
         {/* Next Tasks */}
         <View>
-          <Text className="text-[11px] text-ash uppercase font-body-semibold tracking-[1.5px] mb-2">
+          <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
             Remaining Tasks
           </Text>
           {nextTasks && nextTasks.length > 0 ? (
             nextTasks.map((task) => {
-              const recurrence = task.recurrence as Record<string, any>;
+              const recurrence = task.recurrence as Record<string, unknown>;
               return (
                 <View
                   key={task.id}
-                  className="flex-row items-center bg-navy-raise border border-navy-border rounded-xl p-3 mb-2"
+                  className="flex-row items-center bg-navy-card border border-navy-border rounded-xl p-3 mb-2"
                 >
                   <TouchableOpacity
-                    className="w-6 h-6 rounded-full border-2 border-navy-border mr-3 items-center justify-center"
+                    className="w-7 h-7 rounded-full border-2 border-navy-border mr-3 items-center justify-center"
                     onPress={() => completeChore.mutate(task.id)}
-                  />
+                  >
+                    <CheckCircle size={14} strokeWidth={1.5} color={colors.ash} />
+                  </TouchableOpacity>
                   <View className="flex-1">
                     <Text className="text-base font-body-medium text-white">{task.title}</Text>
                     {recurrence?.time && (
-                      <Text className="text-sm text-ash">
-                        {recurrence.time}
-                      </Text>
+                      <View className="flex-row items-center mt-0.5">
+                        <Clock size={12} strokeWidth={1.5} color={colors.ash} />
+                        <Text className="text-sm text-ash ml-1">
+                          {recurrence.time as string}
+                        </Text>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -176,7 +218,7 @@ function DailyBriefingView() {
             })
           ) : (
             <View className="bg-navy-card border border-navy-border rounded-2xl p-4 items-center">
-              <Text className="text-ash">All caught up!</Text>
+              <Text className="text-ash font-body-medium">All caught up!</Text>
             </View>
           )}
         </View>
@@ -184,10 +226,10 @@ function DailyBriefingView() {
         {/* Share */}
         <View className="mt-8">
           <TouchableOpacity
-            className="rounded-2xl py-4 border border-navy-border"
+            className="rounded-2xl py-4 border border-amber"
             onPress={handleShare}
           >
-            <Text className="text-center font-body-semibold text-base text-ash">
+            <Text className="text-center font-body-semibold text-base text-amber">
               Share Summary
             </Text>
           </TouchableOpacity>

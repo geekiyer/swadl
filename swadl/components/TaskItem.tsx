@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -39,9 +39,19 @@ export function TaskItem({
   const { animStyle, handlers } = usePressSpring(PRESS_SCALE_DENSE);
   const translateX = useSharedValue(0);
   const rowOpacity = useSharedValue(1);
+  const checkProgress = useSharedValue(isCompleted ? 1 : 0);
 
   function fireComplete() {
     onComplete?.();
+  }
+
+  function handleTapComplete() {
+    if (isCompleted) return;
+    // Animate circle fill + checkmark, then fade row out
+    checkProgress.value = withSpring(1, Springs.microFeedback);
+    rowOpacity.value = withTiming(0.4, { duration: 400 }, () => {
+      runOnJS(fireComplete)();
+    });
   }
 
   const pan = Gesture.Pan()
@@ -71,6 +81,20 @@ export function TaskItem({
 
   const bgRevealStyle = useAnimatedStyle(() => ({
     opacity: Math.min(1, translateX.value / SWIPE_THRESHOLD),
+  }));
+
+  const circleStyle = useAnimatedStyle(() => ({
+    backgroundColor: checkProgress.value > 0
+      ? `rgba(52, 199, 89, ${checkProgress.value})`
+      : 'transparent',
+    borderColor: checkProgress.value > 0.5
+      ? colors.success
+      : colors.navyBorder,
+  }));
+
+  const checkmarkStyle = useAnimatedStyle(() => ({
+    opacity: checkProgress.value,
+    transform: [{ scale: checkProgress.value }],
   }));
 
   return (
@@ -109,17 +133,16 @@ export function TaskItem({
               {...handlers}
             >
               {/* Completion circle */}
-              <View
-                className={`w-5 h-5 rounded-md border-2 mr-3 items-center justify-center ${
-                  isCompleted
-                    ? "bg-success border-success"
-                    : "border-navy-border"
-                }`}
-              >
-                {isCompleted && (
-                  <Check size={12} strokeWidth={2.5} color={colors.white} />
-                )}
-              </View>
+              <Pressable onPress={handleTapComplete} hitSlop={8}>
+                <Animated.View
+                  className="w-5 h-5 rounded-md border-2 items-center justify-center mr-3"
+                  style={circleStyle}
+                >
+                  <Animated.View style={checkmarkStyle}>
+                    <Check size={12} strokeWidth={2.5} color={colors.white} />
+                  </Animated.View>
+                </Animated.View>
+              </Pressable>
 
               <View className="flex-1">
                 <Text

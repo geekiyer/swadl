@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "./supabase";
 import type { Database } from "../types/database";
 
@@ -301,6 +301,56 @@ export function useActiveShift() {
       } as ShiftWithCaregiver;
     },
   });
+}
+
+// ============================================================
+// Ensure Together-Mode Shift
+// In together mode, one permanent open shift per user is
+// created behind the scenes so switching to shifts mode later
+// requires no data migration.
+// ============================================================
+
+export function useEnsureTogetherShift(careMode: string | undefined) {
+  const ran = useRef(false);
+
+  useEffect(() => {
+    if (careMode !== "together" || ran.current) return;
+    ran.current = true;
+
+    (async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("household_id")
+        .eq("id", session.user.id)
+        .single();
+
+      if (!profile) return;
+      const householdId = (profile as Profile).household_id;
+
+      // Check if user already has an open shift
+      const { data: existing } = await supabase
+        .from("caregiver_shifts")
+        .select("id")
+        .eq("household_id", householdId)
+        .eq("caregiver_id", session.user.id)
+        .is("ended_at", null)
+        .limit(1)
+        .maybeSingle();
+
+      if (existing) return; // already has an open shift
+
+      // Create a permanent open shift
+      await supabase.from("caregiver_shifts").insert({
+        household_id: householdId,
+        caregiver_id: session.user.id,
+      });
+    })();
+  }, [careMode]);
 }
 
 // ============================================================

@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { useCallback, useState } from "react";
+import { View, Text, ScrollView, Pressable, Modal, FlatList } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { StatusCard } from "../../components/StatusCard";
@@ -16,10 +16,11 @@ import {
   useNextTasks,
   useCompleteChore,
   useDashboardRealtime,
+  useEnsureTogetherShift,
 } from "../../lib/queries";
 import { useCareMode } from "../../lib/careMode";
 import { shadows, colors } from "../../constants/theme";
-import { Baby, Moon, Droplets } from "lucide-react-native";
+import { Baby, Moon, Droplets, ChevronDown } from "lucide-react-native";
 
 function timeAgo(dateStr: string | undefined | null): string {
   if (!dateStr) return "No data";
@@ -36,17 +37,26 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const { data: profile } = useProfile();
   const { data: babies } = useBabies();
-  const baby = babies?.[0]; // Default to first baby (multi-baby selector in header for Phase 2)
+  const [selectedBabyId, setSelectedBabyId] = useState<string | null>(null);
+  const [babyPickerVisible, setBabyPickerVisible] = useState(false);
 
-  const { data: latestFeed } = useLatestFeed(baby?.id);
-  const { data: latestDiaper } = useLatestDiaper(baby?.id);
-  const { data: latestSleep } = useLatestSleep(baby?.id);
+  // Default to first baby if no selection has been made (or if selected baby no longer exists)
+  const resolvedBabyId = selectedBabyId && babies?.some((b) => b.id === selectedBabyId)
+    ? selectedBabyId
+    : babies?.[0]?.id ?? null;
+  const baby = babies?.find((b) => b.id === resolvedBabyId) ?? null;
+  const hasMultipleBabies = (babies?.length ?? 0) > 1;
+
+  const { data: latestFeed } = useLatestFeed(resolvedBabyId ?? undefined);
+  const { data: latestDiaper } = useLatestDiaper(resolvedBabyId ?? undefined);
+  const { data: latestSleep } = useLatestSleep(resolvedBabyId ?? undefined);
   const { careMode } = useCareMode();
   const { data: activeShift } = useActiveShift();
   const { data: nextTasks } = useNextTasks(3);
   const completeChore = useCompleteChore();
 
   useDashboardRealtime();
+  useEnsureTogetherShift(careMode.mode);
 
   // Refetch dashboard data whenever screen comes into focus (e.g. returning from a logger)
   useFocusEffect(
@@ -68,13 +78,90 @@ export default function Dashboard() {
       <View className="px-4 pt-4 pb-8">
         {/* Header */}
         <View className="mb-6">
-          <Text className="text-2xl text-white font-display" style={{ letterSpacing: -1 }}>
-            {baby ? baby.name : "Dashboard"}
-          </Text>
+          {hasMultipleBabies ? (
+            <Pressable
+              className="flex-row items-center"
+              onPress={() => setBabyPickerVisible(true)}
+            >
+              <Text className="text-2xl text-white font-display" style={{ letterSpacing: -1 }}>
+                {baby ? baby.name : "Dashboard"}
+              </Text>
+              <ChevronDown size={20} color={colors.amber} style={{ marginLeft: 6, marginTop: 2 }} />
+            </Pressable>
+          ) : (
+            <Text className="text-2xl text-white font-display" style={{ letterSpacing: -1 }}>
+              {baby ? baby.name : "Dashboard"}
+            </Text>
+          )}
           <Text className="text-ash text-sm mt-0.5 font-body">
             Hi, {profile?.display_name ?? "there"}
           </Text>
         </View>
+
+        {/* Baby Picker Modal */}
+        <Modal
+          visible={babyPickerVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setBabyPickerVisible(false)}
+        >
+          <Pressable
+            className="flex-1 bg-black/60 justify-center items-center px-6"
+            onPress={() => setBabyPickerVisible(false)}
+          >
+            <View
+              className="bg-navy-card border border-navy-border rounded-2xl w-full overflow-hidden"
+              onStartShouldSetResponder={() => true}
+            >
+              <Text
+                className="text-[11px] text-ash uppercase font-body-bold px-5 pt-5 pb-2"
+                style={{ letterSpacing: 2 }}
+              >
+                Select Baby
+              </Text>
+              <FlatList
+                data={babies}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  const isSelected = item.id === resolvedBabyId;
+                  return (
+                    <Pressable
+                      className={`px-5 py-3.5 flex-row items-center justify-between ${
+                        isSelected ? "bg-midnight/40" : ""
+                      }`}
+                      onPress={() => {
+                        setSelectedBabyId(item.id);
+                        setBabyPickerVisible(false);
+                      }}
+                    >
+                      <Text
+                        className={`text-base font-body-medium ${
+                          isSelected ? "text-amber" : "text-white"
+                        }`}
+                      >
+                        {item.name}
+                      </Text>
+                      {isSelected && (
+                        <View className="w-2 h-2 rounded-full bg-amber" />
+                      )}
+                    </Pressable>
+                  );
+                }}
+                ItemSeparatorComponent={() => (
+                  <View className="h-px bg-navy-border mx-5" />
+                )}
+              />
+              <View className="px-5 pb-4 pt-2">
+                <Pressable
+                  className="items-center py-2.5"
+                  onPress={() => setBabyPickerVisible(false)}
+                >
+                  <Text className="text-ash text-sm font-body-semibold">Cancel</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Pressable>
+        </Modal>
 
         {/* Quick Log buttons — above the fold for one-handed access */}
         <View className="flex-row justify-between mb-5 gap-2">
@@ -116,7 +203,7 @@ export default function Dashboard() {
                 <Text className="text-sm text-amber font-body-semibold">Daily Briefing</Text>
               </Pressable>
             </View>
-            <ActivityFeed babyId={baby?.id} />
+            <ActivityFeed babyId={resolvedBabyId ?? undefined} />
           </View>
         ) : (
           <Pressable

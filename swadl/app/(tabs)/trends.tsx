@@ -110,32 +110,31 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
         Daily {hasOz ? "oz (bottle)" : "feed count"}
       </Text>
 
-      <View style={{ height: CHART_HEIGHT }} className="flex-row items-end gap-0.5">
-        {data.map((day) => (
-          <Bar
-            key={day.date}
-            height={hasOz ? day.feedOz : day.feedCount}
-            color={colors.amber}
-            maxHeight={maxVal}
-            onPress={() => navigateToDay(day.date)}
-          />
-        ))}
-      </View>
+      <View style={{ height: CHART_HEIGHT, position: "relative" }}>
+        {/* Bars */}
+        <View style={{ height: CHART_HEIGHT, flexDirection: "row", alignItems: "flex-end", gap: 2 }}>
+          {data.map((day) => (
+            <Bar
+              key={day.date}
+              height={hasOz ? day.feedOz : day.feedCount}
+              color={colors.amber}
+              maxHeight={maxVal}
+              onPress={() => navigateToDay(day.date)}
+            />
+          ))}
+        </View>
 
-      {/* Dotted avg line overlay */}
-      <View className="flex-row items-end gap-0.5 -mt-1" style={{ height: 2 }}>
-        {avgValues.map((val, i) => (
-          <View
-            key={i}
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: colors.ember,
-              opacity: 0.6,
-              borderRadius: 1,
-            }}
-          />
-        ))}
+        {/* Rolling average dots overlay */}
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, height: CHART_HEIGHT, flexDirection: "row", alignItems: "flex-end", gap: 2 }}>
+          {avgValues.map((val, i) => {
+            const dotBottom = maxVal > 0 ? (val / maxVal) * (CHART_HEIGHT - 6) : 0;
+            return (
+              <View key={i} style={{ flex: 1, alignItems: "center" }}>
+                <View style={{ position: "absolute", bottom: dotBottom, width: 5, height: 5, borderRadius: 3, backgroundColor: colors.ember, opacity: 0.8 }} />
+              </View>
+            );
+          })}
+        </View>
       </View>
 
       {/* X-axis labels */}
