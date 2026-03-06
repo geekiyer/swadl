@@ -772,6 +772,35 @@ export function useDeleteChore() {
 }
 
 // ============================================================
+// Update Chore
+// ============================================================
+
+export function useUpdateChore() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      ...updates
+    }: {
+      id: string;
+      title?: string;
+      category?: string;
+      recurrence?: Record<string, unknown>;
+    }) => {
+      const { error } = await supabase
+        .from("chores")
+        .update(updates)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-chores"] });
+      queryClient.invalidateQueries({ queryKey: ["next-tasks"] });
+    },
+  });
+}
+
+// ============================================================
 // Update Baby
 // ============================================================
 
@@ -1383,6 +1412,39 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
       );
 
       return items.slice(0, limit);
+    },
+  });
+}
+
+// ============================================================
+// Update Care Mode
+// ============================================================
+
+export function useUpdateCareMode() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (mode: "together" | "shifts" | "nanny") => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not signed in");
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("household_id")
+        .eq("id", session.user.id)
+        .single();
+      if (!profile) throw new Error("No profile found");
+
+      const { error } = await supabase
+        .from("households")
+        .update({ care_mode: mode })
+        .eq("id", profile.household_id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["careMode"] });
     },
   });
 }

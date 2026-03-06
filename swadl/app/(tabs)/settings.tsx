@@ -7,6 +7,7 @@ import {
   TextInput,
   Alert,
   Modal,
+  Switch,
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
@@ -16,10 +17,11 @@ import {
   useHouseholdMembers,
   useUpdateBaby,
   useUpdateProfile,
+  useUpdateCareMode,
 } from "../../lib/queries";
+import { useCareMode } from "../../lib/careMode";
 import { useAuthStore } from "../../lib/store";
-import { colors } from "../../constants/theme";
-import { useThemeStore } from "../../lib/theme";
+import { useThemeStore, useThemeColors } from "../../lib/theme";
 
 const FEEDING_OPTIONS = [
   { key: "breast", label: "Breast" },
@@ -34,15 +36,29 @@ const ROLES = [
   { key: "restricted", label: "Restricted", desc: "Log only" },
 ] as const;
 
+const CARE_MODES = [
+  { key: "together", label: "Together", desc: "We parent together" },
+  { key: "shifts", label: "Shifts", desc: "We take turns / shifts" },
+  { key: "nanny", label: "Nanny", desc: "We have a nanny or caregiver" },
+] as const;
+
 export default function Settings() {
   const { data: profile } = useProfile();
   const { data: babies } = useBabies();
   const { data: members } = useHouseholdMembers();
   const updateBaby = useUpdateBaby();
   const updateProfile = useUpdateProfile();
+  const updateCareMode = useUpdateCareMode();
+  const { careMode } = useCareMode();
   const setSession = useAuthStore((s) => s.setSession);
   const themeMode = useThemeStore((s) => s.mode);
   const toggleTheme = useThemeStore((s) => s.toggleMode);
+  const tc = useThemeColors();
+
+  // Notification preferences (local for now — Phase 2 syncs to server)
+  const [notifyAssignments, setNotifyAssignments] = useState(true);
+  const [notifyReminders, setNotifyReminders] = useState(true);
+  const [notifyShiftChanges, setNotifyShiftChanges] = useState(true);
 
   const baby = babies?.[0];
   const isAdmin = profile?.role === "admin";
@@ -276,6 +292,86 @@ export default function Settings() {
                 style={{ backgroundColor: "#FFFFFF" }}
               />
             </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Care Mode */}
+        {isAdmin && (
+          <>
+            <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              Care Mode
+            </Text>
+            <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden mb-6">
+              {CARE_MODES.map((cm, i) => (
+                <TouchableOpacity
+                  key={cm.key}
+                  className={`flex-row justify-between items-center p-4 ${
+                    i > 0 ? "border-t border-navy-border" : ""
+                  }`}
+                  onPress={() => updateCareMode.mutate(cm.key)}
+                  disabled={updateCareMode.isPending}
+                >
+                  <View>
+                    <Text className="text-base font-body-medium text-white">
+                      {cm.label}
+                    </Text>
+                    <Text className="text-sm text-ash mt-0.5">
+                      {cm.desc}
+                    </Text>
+                  </View>
+                  {careMode.mode === cm.key && (
+                    <View className="w-5 h-5 rounded-full bg-amber items-center justify-center">
+                      <Text className="text-midnight text-xs font-body-bold">
+                        {"\u2713"}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* Notification Preferences */}
+        <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+          Notifications
+        </Text>
+        <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-6">
+          <View className="flex-row items-center justify-between mb-3">
+            <View>
+              <Text className="text-base font-body-medium text-white">Chore Assignments</Text>
+              <Text className="text-sm text-ash">When a chore is assigned to you</Text>
+            </View>
+            <Switch
+              value={notifyAssignments}
+              onValueChange={setNotifyAssignments}
+              trackColor={{ false: tc.navyBorder, true: tc.amber }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+          <View className="flex-row items-center justify-between mb-3">
+            <View>
+              <Text className="text-base font-body-medium text-white">Chore Reminders</Text>
+              <Text className="text-sm text-ash">Upcoming chore due reminders</Text>
+            </View>
+            <Switch
+              value={notifyReminders}
+              onValueChange={setNotifyReminders}
+              trackColor={{ false: tc.navyBorder, true: tc.amber }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Text className="text-base font-body-medium text-white">Shift Changes</Text>
+              <Text className="text-sm text-ash">When a caregiver starts or ends a shift</Text>
+            </View>
+            <Switch
+              value={notifyShiftChanges}
+              onValueChange={setNotifyShiftChanges}
+              trackColor={{ false: tc.navyBorder, true: tc.amber }}
+              thumbColor="#FFFFFF"
+            />
           </View>
         </View>
 

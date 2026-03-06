@@ -227,7 +227,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     return (
       <View>
         <View className="items-center">
-          <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1 }}>
+          <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 60 }}>
             {formatElapsed(elapsed)}
           </Text>
           <Text className="text-ash mb-6">

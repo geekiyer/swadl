@@ -18,6 +18,7 @@ import {
   useAssignChore,
   useCreateChore,
   useDeleteChore,
+  useUpdateChore,
   useHouseholdMembers,
   useProfile,
   type ChoreWithStatus,
@@ -56,6 +57,7 @@ export default function Chores() {
   const assignChore = useAssignChore();
   const createChore = useCreateChore();
   const deleteChore = useDeleteChore();
+  const updateChore = useUpdateChore();
 
   const isTogether = careMode.isTogether;
   const { animStyle: fabAnimStyle, handlers: fabHandlers } = usePressSpring();
@@ -65,6 +67,7 @@ export default function Chores() {
   const [assigningChore, setAssigningChore] = useState<ChoreWithStatus | null>(
     null
   );
+  const [editingChore, setEditingChore] = useState<ChoreWithStatus | null>(null);
 
   // Add chore form state
   const [newTitle, setNewTitle] = useState("");
@@ -72,6 +75,13 @@ export default function Chores() {
   const [newRecurrence, setNewRecurrence] = useState("daily");
   const [newIntervalDays, setNewIntervalDays] = useState("");
   const [newTime, setNewTime] = useState("");
+
+  // Edit chore form state
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState("other");
+  const [editRecurrence, setEditRecurrence] = useState("daily");
+  const [editIntervalDays, setEditIntervalDays] = useState("");
+  const [editTime, setEditTime] = useState("");
 
   const todayChores = chores?.filter((c) => !c.completed_today) ?? [];
   const completedToday = chores?.filter((c) => c.completed_today) ?? [];
@@ -144,6 +154,47 @@ export default function Chores() {
     assignChore.mutate({ choreId: chore.id, assignTo: profile.id });
   }
 
+  function openEditChore(chore: ChoreWithStatus) {
+    const rec = chore.recurrence as Record<string, string>;
+    setEditTitle(chore.title);
+    setEditCategory(chore.category);
+    setEditRecurrence(rec?.type ?? "daily");
+    setEditIntervalDays(rec?.interval_days ?? "");
+    setEditTime(rec?.time ?? "");
+    setEditingChore(chore);
+  }
+
+  function handleSaveEdit() {
+    if (!editingChore || !editTitle.trim()) return;
+    if (editRecurrence === "every-x-days" && !editIntervalDays) return;
+
+    let recurrence: Record<string, unknown>;
+    if (editRecurrence === "one-time") {
+      recurrence = { type: "one-time" };
+    } else if (editRecurrence === "every-x-days") {
+      recurrence = {
+        type: "every-x-days",
+        interval_days: parseInt(editIntervalDays, 10),
+        ...(editTime ? { time: editTime } : {}),
+      };
+    } else {
+      recurrence = { type: editRecurrence, ...(editTime ? { time: editTime } : {}) };
+    }
+
+    updateChore.mutate(
+      {
+        id: editingChore.id,
+        title: editTitle.trim(),
+        category: editCategory,
+        recurrence,
+      },
+      {
+        onSuccess: () => setEditingChore(null),
+        onError: (err) => Alert.alert("Error", err.message),
+      }
+    );
+  }
+
   function handleDelete(chore: ChoreWithStatus) {
     Alert.alert("Delete Chore", `Delete "${chore.title}"?`, [
       { text: "Cancel", style: "cancel" },
@@ -188,7 +239,10 @@ export default function Chores() {
     const recurrence = item.recurrence as Record<string, string>;
     return (
       <Swipeable renderRightActions={() => renderRightActions(item)}>
-        <View className="flex-row items-center bg-navy-card border-b border-navy-border px-4 py-3">
+        <Pressable
+          onLongPress={() => openEditChore(item)}
+          className="flex-row items-center bg-navy-card border-b border-navy-border px-4 py-3"
+        >
           {/* Complete button */}
           <TouchableOpacity
             className={`w-7 h-7 rounded-full border-2 mr-3 items-center justify-center ${
@@ -259,7 +313,7 @@ export default function Chores() {
               <Text className="text-xs text-ash">Assign</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </Pressable>
       </Swipeable>
     );
   }
@@ -514,6 +568,137 @@ export default function Chores() {
               <TouchableOpacity
                 className="py-3 mb-4"
                 onPress={() => setShowAdd(false)}
+              >
+                <Text className="text-ash text-center">Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Edit Chore Modal */}
+      <Modal
+        visible={!!editingChore}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setEditingChore(null)}
+      >
+        <TouchableOpacity
+          className="flex-1 bg-black/40 justify-end"
+          activeOpacity={1}
+          onPress={() => setEditingChore(null)}
+        >
+          <TouchableOpacity activeOpacity={1}>
+            <ScrollView className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
+              <Text className="text-lg font-body-bold text-white mb-4">Edit Chore</Text>
+
+              <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                Title
+              </Text>
+              <TextInput
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                value={editTitle}
+                onChangeText={setEditTitle}
+              />
+
+              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+                Category
+              </Text>
+              <View className="flex-row flex-wrap gap-2 mb-4">
+                {CATEGORIES.map((cat) => (
+                  <TouchableOpacity
+                    key={cat.key}
+                    className={`px-3 py-2 rounded-xl border ${
+                      editCategory === cat.key
+                        ? "bg-amber border-amber"
+                        : "border-navy-border bg-navy-raise"
+                    }`}
+                    onPress={() => setEditCategory(cat.key)}
+                  >
+                    <Text
+                      className={`text-sm ${
+                        editCategory === cat.key
+                          ? "text-midnight font-body-medium"
+                          : "text-ash"
+                      }`}
+                    >
+                      {cat.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+                Recurrence
+              </Text>
+              <View className="flex-row gap-2 mb-4">
+                {RECURRENCE_OPTIONS.map((opt) => (
+                  <TouchableOpacity
+                    key={opt.key}
+                    className={`px-4 py-2 rounded-xl border flex-1 items-center ${
+                      editRecurrence === opt.key
+                        ? "bg-amber border-amber"
+                        : "border-navy-border bg-navy-raise"
+                    }`}
+                    onPress={() => setEditRecurrence(opt.key)}
+                  >
+                    <Text
+                      className={`text-sm ${
+                        editRecurrence === opt.key
+                          ? "text-midnight font-body-medium"
+                          : "text-ash"
+                      }`}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {editRecurrence === "every-x-days" && (
+                <>
+                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                    Every how many days?
+                  </Text>
+                  <TextInput
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                    value={editIntervalDays}
+                    onChangeText={setEditIntervalDays}
+                    keyboardType="number-pad"
+                  />
+                </>
+              )}
+
+              {editRecurrence !== "one-time" && (
+                <>
+                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                    Time (optional)
+                  </Text>
+                  <TextInput
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                    value={editTime}
+                    onChangeText={setEditTime}
+                    placeholder="e.g. 20:00"
+                    placeholderTextColor={colors.ash}
+                  />
+                </>
+              )}
+
+              <TouchableOpacity
+                className={`rounded-2xl py-4 mb-3 ${
+                  editTitle.trim() ? "bg-amber" : "bg-navy-raise border border-navy-border"
+                }`}
+                onPress={handleSaveEdit}
+                disabled={!editTitle.trim() || updateChore.isPending}
+              >
+                <Text className={`text-center font-body-semibold text-base ${editTitle.trim() ? "text-midnight" : "text-ash"}`}>
+                  {updateChore.isPending ? "Saving..." : "Save Changes"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                className="py-3 mb-4"
+                onPress={() => setEditingChore(null)}
               >
                 <Text className="text-ash text-center">Cancel</Text>
               </TouchableOpacity>

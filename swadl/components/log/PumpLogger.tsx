@@ -241,7 +241,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
           {PUMP_TYPES.find((p) => p.key === pumpType)?.label} ·{" "}
           {SIDES.find((s) => s.key === side)?.label}
         </Text>
-        <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1 }}>
+        <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 60 }}>
           {formatTimer(elapsed)}
         </Text>
         <Text className="text-ash mb-8">Pumping...</Text>
@@ -265,7 +265,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
     <View>
       <View className="items-center mb-4">
         <Text className="text-ash mb-1">Session Complete</Text>
-        <Text className="text-3xl font-mono-bold text-white" style={{ letterSpacing: -1 }}>{formatTimer(elapsed)}</Text>
+        <Text className="text-3xl font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 40 }}>{formatTimer(elapsed)}</Text>
       </View>
 
       <UnitToggle />
