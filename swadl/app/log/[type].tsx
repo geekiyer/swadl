@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { FeedLogger } from "../../components/log/FeedLogger";
@@ -21,15 +21,23 @@ export default function QuickLog() {
   const { type } = useLocalSearchParams<{ type: string }>();
   const confirmRef = useRef<LogConfirmationRef>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const navigated = useRef(false);
+
+  function goBack() {
+    if (navigated.current) return;
+    navigated.current = true;
+    router.back();
+  }
 
   function handleLogSuccess() {
     setShowConfirm(true);
-    confirmRef.current?.fire();
+    // Safety fallback: navigate back after 2s even if animation callback doesn't fire
+    setTimeout(goBack, 2000);
   }
 
-  function handleDone() {
-    router.back();
-  }
+  const handleConfirmReady = useCallback(() => {
+    confirmRef.current?.fire();
+  }, []);
 
   return (
     <View className="flex-1 bg-midnight pt-16 px-6">
@@ -50,7 +58,11 @@ export default function QuickLog() {
       {type === "pump" && <PumpLogger onSuccess={handleLogSuccess} />}
 
       {showConfirm && (
-        <LogConfirmation ref={confirmRef} onDone={handleDone} />
+        <LogConfirmation
+          ref={confirmRef}
+          onDone={goBack}
+          onReady={handleConfirmReady}
+        />
       )}
     </View>
   );

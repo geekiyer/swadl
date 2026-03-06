@@ -7,6 +7,7 @@ import {
   Share,
   ActivityIndicator,
 } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import { useBabies, useSummary, type SummaryData } from "../../lib/queries";
 import { colors } from "../../constants/theme";
 import { useUnitStore, displayVolume } from "../../lib/store";
@@ -69,8 +70,9 @@ export default function Summary() {
   const { data: babies } = useBabies();
   const baby = babies?.[0];
 
+  const params = useLocalSearchParams<{ date?: string }>();
   const unit = useUnitStore((s) => s.unit);
-  const [date, setDate] = useState(() => formatDate(new Date()));
+  const [date, setDate] = useState(() => params.date ?? formatDate(new Date()));
   const [viewMode, setViewMode] = useState<ViewMode>("day");
 
   const weekStart = getWeekStart(date);

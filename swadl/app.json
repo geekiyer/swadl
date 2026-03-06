@@ -34,7 +34,8 @@
       "expo-router",
       "expo-sharing",
       "expo-font",
-      "expo-splash-screen"
+      "expo-splash-screen",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

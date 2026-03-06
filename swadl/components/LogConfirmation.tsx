@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, interpolate } from "react-native-reanimated";
 import { useLogBurst, BURST_ANGLES, BURST_RADII } from "../hooks/useLogBurst";
 import { colors } from "../constants/theme";
-import { useImperativeHandle, forwardRef } from "react";
+import { useImperativeHandle, forwardRef, useEffect } from "react";
 
 export interface LogConfirmationRef {
   fire: () => void;
@@ -10,15 +10,21 @@ export interface LogConfirmationRef {
 
 interface LogConfirmationProps {
   onDone: () => void;
+  onReady?: () => void;
 }
 
 export const LogConfirmation = forwardRef<LogConfirmationRef, LogConfirmationProps>(
-  function LogConfirmation({ onDone }, ref) {
+  function LogConfirmation({ onDone, onReady }, ref) {
     const { burst, checkStyle, labelStyle, particleP } = useLogBurst(onDone);
 
     useImperativeHandle(ref, () => ({
       fire: () => burst(),
     }));
+
+    // Notify parent that the component is mounted and the ref is ready
+    useEffect(() => {
+      onReady?.();
+    }, []);
 
     return (
       <View style={styles.overlay} pointerEvents="none">

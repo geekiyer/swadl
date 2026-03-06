@@ -30,15 +30,19 @@ function Bar({
   height,
   color,
   maxHeight,
+  onPress,
 }: {
   height: number;
   color: string;
   maxHeight: number;
+  onPress?: () => void;
 }) {
   const h = maxHeight > 0 ? Math.max(2, (height / maxHeight) * CHART_HEIGHT) : 2;
   return (
-    <View
+    <TouchableOpacity
       style={{ height: h, backgroundColor: color, borderRadius: 2, flex: 1 }}
+      onPress={onPress}
+      activeOpacity={0.7}
     />
   );
 }
@@ -50,12 +54,14 @@ function StackedBar({
   bottomColor,
   topColor,
   maxHeight,
+  onPress,
 }: {
   bottom: number;
   top: number;
   bottomColor: string;
   topColor: string;
   maxHeight: number;
+  onPress?: () => void;
 }) {
   const total = bottom + top;
   const totalH =
@@ -64,11 +70,19 @@ function StackedBar({
   const topH = total > 0 ? (top / total) * totalH : 1;
 
   return (
-    <View style={{ height: totalH, flex: 1, borderRadius: 2, overflow: "hidden" }}>
+    <TouchableOpacity
+      style={{ height: totalH, flex: 1, borderRadius: 2, overflow: "hidden" }}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <View style={{ height: topH, backgroundColor: topColor }} />
       <View style={{ height: bottomH, backgroundColor: bottomColor }} />
-    </View>
+    </TouchableOpacity>
   );
+}
+
+function navigateToDay(dateStr: string) {
+  router.push({ pathname: "/(tabs)/summary", params: { date: dateStr } });
 }
 
 function FeedingChart({ data }: { data: TrendDay[] }) {
@@ -103,6 +117,7 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
             height={hasOz ? day.feedOz : day.feedCount}
             color={colors.amber}
             maxHeight={maxVal}
+            onPress={() => navigateToDay(day.date)}
           />
         ))}
       </View>
@@ -178,6 +193,7 @@ function SleepChart({ data }: { data: TrendDay[] }) {
             bottomColor={colors.navyBorder}
             topColor={colors.honey}
             maxHeight={maxHrs}
+            onPress={() => navigateToDay(day.date)}
           />
         ))}
       </View>
@@ -240,6 +256,7 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
               bottomColor={colors.honey}
               topColor="#92400e"
               maxHeight={maxCount}
+              onPress={() => navigateToDay(day.date)}
             />
           );
         })}
@@ -302,6 +319,7 @@ function PumpChart({ data }: { data: TrendDay[] }) {
             height={hasOz ? day.pumpOz : day.pumpCount}
             color={colors.ember}
             maxHeight={maxVal}
+            onPress={() => navigateToDay(day.date)}
           />
         ))}
       </View>
@@ -337,7 +355,14 @@ export default function Trends() {
   const baby = babies?.[0];
 
   const [range, setRange] = useState<7 | 14 | 30>(7);
-  const { data: trendData, isLoading } = useTrends(baby?.id, range);
+
+  // Pre-fetch all ranges so switching is instant
+  const trends7 = useTrends(baby?.id, 7);
+  const trends14 = useTrends(baby?.id, 14);
+  const trends30 = useTrends(baby?.id, 30);
+
+  const trendsMap = { 7: trends7, 14: trends14, 30: trends30 } as const;
+  const { data: trendData, isLoading } = trendsMap[range];
 
   return (
     <ScrollView className="flex-1 bg-midnight">
@@ -375,7 +400,7 @@ export default function Trends() {
             <DiaperChart data={trendData} />
 
             <Text className="text-xs text-ash text-center mt-2">
-              Tap a bar to view that day's summary (coming soon)
+              Tap a bar to view that day's summary
             </Text>
           </>
         ) : (

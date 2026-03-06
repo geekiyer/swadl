@@ -14,6 +14,7 @@ import { useBabies } from "../../lib/queries";
 import { FORMULA_BRANDS } from "../../constants/formula-brands";
 import { useUnitStore, parseInputToOz } from "../../lib/store";
 import { UnitToggle } from "../UnitToggle";
+import { TimePicker } from "./TimePicker";
 import { colors } from "../../constants/theme";
 
 type FeedCategory = "breastfeed" | "bottle";
@@ -43,6 +44,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
   const [formulaBrand, setFormulaBrand] = useState<string | null>(null);
   const [brandSearch, setBrandSearch] = useState("");
   const [amountOz, setAmountOz] = useState("");
+  const [bottleTime, setBottleTime] = useState(() => new Date());
 
   const unit = useUnitStore((s) => s.unit);
   const [saving, setSaving] = useState(false);
@@ -86,6 +88,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     setBrandSearch("");
     setAmountOz("");
     setElapsed(0);
+    setBottleTime(new Date());
   }
 
   async function saveBreast() {
@@ -95,7 +98,11 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      setSaving(false);
+      Alert.alert("Error", "Not signed in");
+      return;
+    }
 
     const { error } = await supabase.from("feed_logs").insert({
       baby_id: baby.id,
@@ -122,7 +129,11 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      setSaving(false);
+      Alert.alert("Error", "Not signed in");
+      return;
+    }
 
     const notesObj: Record<string, string> = { content: bottleContent };
     if (bottleContent === "formula" && formulaBrand) {
@@ -134,7 +145,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
       logged_by: session.user.id,
       type: "bottle",
       amount_oz: amountOz ? parseInputToOz(amountOz, unit) : null,
-      started_at: new Date().toISOString(),
+      started_at: bottleTime.toISOString(),
       notes: JSON.stringify(notesObj),
     });
 
@@ -334,7 +345,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
       );
     }
 
-    // Step B3: Enter amount
+    // Step B3: Enter amount + time
     return (
       <View>
         <View className="flex-row justify-between items-center mb-4">
@@ -351,7 +362,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
           Amount ({unit})
         </Text>
         <TextInput
-          className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
+          className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
           placeholder={unit === "oz" ? "e.g. 4" : "e.g. 120"}
           placeholderTextColor={colors.ash}
           value={amountOz}
@@ -359,6 +370,8 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
           keyboardType="decimal-pad"
           autoFocus
         />
+
+        <TimePicker value={bottleTime} onChange={setBottleTime} />
 
         <TouchableOpacity
           className={`rounded-xl py-4 ${amountOz ? "bg-amber" : "bg-navy-raise border border-navy-border"}`}

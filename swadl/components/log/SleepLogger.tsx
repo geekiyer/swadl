@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies, useLatestSleep } from "../../lib/queries";
+import { TimePicker } from "./TimePicker";
 
 const LOCATIONS = [
   { key: "crib", label: "Crib" },
@@ -25,6 +26,8 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
   const { data: latestSleep } = useLatestSleep(baby?.id);
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
+  const [sleepTime, setSleepTime] = useState(() => new Date());
+  const [wakeTime, setWakeTime] = useState(() => new Date());
 
   const isSleeping = latestSleep && !latestSleep.ended_at;
 
@@ -34,7 +37,7 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
 
     const { error } = await supabase
       .from("sleep_logs")
-      .update({ ended_at: new Date().toISOString() })
+      .update({ ended_at: wakeTime.toISOString() })
       .eq("id", latestSleep.id);
 
     setSaving(false);
@@ -52,12 +55,16 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
     setSaving(true);
 
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      setSaving(false);
+      Alert.alert("Error", "Not signed in");
+      return;
+    }
 
     const { error } = await supabase.from("sleep_logs").insert({
       baby_id: baby.id,
       logged_by: session.user.id,
-      started_at: new Date().toISOString(),
+      started_at: sleepTime.toISOString(),
       location,
     });
 
@@ -81,9 +88,13 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
         <Text className="text-4xl font-mono-bold text-white mb-1" style={{ letterSpacing: -1 }}>
           {Math.floor(mins / 60)}h {mins % 60}m
         </Text>
-        <Text className="text-ash mb-6">
+        <Text className="text-ash mb-4">
           in {latestSleep.location}
         </Text>
+
+        <View className="w-full mb-4">
+          <TimePicker value={wakeTime} onChange={setWakeTime} label="Woke up at" />
+        </View>
 
         <TouchableOpacity
           className="bg-amber rounded-2xl py-4 px-8"
@@ -100,6 +111,8 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
 
   return (
     <View>
+      <TimePicker value={sleepTime} onChange={setSleepTime} label="Fell asleep at" />
+
       <Text className="text-ash mb-4">Where did they fall asleep?</Text>
       <View className="flex-row flex-wrap gap-3">
         {LOCATIONS.map((loc) => (

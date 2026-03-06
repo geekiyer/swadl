@@ -95,7 +95,11 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      setSaving(false);
+      Alert.alert("Error", "Not signed in");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("pump_logs")

@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies } from "../../lib/queries";
+import { TimePicker } from "./TimePicker";
 import { colors } from "../../constants/theme";
 
 type DiaperType = "wet" | "dirty" | "both" | "dry";
@@ -43,6 +44,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
   const [saving, setSaving] = useState(false);
 
   const [diaperType, setDiaperType] = useState<DiaperType | null>(null);
+  const [logTime, setLogTime] = useState(() => new Date());
   const [poopColor, setPoopColor] = useState<string | null>(null);
   const [consistency, setConsistency] = useState<string | null>(null);
   const [hasRash, setHasRash] = useState(false);
@@ -63,7 +65,11 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) {
+      setSaving(false);
+      Alert.alert("Error", "Not signed in");
+      return;
+    }
 
     const notes = details
       ? JSON.stringify({
@@ -78,7 +84,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       baby_id: baby.id,
       logged_by: session.user.id,
       type,
-      logged_at: new Date().toISOString(),
+      logged_at: logTime.toISOString(),
       notes,
     });
 
@@ -96,6 +102,8 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
   if (!diaperType) {
     return (
       <View>
+        <TimePicker value={logTime} onChange={setLogTime} />
+
         <Text className="text-ash mb-4">What kind of diaper?</Text>
         <View className="flex-row flex-wrap gap-3">
           <TouchableOpacity

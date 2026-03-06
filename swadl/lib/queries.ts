@@ -1125,7 +1125,7 @@ export function useTrends(babyId: string | undefined, days: number) {
     queryFn: async () => {
       const endDate = new Date();
       const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
+      startDate.setDate(startDate.getDate() - (days - 1));
       startDate.setHours(0, 0, 0, 0);
 
       const [{ data: feeds }, { data: diapers }, { data: sleeps }, { data: pumps }] =
@@ -1181,9 +1181,14 @@ export function useTrends(babyId: string | undefined, days: number) {
         });
       }
 
+      // Extract local-time date key from an ISO timestamp
+      function localDateKey(isoStr: string): string {
+        const d = new Date(isoStr);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
       feedList.forEach((f) => {
-        const key = f.started_at.slice(0, 10);
-        const day = dayMap.get(key);
+        const day = dayMap.get(localDateKey(f.started_at));
         if (day) {
           day.feedCount++;
           day.feedOz += f.amount_oz ?? 0;
@@ -1191,8 +1196,7 @@ export function useTrends(babyId: string | undefined, days: number) {
       });
 
       diaperList.forEach((d) => {
-        const key = d.logged_at.slice(0, 10);
-        const day = dayMap.get(key);
+        const day = dayMap.get(localDateKey(d.logged_at));
         if (day) {
           day.diaperCount++;
           if (d.type === "wet" || d.type === "both") day.diaperWet++;
@@ -1201,8 +1205,7 @@ export function useTrends(babyId: string | undefined, days: number) {
       });
 
       sleepList.forEach((s) => {
-        const key = s.started_at.slice(0, 10);
-        const day = dayMap.get(key);
+        const day = dayMap.get(localDateKey(s.started_at));
         if (day) {
           const start = new Date(s.started_at);
           const end = s.ended_at ? new Date(s.ended_at) : new Date();
@@ -1217,8 +1220,7 @@ export function useTrends(babyId: string | undefined, days: number) {
       });
 
       pumpList.forEach((p) => {
-        const key = p.started_at.slice(0, 10);
-        const day = dayMap.get(key);
+        const day = dayMap.get(localDateKey(p.started_at));
         if (day) {
           day.pumpCount++;
           day.pumpOz += p.amount_oz ?? 0;
@@ -1306,28 +1308,38 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
       const items: ActivityItem[] = [];
 
       (feeds as FeedLog[] | null)?.forEach((f) => {
-        const type = f.type.replace("_", " ");
-        const detail = f.amount_oz
-          ? `${f.amount_oz} oz`
-          : f.duration_min
-            ? `${f.duration_min} min`
-            : "";
+        const FEED_LABELS: Record<string, string> = {
+          breast_left: "breastfed (left)",
+          breast_right: "breastfed (right)",
+          bottle: "gave a bottle",
+          solids: "fed solids",
+        };
+        const detail = [
+          f.amount_oz ? `${f.amount_oz} oz` : "",
+          f.duration_min ? `${f.duration_min} min` : "",
+        ].filter(Boolean).join(" · ");
         items.push({
           id: f.id,
           kind: "feed",
           timestamp: f.started_at,
-          label: `Fed (${type})`,
+          label: FEED_LABELS[f.type] ?? "logged a feed",
           detail,
           loggedBy: nameMap[f.logged_by] ?? "Unknown",
         });
       });
 
       (diapers as DiaperLog[] | null)?.forEach((d) => {
+        const DIAPER_LABELS: Record<string, string> = {
+          wet: "changed a wet diaper",
+          dirty: "changed a dirty diaper",
+          both: "changed a wet + dirty diaper",
+          dry: "did a diaper check (dry)",
+        };
         items.push({
           id: d.id,
           kind: "diaper",
           timestamp: d.logged_at,
-          label: `Diaper (${d.type})`,
+          label: DIAPER_LABELS[d.type] ?? "changed a diaper",
           detail: "",
           loggedBy: nameMap[d.logged_by] ?? "Unknown",
         });
@@ -1336,22 +1348,22 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
       (sleeps as SleepLog[] | null)?.forEach((s) => {
         const duration = s.ended_at
           ? `${Math.round((new Date(s.ended_at).getTime() - new Date(s.started_at).getTime()) / 60000)} min`
-          : "ongoing";
+          : "";
+        const isAwake = !!s.ended_at;
         items.push({
           id: s.id,
           kind: "sleep",
           timestamp: s.started_at,
-          label: `Sleep (${s.location})`,
+          label: isAwake ? `logged sleep in ${s.location}` : `put baby down in ${s.location}`,
           detail: duration,
           loggedBy: nameMap[s.logged_by] ?? "Unknown",
         });
       });
 
       (pumps as PumpLog[] | null)?.forEach((p) => {
-        const pType = p.pump_type.replace("_", " ");
         const dur = p.ended_at
           ? `${Math.round((new Date(p.ended_at).getTime() - new Date(p.started_at).getTime()) / 60000)} min`
-          : "ongoing";
+          : "in progress";
         const detail = [dur, p.amount_oz ? `${p.amount_oz} oz` : ""]
           .filter(Boolean)
           .join(" · ");
@@ -1359,7 +1371,7 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
           id: p.id,
           kind: "pump",
           timestamp: p.started_at,
-          label: `Pump (${pType})`,
+          label: "pumped",
           detail,
           loggedBy: nameMap[p.logged_by] ?? "Unknown",
         });

@@ -19,6 +19,7 @@ import {
 } from "../../lib/queries";
 import { useAuthStore } from "../../lib/store";
 import { colors } from "../../constants/theme";
+import { useThemeStore } from "../../lib/theme";
 
 const FEEDING_OPTIONS = [
   { key: "breast", label: "Breast" },
@@ -40,6 +41,8 @@ export default function Settings() {
   const updateBaby = useUpdateBaby();
   const updateProfile = useUpdateProfile();
   const setSession = useAuthStore((s) => s.setSession);
+  const themeMode = useThemeStore((s) => s.mode);
+  const toggleTheme = useThemeStore((s) => s.toggleMode);
 
   const baby = babies?.[0];
   const isAdmin = profile?.role === "admin";
@@ -246,6 +249,33 @@ export default function Settings() {
               )}
             </TouchableOpacity>
           ))}
+        </View>
+
+        {/* Appearance */}
+        <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+          Appearance
+        </Text>
+        <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-6">
+          <View className="flex-row justify-between items-center">
+            <View>
+              <Text className="text-base font-body-medium text-white">Dark Mode</Text>
+              <Text className="text-sm text-ash mt-0.5">
+                {themeMode === "dark" ? "On" : "Off"}
+              </Text>
+            </View>
+            <TouchableOpacity
+              className={`w-12 h-7 rounded-full justify-center ${
+                themeMode === "dark" ? "bg-amber" : "bg-navy-raise"
+              }`}
+              onPress={toggleTheme}
+            >
+              <View
+                className={`w-5 h-5 rounded-full bg-white mx-1 ${
+                  themeMode === "dark" ? "self-end" : "self-start"
+                }`}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Sign Out */}
