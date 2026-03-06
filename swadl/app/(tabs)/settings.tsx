@@ -270,9 +270,10 @@ export default function Settings() {
               onPress={toggleTheme}
             >
               <View
-                className={`w-5 h-5 rounded-full bg-white mx-1 ${
+                className={`w-5 h-5 rounded-full mx-1 ${
                   themeMode === "dark" ? "self-end" : "self-start"
                 }`}
+                style={{ backgroundColor: "#FFFFFF" }}
               />
             </TouchableOpacity>
           </View>

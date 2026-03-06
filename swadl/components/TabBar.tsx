@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import {
@@ -9,6 +9,7 @@ import {
   Settings,
 } from "lucide-react-native";
 import { colors } from "../constants/theme";
+import { useThemeColors } from "../lib/theme";
 import type { LucideIcon } from "lucide-react-native";
 
 const TAB_ICONS: Record<string, LucideIcon> = {
@@ -29,6 +30,7 @@ const TAB_LABELS: Record<string, string> = {
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const tc = useThemeColors();
 
   // Filter to only visible tabs (respects href: null for restricted users)
   const visibleRoutes = state.routes.filter((route) => {
@@ -38,19 +40,19 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   });
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      <View style={styles.tabs}>
+    <View style={{ backgroundColor: tc.navyCard, borderTopWidth: 1, borderTopColor: tc.navyBorder, paddingBottom: insets.bottom }}>
+      <View style={{ flexDirection: "row", height: 56, alignItems: "center", justifyContent: "space-around" }}>
         {visibleRoutes.map((route) => {
           const routeIndex = state.routes.indexOf(route);
           const isFocused = state.index === routeIndex;
           const Icon = TAB_ICONS[route.name] ?? Home;
           const label = TAB_LABELS[route.name] ?? route.name;
-          const tintColor = isFocused ? colors.amber : colors.ash;
+          const tintColor = isFocused ? colors.amber : tc.ash;
 
           return (
             <Pressable
               key={route.key}
-              style={styles.tab}
+              style={{ flex: 1, alignItems: "center", justifyContent: "center", paddingVertical: 6 }}
               onPress={() => {
                 if (!isFocused) {
                   navigation.navigate(route.name);
@@ -59,10 +61,12 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             >
               <Icon size={24} strokeWidth={1.5} color={tintColor} />
               <Text
-                style={[
-                  styles.label,
-                  { color: tintColor },
-                ]}
+                style={{
+                  fontFamily: "JetBrainsMono_400Regular",
+                  fontSize: 10,
+                  marginTop: 2,
+                  color: tintColor,
+                }}
               >
                 {label}
               </Text>
@@ -73,28 +77,3 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.navyCard,
-    borderTopWidth: 1,
-    borderTopColor: colors.navyBorder,
-  },
-  tabs: {
-    flexDirection: "row",
-    height: 56,
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  tab: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 6,
-  },
-  label: {
-    fontFamily: "JetBrainsMono_400Regular",
-    fontSize: 10,
-    marginTop: 2,
-  },
-});

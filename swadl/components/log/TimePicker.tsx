@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity, Platform } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { colors } from "../../constants/theme";
+import { useThemeColors, useThemeStore } from "../../lib/theme";
 
 interface TimePickerProps {
   value: Date;
@@ -36,6 +36,8 @@ function formatLabel(d: Date): string {
 export function TimePicker({ value, onChange, label = "When" }: TimePickerProps) {
   const [showPicker, setShowPicker] = useState(false);
   const [mode, setMode] = useState<"date" | "time">("time");
+  const tc = useThemeColors();
+  const themeMode = useThemeStore((s) => s.mode);
 
   function handleChange(_event: unknown, selectedDate?: Date) {
     if (Platform.OS === "android") {
@@ -87,8 +89,8 @@ export function TimePicker({ value, onChange, label = "When" }: TimePickerProps)
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleChange}
           maximumDate={new Date()}
-          themeVariant="dark"
-          textColor={colors.white}
+          themeVariant={themeMode}
+          textColor={tc.white}
         />
       )}
     </View>

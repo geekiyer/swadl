@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies } from "../../lib/queries";
 import { TimePicker } from "./TimePicker";
-import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
 
 type DiaperType = "wet" | "dirty" | "both" | "dry";
 
@@ -38,6 +38,7 @@ interface DiaperLoggerProps {
 }
 
 export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
+  const tc = useThemeColors();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const queryClient = useQueryClient();
@@ -219,7 +220,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
           <Switch
             value={hasRash}
             onValueChange={setHasRash}
-            trackColor={{ false: colors.navyBorder, true: colors.amber }}
+            trackColor={{ false: tc.navyBorder, true: tc.amber }}
             thumbColor="#FFFFFF"
           />
         </View>
@@ -233,7 +234,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
           <Switch
             value={isBlowout}
             onValueChange={setIsBlowout}
-            trackColor={{ false: colors.navyBorder, true: colors.amber }}
+            trackColor={{ false: tc.navyBorder, true: tc.amber }}
             thumbColor="#FFFFFF"
           />
         </View>

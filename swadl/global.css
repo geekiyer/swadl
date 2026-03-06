@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-midnight: 8 14 26;
+  --color-navy-deep: 10 22 40;
+  --color-navy-card: 15 29 50;
+  --color-navy-raise: 22 42 70;
+  --color-navy-border: 30 51 84;
+  --color-text-primary: 255 255 255;
+  --color-text-secondary: 155 163 181;
+  --color-text-muted: 200 205 216;
+}
+
+.light {
+  --color-midnight: 248 249 251;
+  --color-navy-deep: 248 249 251;
+  --color-navy-card: 255 255 255;
+  --color-navy-raise: 241 243 247;
+  --color-navy-border: 226 230 237;
+  --color-text-primary: 15 29 50;
+  --color-text-secondary: 74 85 104;
+  --color-text-muted: 155 163 181;
+}

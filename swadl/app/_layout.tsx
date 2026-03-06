@@ -1,5 +1,6 @@
 import "../global.css";
 import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -24,6 +25,7 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useOfflineSync } from "../hooks/useOfflineSync";
+import { useThemeStore } from "../lib/theme";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +38,7 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const setSession = useAuthStore((s) => s.setSession);
+  const themeMode = useThemeStore((s) => s.mode);
   const [ready, setReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
@@ -75,18 +78,20 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <OfflineSyncProvider />
-        <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(onboarding)" />
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="log" options={{ presentation: "modal" }} />
-          <Stack.Screen name="briefing" options={{ presentation: "modal" }} />
-        </Stack>
-      </QueryClientProvider>
+      <View className={themeMode === "light" ? "light flex-1" : "flex-1"}>
+        <QueryClientProvider client={queryClient}>
+          <OfflineSyncProvider />
+          <StatusBar style={themeMode === "light" ? "dark" : "light"} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(onboarding)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="log" options={{ presentation: "modal" }} />
+            <Stack.Screen name="briefing" options={{ presentation: "modal" }} />
+          </Stack>
+        </QueryClientProvider>
+      </View>
     </GestureHandlerRootView>
   );
 }

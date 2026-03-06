@@ -1,19 +1,20 @@
 import { Tabs } from "expo-router";
 import { useProfile } from "../../lib/queries";
-import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
 import { TabBar } from "../../components/TabBar";
 
 export default function TabsLayout() {
   const { data: profile } = useProfile();
   const isRestricted = profile?.role === "restricted";
+  const tc = useThemeColors();
 
   return (
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: true,
-        headerStyle: { backgroundColor: colors.midnight },
-        headerTintColor: colors.white,
+        headerStyle: { backgroundColor: tc.midnight },
+        headerTintColor: tc.white,
         headerTitleStyle: { fontFamily: "Outfit_600SemiBold" },
         animation: "none",
       }}
