@@ -49,7 +49,8 @@ export default function BabyInfo() {
         Baby's Name
       </Text>
       <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white font-body"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white font-body"
+        style={{ fontSize: 16, height: 48 }}
         placeholder="e.g. Emma"
         placeholderTextColor={colors.ash}
         value={name}
@@ -61,7 +62,8 @@ export default function BabyInfo() {
         Date of Birth
       </Text>
       <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white font-mono"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-6 text-white font-mono"
+        style={{ fontSize: 16, height: 48 }}
         placeholder="YYYY-MM-DD"
         placeholderTextColor={colors.ash}
         value={dob}

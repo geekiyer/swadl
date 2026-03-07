@@ -528,7 +528,8 @@ export default function Chores() {
                 Title
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                 placeholder="e.g. Sanitize bottles"
                 placeholderTextColor={colors.ash}
                 value={newTitle}
@@ -599,7 +600,8 @@ export default function Chores() {
                     Every how many days?
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                     placeholder="e.g. 3"
                     placeholderTextColor={colors.ash}
                     value={newIntervalDays}
@@ -616,7 +618,8 @@ export default function Chores() {
                     Time (optional)
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                     placeholder="e.g. 20:00"
                     placeholderTextColor={colors.ash}
                     value={newTime}
@@ -669,7 +672,8 @@ export default function Chores() {
                 Title
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                 value={editTitle}
                 onChangeText={setEditTitle}
               />
@@ -734,7 +738,8 @@ export default function Chores() {
                     Every how many days?
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                     value={editIntervalDays}
                     onChangeText={setEditIntervalDays}
                     keyboardType="number-pad"
@@ -748,7 +753,8 @@ export default function Chores() {
                     Time (optional)
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                     value={editTime}
                     onChangeText={setEditTime}
                     placeholder="e.g. 20:00"

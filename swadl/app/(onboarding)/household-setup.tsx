@@ -75,7 +75,8 @@ export default function HouseholdSetup() {
         Partner / Caregiver Email
       </Text>
       <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-8 text-base text-white font-body"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-8 text-white font-body"
+        style={{ fontSize: 16, height: 48 }}
         placeholder="partner@email.com"
         placeholderTextColor={colors.ash}
         value={email}

@@ -495,7 +495,8 @@ export default function Settings() {
                 Name
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                 value={babyName}
                 onChangeText={setBabyName}
               />
@@ -504,7 +505,8 @@ export default function Settings() {
                 Date of Birth
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                 value={babyDob}
                 onChangeText={setBabyDob}
                 placeholder="YYYY-MM-DD"
@@ -574,7 +576,8 @@ export default function Settings() {
             <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
               <Text className="text-lg font-body-bold text-white mb-4">Edit Your Name</Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-6 text-white"
+                style={{ fontSize: 16, height: 48 }}
                 value={displayName}
                 onChangeText={setDisplayName}
                 autoFocus
@@ -670,7 +673,8 @@ export default function Settings() {
                 They'll join your household when they sign up.
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                style={{ fontSize: 16, height: 48 }}
                 placeholder="Email address"
                 placeholderTextColor={tc.ash}
                 value={inviteEmail}
