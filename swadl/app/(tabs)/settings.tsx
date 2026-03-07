@@ -185,13 +185,12 @@ export default function Settings() {
               const { data: { session } } = await supabase.auth.getSession();
               if (!session) return;
 
-              // Delete profile (cascading DB constraints handle related data)
-              const { error } = await supabase
-                .from("profiles")
-                .delete()
-                .eq("id", session.user.id);
+              const { data, error } = await supabase.functions.invoke("delete-account", {
+                body: { user_id: session.user.id },
+              });
 
               if (error) throw error;
+              if (data?.error) throw new Error(data.error);
 
               await supabase.auth.signOut();
               setSession(null);
