@@ -58,16 +58,14 @@ Place screenshots in swadl/docs/screenshots/ and uncomment this section.
 
 ## Design
 
-<table>
-  <tr>
-    <td align="center"><strong>Midnight</strong><br/><code>#080E1A</code><br/><img src="https://via.placeholder.com/40/080E1A/080E1A" width="40" height="40" alt="midnight"/></td>
-    <td align="center"><strong>Navy Card</strong><br/><code>#0F1D32</code><br/><img src="https://via.placeholder.com/40/0F1D32/0F1D32" width="40" height="40" alt="navy-card"/></td>
-    <td align="center"><strong>Navy Raise</strong><br/><code>#162A46</code><br/><img src="https://via.placeholder.com/40/162A46/162A46" width="40" height="40" alt="navy-raise"/></td>
-    <td align="center"><strong>Amber</strong><br/><code>#F59E0B</code><br/><img src="https://via.placeholder.com/40/F59E0B/F59E0B" width="40" height="40" alt="amber"/></td>
-    <td align="center"><strong>Ember</strong><br/><code>#F97316</code><br/><img src="https://via.placeholder.com/40/F97316/F97316" width="40" height="40" alt="ember"/></td>
-    <td align="center"><strong>White</strong><br/><code>#F8FAFC</code><br/><img src="https://via.placeholder.com/40/F8FAFC/F8FAFC" width="40" height="40" alt="white"/></td>
-  </tr>
-</table>
+| Color | Hex | Usage |
+|---|---|---|
+| ![midnight](swadl/docs/swatches/midnight.png) | `#080E1A` | Page background |
+| ![navy-card](swadl/docs/swatches/navy-card.png) | `#0F1D32` | Card surfaces |
+| ![navy-raise](swadl/docs/swatches/navy-raise.png) | `#162A46` | Elevated surfaces, inputs |
+| ![amber](swadl/docs/swatches/amber.png) | `#F59E0B` | Primary — CTAs, active states |
+| ![ember](swadl/docs/swatches/ember.png) | `#F97316` | Accent — sparingly, 1 per screen |
+| ![white](swadl/docs/swatches/white.png) | `#F8FAFC` | Primary text |
 
 **Typography:** Fraunces 900 (display) / Outfit (body) / JetBrains Mono (data)
 
