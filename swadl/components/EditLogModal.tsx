@@ -37,6 +37,7 @@ const DIAPER_TYPES = [
 const SLEEP_LOCATIONS = [
   { key: "crib", label: "Crib" },
   { key: "bassinet", label: "Bassinet" },
+  { key: "co_sleep", label: "Co-sleep" },
   { key: "stroller", label: "Stroller" },
   { key: "car", label: "Car" },
   { key: "arms", label: "Arms" },

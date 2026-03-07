@@ -1467,11 +1467,16 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
           ? `${Math.round((new Date(s.ended_at).getTime() - new Date(s.started_at).getTime()) / 60000)} min`
           : "";
         const isAwake = !!s.ended_at;
+        const locLabel: Record<string, string> = {
+          crib: "crib", bassinet: "bassinet", co_sleep: "co-sleep",
+          stroller: "stroller", car: "car", arms: "arms",
+        };
+        const loc = locLabel[s.location] ?? s.location;
         items.push({
           id: s.id,
           kind: "sleep",
           timestamp: s.started_at,
-          label: isAwake ? `logged sleep in ${s.location}` : `put baby down in ${s.location}`,
+          label: isAwake ? `logged sleep in ${loc}` : `put baby down in ${loc}`,
           detail: duration,
           loggedBy: nameMap[s.logged_by] ?? "Unknown",
           raw: s as unknown as Record<string, unknown>,
