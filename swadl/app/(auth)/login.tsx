@@ -82,7 +82,8 @@ export default function Login() {
       </Text>
 
       <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+        style={{ fontSize: 16, height: 48 }}
         placeholder="Email"
         placeholderTextColor={colors.ash}
         value={email}
@@ -90,9 +91,10 @@ export default function Login() {
         autoCapitalize="none"
         keyboardType="email-address"
       />
-      <View className="flex-row items-center border border-navy-border bg-navy-raise rounded-xl mb-2">
+      <View className="flex-row items-center border border-navy-border bg-navy-raise rounded-xl mb-2" style={{ height: 48 }}>
         <TextInput
-          className="flex-1 px-4 py-3 text-base text-white"
+          className="flex-1 px-4 text-white"
+          style={{ fontSize: 16, height: 48 }}
           placeholder="Password"
           placeholderTextColor={colors.ash}
           value={password}
