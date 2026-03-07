@@ -84,11 +84,15 @@ export default function InstantValue() {
       }
 
       if (partnerEmail) {
-        await supabase.from("household_invites").insert({
-          household_id: householdId,
-          email: partnerEmail.trim().toLowerCase(),
-          role: "caregiver",
-          invited_by: session.user.id,
+        await supabase.functions.invoke("send-invite", {
+          body: {
+            email: partnerEmail,
+            household_id: householdId,
+            household_name: `${babyName}'s Family`,
+            invited_by_name: session.user.email?.split("@")[0] ?? "Your partner",
+            invited_by: session.user.id,
+            role: "caregiver",
+          },
         });
       }
 

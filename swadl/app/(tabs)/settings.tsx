@@ -139,29 +139,35 @@ export default function Settings() {
   async function handleInvite() {
     if (!inviteEmail.trim() || !profile) return;
     try {
-      const { error } = await supabase.from("household_invites").insert({
-        household_id: profile.household_id,
-        email: inviteEmail.trim().toLowerCase(),
-        role: inviteRole,
-        invited_by: profile.id,
+      const { data: result, error } = await supabase.functions.invoke("send-invite", {
+        body: {
+          email: inviteEmail.trim(),
+          household_id: profile.household_id,
+          household_name: baby ? `${baby.name}'s Family` : "the household",
+          invited_by_name: profile.display_name,
+          invited_by: profile.id,
+          role: inviteRole,
+        },
       });
-      if (error) {
-        if (error.code === "23505") {
+      if (error) throw error;
+      if (result?.error) {
+        if (result.error.includes("duplicate") || result.error.includes("already")) {
           Alert.alert("Already Invited", "This email has already been invited.");
         } else {
-          throw error;
+          throw new Error(result.error);
         }
         return;
       }
       Alert.alert(
         "Invite Sent",
-        `When ${inviteEmail.trim()} signs up, they'll automatically join your household.`
+        `An invite email has been sent to ${inviteEmail.trim()}.`
       );
       setInviteEmail("");
       setInviteRole("caregiver");
       setShowInvite(false);
-    } catch (err: any) {
-      Alert.alert("Error", err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to send invite";
+      Alert.alert("Error", message);
     }
   }
 
