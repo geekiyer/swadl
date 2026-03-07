@@ -78,6 +78,28 @@ export function parseInputToOz(value: string, unit: VolumeUnit): number {
 }
 
 // ============================================================
+// Last Used Formula Brand
+// ============================================================
+
+interface FormulaBrandState {
+  lastBrand: string | null;
+  setLastBrand: (brand: string) => void;
+}
+
+export const useFormulaBrandStore = create<FormulaBrandState>()(
+  persist(
+    (set) => ({
+      lastBrand: null,
+      setLastBrand: (brand) => set({ lastBrand: brand }),
+    }),
+    {
+      name: "formula-brand-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+
+// ============================================================
 // Offline Queue
 // ============================================================
 

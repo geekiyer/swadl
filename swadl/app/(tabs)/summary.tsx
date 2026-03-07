@@ -328,7 +328,7 @@ export default function Summary() {
               {summary.lowWetWarning && (
                 <View className="bg-navy-raise rounded-lg p-2 mt-2 border-l-[3px] border-amber">
                   <Text className="text-sm text-amber font-body">
-                    Fewer than 4 wet diapers — consider checking hydration
+                    Fewer than 6 wet diapers — consider checking hydration
                   </Text>
                 </View>
               )}

@@ -47,7 +47,9 @@ export default function QuickLog() {
   return (
     <View className="flex-1 bg-midnight pt-16 px-6">
       <TouchableOpacity onPress={() => router.back()} className="mb-6">
-        <Text className="text-ash text-base font-body-medium">Cancel</Text>
+        <Text className="text-ash text-base font-body-medium">
+          {type === "sleep" || type === "pump" ? "Done" : "Cancel"}
+        </Text>
       </TouchableOpacity>
 
       <View className="flex-row items-center mb-6">

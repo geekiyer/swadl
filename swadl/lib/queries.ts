@@ -1168,7 +1168,7 @@ export function useSummary(
         pumpTotalMin: Math.round(pumpTotalMin),
         diaperCount: diaperList.length,
         diaperByType,
-        lowWetWarning: wetCount < 4,
+        lowWetWarning: wetCount < 6,
         sleepTotalMin: Math.round(sleepTotalMin),
         napCount: sleepList.length,
         longestStretchMin: Math.round(longestStretchMin),

@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies } from "../../lib/queries";
 import { FORMULA_BRANDS } from "../../constants/formula-brands";
-import { useUnitStore, parseInputToOz } from "../../lib/store";
+import { useUnitStore, useFormulaBrandStore, parseInputToOz } from "../../lib/store";
 import { UnitToggle } from "../UnitToggle";
 import { TimePicker } from "./TimePicker";
 import { colors } from "../../constants/theme";
@@ -41,7 +41,9 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
 
   // Bottle state
   const [bottleContent, setBottleContent] = useState<BottleContent | null>(null);
-  const [formulaBrand, setFormulaBrand] = useState<string | null>(null);
+  const lastBrand = useFormulaBrandStore((s) => s.lastBrand);
+  const setLastBrand = useFormulaBrandStore((s) => s.setLastBrand);
+  const [formulaBrand, setFormulaBrand] = useState<string | null>(lastBrand);
   const [brandSearch, setBrandSearch] = useState("");
   const [amountOz, setAmountOz] = useState("");
   const [bottleTime, setBottleTime] = useState(() => new Date());
@@ -298,45 +300,48 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
 
     // Step B2: Pick formula brand (formula only)
     if (bottleContent === "formula" && !formulaBrand) {
-      const filtered = brandSearch
+      const filtered = brandSearch.length >= 1
         ? FORMULA_BRANDS.filter((b) =>
             b.toLowerCase().includes(brandSearch.toLowerCase())
           )
-        : FORMULA_BRANDS;
+        : [];
 
       return (
         <View className="flex-1">
-          <Text className="text-ash mb-3">Pick a formula brand</Text>
+          <Text className="text-ash mb-3">Type to search formula brand</Text>
           <TextInput
             className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-3 text-base text-white"
-            placeholder="Search brands..."
+            placeholder="Start typing brand name..."
             placeholderTextColor={colors.ash}
             value={brandSearch}
             onChangeText={setBrandSearch}
             autoFocus
           />
-          <FlatList
-            data={filtered}
-            keyExtractor={(item) => item}
-            keyboardShouldPersistTaps="handled"
-            style={{ maxHeight: 350 }}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                className="py-3 px-2 border-b border-navy-border"
-                onPress={() => {
-                  setFormulaBrand(item);
-                  setBrandSearch("");
-                }}
-              >
-                <Text className="text-base text-white">{item}</Text>
-              </TouchableOpacity>
-            )}
-            ListEmptyComponent={
-              <Text className="text-ash text-center py-4">
-                No brands found
-              </Text>
-            }
-          />
+          {brandSearch.length >= 1 && (
+            <FlatList
+              data={filtered}
+              keyExtractor={(item) => item}
+              keyboardShouldPersistTaps="handled"
+              style={{ maxHeight: 350 }}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  className="py-3 px-2 border-b border-navy-border"
+                  onPress={() => {
+                    setFormulaBrand(item);
+                    setLastBrand(item);
+                    setBrandSearch("");
+                  }}
+                >
+                  <Text className="text-base text-white">{item}</Text>
+                </TouchableOpacity>
+              )}
+              ListEmptyComponent={
+                <Text className="text-ash text-center py-4">
+                  No brands found
+                </Text>
+              }
+            />
+          )}
           <TouchableOpacity
             className="mt-3 py-3"
             onPress={() => setBottleContent(null)}

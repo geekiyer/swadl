@@ -17,7 +17,8 @@ function timeLabel(dateStr: string): string {
   if (mins < 1) return "Just now";
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  const remMins = mins % 60;
+  if (hours < 24) return remMins > 0 ? `${hours}h ${remMins}m ago` : `${hours}h ago`;
   return `${Math.floor(hours / 24)}d ago`;
 }
 
