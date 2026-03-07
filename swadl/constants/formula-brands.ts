@@ -32,6 +32,7 @@ export const FORMULA_BRANDS = [
   "Happy Baby Organics",
   "Burt's Bees Baby Organic",
   "Bobbie Organic",
+  "Bobbie Organic Gentle",
   "ByHeart",
   "Kendamil",
   "HiPP (imported)",

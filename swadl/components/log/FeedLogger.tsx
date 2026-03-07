@@ -135,9 +135,11 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
       return;
     }
 
-    const notesObj: Record<string, string> = { content: bottleContent };
-    if (bottleContent === "formula" && formulaBrand) {
-      notesObj.brand = formulaBrand;
+    const noteParts: string[] = [];
+    if (bottleContent === "formula") {
+      noteParts.push(formulaBrand ? `Formula: ${formulaBrand}` : "Formula");
+    } else {
+      noteParts.push("Breastmilk");
     }
 
     const { error } = await supabase.from("feed_logs").insert({
@@ -146,7 +148,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
       type: "bottle",
       amount_oz: amountOz ? parseInputToOz(amountOz, unit) : null,
       started_at: bottleTime.toISOString(),
-      notes: JSON.stringify(notesObj),
+      notes: noteParts.join(""),
     });
 
     setSaving(false);

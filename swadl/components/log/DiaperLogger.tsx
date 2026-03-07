@@ -72,14 +72,12 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       return;
     }
 
-    const notes = details
-      ? JSON.stringify({
-          ...(details.color && { color: details.color }),
-          ...(details.consistency && { consistency: details.consistency }),
-          ...(details.rash && { rash: true }),
-          ...(details.blowout && { blowout: true }),
-        })
-      : null;
+    const noteParts: string[] = [];
+    if (details?.color) noteParts.push(`Color: ${details.color}`);
+    if (details?.consistency) noteParts.push(details.consistency);
+    if (details?.rash) noteParts.push("Rash");
+    if (details?.blowout) noteParts.push("Blowout");
+    const notes = noteParts.length > 0 ? noteParts.join(", ") : null;
 
     const { error } = await supabase.from("diaper_logs").insert({
       baby_id: baby.id,

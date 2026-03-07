@@ -142,13 +142,13 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
       updates.amount_oz = Math.round(totalOz * 10) / 10;
     }
 
-    // Store left/right breakdown in notes as JSON
-    const noteData: Record<string, unknown> = {};
-    if (leftOz > 0) noteData.left_oz = Math.round(leftOz * 10) / 10;
-    if (rightOz > 0) noteData.right_oz = Math.round(rightOz * 10) / 10;
-    if (notes.trim()) noteData.text = notes.trim();
-    if (Object.keys(noteData).length > 0) {
-      updates.notes = JSON.stringify(noteData);
+    // Store left/right breakdown as readable text
+    const noteParts: string[] = [];
+    if (leftOz > 0) noteParts.push(`Left: ${Math.round(leftOz * 10) / 10} oz`);
+    if (rightOz > 0) noteParts.push(`Right: ${Math.round(rightOz * 10) / 10} oz`);
+    if (notes.trim()) noteParts.push(notes.trim());
+    if (noteParts.length > 0) {
+      updates.notes = noteParts.join(", ");
     }
 
     const { error } = await supabase
@@ -254,6 +254,20 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
             Stop Pumping
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          className="py-3 mt-3"
+          onPress={async () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+            if (sessionId) {
+              await supabase.from("pump_logs").delete().eq("id", sessionId);
+              queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
+            }
+            router.back();
+          }}
+        >
+          <Text className="text-ash text-center text-sm">Discard</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -339,7 +353,16 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity className="py-3" onPress={() => router.back()}>
+      <TouchableOpacity
+        className="py-3"
+        onPress={async () => {
+          if (sessionId) {
+            await supabase.from("pump_logs").delete().eq("id", sessionId);
+            queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
+          }
+          router.back();
+        }}
+      >
         <Text className="text-ash text-center">Discard</Text>
       </TouchableOpacity>
     </View>

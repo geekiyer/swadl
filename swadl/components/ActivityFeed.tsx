@@ -1,6 +1,8 @@
-import { View, Text } from "react-native";
+import { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 import { useRecentActivity, type ActivityItem } from "../lib/queries";
 import { shadows, colors } from "../constants/theme";
+import { EditLogModal } from "./EditLogModal";
 
 const DOT_COLORS: Record<ActivityItem["kind"], string> = {
   feed: colors.amber,
@@ -21,6 +23,7 @@ function timeLabel(dateStr: string): string {
 
 export function ActivityFeed({ babyId }: { babyId: string | undefined }) {
   const { data: items } = useRecentActivity(babyId, 8);
+  const [editItem, setEditItem] = useState<ActivityItem | null>(null);
 
   if (!items || items.length === 0) {
     return (
@@ -31,30 +34,40 @@ export function ActivityFeed({ babyId }: { babyId: string | undefined }) {
   }
 
   return (
-    <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden" style={shadows.sm}>
-      {items.map((item, i) => (
-        <View
-          key={item.id}
-          className={`flex-row items-center px-4 py-3 ${
-            i > 0 ? "border-t border-navy-border" : ""
-          }`}
-        >
-          <View
-            className="w-2 h-2 rounded-full mr-3"
-            style={{ backgroundColor: DOT_COLORS[item.kind] }}
-          />
-          <View className="flex-1">
-            <Text className="text-sm text-white">
-              <Text className="font-body-semibold">{item.loggedBy}</Text>
-              <Text className="font-body"> {item.label}</Text>
-            </Text>
-            {item.detail ? (
-              <Text className="text-xs text-ash font-body mt-0.5">{item.detail}</Text>
-            ) : null}
-          </View>
-          <Text className="text-xs text-ash font-mono ml-2">{timeLabel(item.timestamp)}</Text>
-        </View>
-      ))}
-    </View>
+    <>
+      <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden" style={shadows.sm}>
+        {items.map((item, i) => (
+          <TouchableOpacity
+            key={item.id}
+            className={`flex-row items-center px-4 py-3 ${
+              i > 0 ? "border-t border-navy-border" : ""
+            }`}
+            onPress={() => setEditItem(item)}
+            activeOpacity={0.6}
+          >
+            <View
+              className="w-2 h-2 rounded-full mr-3"
+              style={{ backgroundColor: DOT_COLORS[item.kind] }}
+            />
+            <View className="flex-1">
+              <Text className="text-sm text-white">
+                <Text className="font-body-semibold">{item.loggedBy}</Text>
+                <Text className="font-body"> {item.label}</Text>
+              </Text>
+              {item.detail ? (
+                <Text className="text-xs text-ash font-body mt-0.5">{item.detail}</Text>
+              ) : null}
+            </View>
+            <Text className="text-xs text-ash font-mono ml-2">{timeLabel(item.timestamp)}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <EditLogModal
+        item={editItem}
+        visible={!!editItem}
+        onClose={() => setEditItem(null)}
+      />
+    </>
   );
 }

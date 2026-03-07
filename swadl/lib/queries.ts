@@ -1322,6 +1322,7 @@ export interface ActivityItem {
   label: string;
   detail: string;
   loggedBy: string;
+  raw: Record<string, unknown>;
 }
 
 export function useRecentActivity(babyId: string | undefined, limit = 10) {
@@ -1387,23 +1388,44 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
       const items: ActivityItem[] = [];
 
       (feeds as FeedLog[] | null)?.forEach((f) => {
-        const FEED_LABELS: Record<string, string> = {
-          breast_left: "breastfed (left)",
-          breast_right: "breastfed (right)",
-          bottle: "gave a bottle",
-          solids: "fed solids",
-        };
-        const detail = [
-          f.amount_oz ? `${f.amount_oz} oz` : "",
-          f.duration_min ? `${f.duration_min} min` : "",
-        ].filter(Boolean).join(" · ");
+        // Build a descriptive label based on feed type + content
+        let label = "logged a feed";
+        let contentInfo = "";
+        if (f.notes) {
+          try {
+            const parsed = JSON.parse(f.notes);
+            if (parsed.brand) contentInfo = parsed.brand;
+            else if (parsed.content === "formula") contentInfo = "Formula";
+            else if (parsed.content === "breastmilk") contentInfo = "Breastmilk";
+          } catch {
+            contentInfo = f.notes;
+          }
+        }
+
+        if (f.type === "breast_left") label = "breastfed (left)";
+        else if (f.type === "breast_right") label = "breastfed (right)";
+        else if (f.type === "bottle") {
+          if (contentInfo.toLowerCase().includes("formula")) label = "gave a formula bottle";
+          else if (contentInfo.toLowerCase().includes("breastmilk")) label = "gave a breastmilk bottle";
+          else label = "gave a bottle";
+        } else if (f.type === "solids") label = "fed solids";
+
+        const detailParts: string[] = [];
+        if (f.amount_oz) detailParts.push(`${f.amount_oz} oz`);
+        if (f.duration_min) detailParts.push(`${f.duration_min} min`);
+        // Add content info to detail (brand name, etc.) but skip generic "Formula"/"Breastmilk" already in label
+        if (contentInfo && !["Formula", "Breastmilk"].includes(contentInfo)) {
+          detailParts.push(contentInfo);
+        }
+        const detail = detailParts.join(" · ");
         items.push({
           id: f.id,
           kind: "feed",
           timestamp: f.started_at,
-          label: FEED_LABELS[f.type] ?? "logged a feed",
+          label,
           detail,
           loggedBy: nameMap[f.logged_by] ?? "Unknown",
+          raw: f as unknown as Record<string, unknown>,
         });
       });
 
@@ -1414,13 +1436,29 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
           both: "changed a wet + dirty diaper",
           dry: "did a diaper check (dry)",
         };
+        // Parse notes for detail (handles both old JSON and plain text)
+        let diaperDetail = "";
+        if (d.notes) {
+          try {
+            const parsed = JSON.parse(d.notes);
+            const parts: string[] = [];
+            if (parsed.color) parts.push(parsed.color);
+            if (parsed.consistency) parts.push(parsed.consistency);
+            if (parsed.rash) parts.push("Rash");
+            if (parsed.blowout) parts.push("Blowout");
+            diaperDetail = parts.join(" · ");
+          } catch {
+            diaperDetail = d.notes;
+          }
+        }
         items.push({
           id: d.id,
           kind: "diaper",
           timestamp: d.logged_at,
           label: DIAPER_LABELS[d.type] ?? "changed a diaper",
-          detail: "",
+          detail: diaperDetail,
           loggedBy: nameMap[d.logged_by] ?? "Unknown",
+          raw: d as unknown as Record<string, unknown>,
         });
       });
 
@@ -1436,6 +1474,7 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
           label: isAwake ? `logged sleep in ${s.location}` : `put baby down in ${s.location}`,
           detail: duration,
           loggedBy: nameMap[s.logged_by] ?? "Unknown",
+          raw: s as unknown as Record<string, unknown>,
         });
       });
 
@@ -1443,16 +1482,27 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
         const dur = p.ended_at
           ? `${Math.round((new Date(p.ended_at).getTime() - new Date(p.started_at).getTime()) / 60000)} min`
           : "in progress";
-        const detail = [dur, p.amount_oz ? `${p.amount_oz} oz` : ""]
-          .filter(Boolean)
-          .join(" · ");
+        const pumpDetailParts = [dur, p.amount_oz ? `${p.amount_oz} oz` : ""].filter(Boolean);
+        // Add notes (L/R breakdown, etc.)
+        if (p.notes) {
+          try {
+            const parsed = JSON.parse(p.notes);
+            const parts: string[] = [];
+            if (parsed.left_oz) parts.push(`L: ${parsed.left_oz} oz`);
+            if (parsed.right_oz) parts.push(`R: ${parsed.right_oz} oz`);
+            if (parts.length > 0) pumpDetailParts.push(parts.join(", "));
+          } catch {
+            pumpDetailParts.push(p.notes);
+          }
+        }
         items.push({
           id: p.id,
           kind: "pump",
           timestamp: p.started_at,
           label: "pumped",
-          detail,
+          detail: pumpDetailParts.join(" · "),
           loggedBy: nameMap[p.logged_by] ?? "Unknown",
+          raw: p as unknown as Record<string, unknown>,
         });
       });
 
