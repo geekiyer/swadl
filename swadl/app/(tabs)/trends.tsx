@@ -155,7 +155,45 @@ function navigateToDay(dateStr: string) {
   router.push({ pathname: "/(tabs)/summary", params: { date: dateStr } });
 }
 
+function ChartEmpty({ label, hint }: { label: string; hint: string }) {
+  // Fake bar heights to suggest a chart silhouette
+  const placeholderBars = [0.2, 0.35, 0.15, 0.5, 0.3, 0.45, 0.25];
+  return (
+    <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
+      <Text className="text-[11px] text-ash uppercase font-body-bold mb-1">{label}</Text>
+      <View style={{ height: CHART_HEIGHT, position: "relative" }}>
+        {/* Ghost bars */}
+        <View style={{ height: CHART_HEIGHT, flexDirection: "row", alignItems: "flex-end", gap: 4, paddingHorizontal: 8 }}>
+          {placeholderBars.map((h, i) => (
+            <View
+              key={i}
+              style={{
+                flex: 1,
+                height: h * CHART_HEIGHT,
+                backgroundColor: colors.navyBorder,
+                borderRadius: 2,
+                opacity: 0.35,
+              }}
+            />
+          ))}
+        </View>
+        {/* Overlay message */}
+        <View
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "center", alignItems: "center" }}
+        >
+          <View className="bg-navy-card/90 rounded-xl px-5 py-3 border border-navy-border">
+            <Text className="text-ash font-body-medium text-sm text-center">{hint}</Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 function FeedingChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
+  const hasData = data.some((d) => d.feedOz > 0 || d.feedCount > 0);
+  if (!hasData) return <ChartEmpty label="Feeding Trend" hint="Log a feed to see trends" />;
+
   const hasOz = data.some((d) => d.feedOz > 0);
   const maxVal = Math.max(
     ...data.map((d) => (hasOz ? d.feedOz : d.feedCount)),
@@ -241,6 +279,9 @@ function FeedingChart({ data, revealKey }: { data: TrendDay[]; revealKey: string
 }
 
 function SleepChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
+  const hasData = data.some((d) => d.nightSleepHrs > 0 || d.napHrs > 0);
+  if (!hasData) return <ChartEmpty label="Sleep Trend" hint="Log sleep to see trends" />;
+
   const maxHrs = Math.max(
     ...data.map((d) => d.nightSleepHrs + d.napHrs),
     1
@@ -303,6 +344,9 @@ function SleepChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }
 }
 
 function DiaperChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
+  const hasData = data.some((d) => d.diaperCount > 0);
+  if (!hasData) return <ChartEmpty label="Diaper Trend" hint="Log a diaper change to see trends" />;
+
   const maxCount = Math.max(...data.map((d) => d.diaperCount), 1);
 
   return (
@@ -363,7 +407,7 @@ function DiaperChart({ data, revealKey }: { data: TrendDay[]; revealKey: string 
 
 function PumpChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
   const hasData = data.some((d) => d.pumpOz > 0 || d.pumpCount > 0);
-  if (!hasData) return null;
+  if (!hasData) return <ChartEmpty label="Pump Trend" hint="Log a pump session to see trends" />;
 
   const hasOz = data.some((d) => d.pumpOz > 0);
   const maxVal = Math.max(
