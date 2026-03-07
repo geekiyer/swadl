@@ -1,9 +1,14 @@
 // Edge function: send-invite
 // POST /functions/v1/send-invite
-// Body: { email, household_name, invited_by_name, role? }
-// Uses Supabase Auth admin API to send an invite email.
-// If the user already exists, just inserts into household_invites.
-// If the user doesn't exist, sends a magic link invite email via Supabase Auth.
+// Body: { email, household_id, household_name, invited_by_name, invited_by, role? }
+//
+// Simple flow:
+// 1. Upsert into household_invites (so auto-join works when partner signs up)
+// 2. Return success — the inviter tells their partner to download the app and sign up
+// 3. When partner signs up with the same email → confirms → logs in,
+//    index.tsx auto-join finds the household_invites row and creates their profile
+//
+// No confusing emails, no pre-created accounts. Clean signup experience.
 //
 // Requires: SUPABASE_SERVICE_ROLE_KEY (auto-available in edge functions)
 
@@ -42,7 +47,9 @@ serve(async (req: Request) => {
     const normalizedEmail = email.trim().toLowerCase();
     const inviteRole = role ?? "caregiver";
 
-    // Insert into household_invites (so auto-join works on signup)
+    // Upsert household_invites row — this is all we need.
+    // When the partner signs up and confirms their email, index.tsx auto-join
+    // will find this row and create their profile in the household.
     const { error: inviteErr } = await supabase
       .from("household_invites")
       .upsert(
@@ -65,48 +72,10 @@ serve(async (req: Request) => {
     const senderName = invited_by_name ?? "Someone";
     const familyName = household_name ?? "their family";
 
-    // Send invite email via Supabase Auth admin API.
-    // - If user doesn't exist: creates auth user + sends invite email
-    // - If user exists but unconfirmed: re-sends invite email
-    // - If user exists and confirmed: may error — that's fine, we have the household_invites row
-    const { error: authErr } = await supabase.auth.admin.inviteUserByEmail(
-      normalizedEmail,
-      {
-        redirectTo: `swadl://`,
-        data: {
-          household_id,
-          invited_role: inviteRole,
-          invite_message: `${senderName} invited you to join ${familyName} on Swadl.`,
-        },
-      }
-    );
-
-    if (authErr) {
-      // "already been registered" or "already been invited" means user exists.
-      // The household_invites row ensures auto-join on their next login.
-      const msg = authErr.message?.toLowerCase() ?? "";
-      if (msg.includes("already") || msg.includes("registered") || msg.includes("invited")) {
-        return new Response(
-          JSON.stringify({
-            sent: true,
-            method: "existing_user",
-            message: "This user already has an account. They will be added to your household on their next login.",
-          }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      return new Response(
-        JSON.stringify({ error: authErr.message }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     return new Response(
       JSON.stringify({
         sent: true,
-        method: "email_invite",
-        message: `Invite email sent to ${normalizedEmail}`,
+        message: `Invite saved! Ask your partner to download Swadl and sign up with ${normalizedEmail}. They'll automatically join ${familyName}.`,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Pressable, Alert } from "react-native";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { colors } from "../../constants/theme";
 import { Eye, EyeOff } from "lucide-react-native";
@@ -20,7 +20,7 @@ export default function Signup() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { display_name: displayName.trim() } },
@@ -29,9 +29,23 @@ export default function Signup() {
 
     if (error) {
       Alert.alert("Error", error.message);
-    } else {
-      setConfirmationSent(true);
+      return;
     }
+
+    // Supabase returns a user with no identities if the email already exists
+    if (data.user && data.user.identities?.length === 0) {
+      Alert.alert(
+        "Account Already Exists",
+        "An account with this email already exists. Try signing in instead.",
+        [
+          { text: "OK", style: "cancel" },
+          { text: "Go to Sign In", onPress: () => router.replace("/(auth)/login") },
+        ]
+      );
+      return;
+    }
+
+    setConfirmationSent(true);
   }
 
   async function handleResend() {

@@ -162,8 +162,8 @@ export default function Settings() {
         return;
       }
       Alert.alert(
-        "Invite Sent",
-        `An invite email has been sent to ${inviteEmail.trim()}.`
+        "Invite Saved",
+        result?.message ?? `Ask your partner to download Swadl and sign up with ${inviteEmail.trim()}. They'll automatically join your household.`
       );
       setInviteEmail("");
       setInviteRole("caregiver");

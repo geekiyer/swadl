@@ -96,7 +96,7 @@ export default function InstantValue() {
         });
 
         if (inviteErr || inviteResult?.error) {
-          Alert.alert("Invite Issue", "Household created, but the invite email couldn't be sent. You can resend from Settings.");
+          Alert.alert("Invite Issue", "Household created, but the invite couldn't be saved. You can retry from Settings.");
         }
       }
 
