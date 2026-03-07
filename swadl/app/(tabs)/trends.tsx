@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,19 @@ import {
   ScrollView,
   ActivityIndicator,
   Dimensions,
+  RefreshControl,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+} from "react-native-reanimated";
 import { router } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useBabies, useTrends, type TrendDay } from "../../lib/queries";
 import { colors } from "../../constants/theme";
+import { Timings, STAGGER_MS } from "../../constants/animation";
 
 const RANGES = [
   { key: 7, label: "7 days" },
@@ -25,35 +34,67 @@ function shortDate(dateStr: string): string {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-// Simple bar component
+// Animated bar component with staggered reveal
 function Bar({
   height,
   color,
   maxHeight,
+  index,
+  revealKey,
   onPress,
 }: {
   height: number;
   color: string;
   maxHeight: number;
+  index: number;
+  revealKey: string;
   onPress?: () => void;
 }) {
-  const h = maxHeight > 0 ? Math.max(2, (height / maxHeight) * CHART_HEIGHT) : 2;
+  const targetH = height > 0 && maxHeight > 0
+    ? Math.max(2, (height / maxHeight) * CHART_HEIGHT)
+    : 0;
+  const scale = useSharedValue(0);
+
+  useEffect(() => {
+    scale.value = 0;
+    if (targetH > 0) {
+      scale.value = withDelay(
+        index * STAGGER_MS,
+        withTiming(1, Timings.chart)
+      );
+    }
+  }, [revealKey]);
+
+  const animStyle = useAnimatedStyle(() => ({
+    height: targetH * scale.value,
+    backgroundColor: color,
+    borderRadius: 2,
+  }));
+
+  if (targetH === 0) {
+    return <View style={{ flex: 1 }} />;
+  }
+
   return (
     <TouchableOpacity
-      style={{ height: h, backgroundColor: color, borderRadius: 2, flex: 1 }}
+      style={{ flex: 1, justifyContent: "flex-end" }}
       onPress={onPress}
       activeOpacity={0.7}
-    />
+    >
+      <Animated.View style={animStyle} />
+    </TouchableOpacity>
   );
 }
 
-// Stacked bar
+// Animated stacked bar with staggered reveal
 function StackedBar({
   bottom,
   top,
   bottomColor,
   topColor,
   maxHeight,
+  index,
+  revealKey,
   onPress,
 }: {
   bottom: number;
@@ -61,22 +102,51 @@ function StackedBar({
   bottomColor: string;
   topColor: string;
   maxHeight: number;
+  index: number;
+  revealKey: string;
   onPress?: () => void;
 }) {
   const total = bottom + top;
   const totalH =
-    maxHeight > 0 ? Math.max(2, (total / maxHeight) * CHART_HEIGHT) : 2;
-  const bottomH = total > 0 ? (bottom / total) * totalH : 1;
-  const topH = total > 0 ? (top / total) * totalH : 1;
+    total > 0 && maxHeight > 0
+      ? Math.max(2, (total / maxHeight) * CHART_HEIGHT)
+      : 0;
+  // Use flex proportions so they scale correctly inside the animated container
+  const topFlex = total > 0 ? top / total : 0;
+  const bottomFlex = total > 0 ? bottom / total : 0;
+
+  const scale = useSharedValue(0);
+
+  useEffect(() => {
+    scale.value = 0;
+    if (totalH > 0) {
+      scale.value = withDelay(
+        index * STAGGER_MS,
+        withTiming(1, Timings.chart)
+      );
+    }
+  }, [revealKey]);
+
+  const animStyle = useAnimatedStyle(() => ({
+    height: totalH * scale.value,
+    borderRadius: 2,
+    overflow: "hidden" as const,
+  }));
+
+  if (totalH === 0) {
+    return <View style={{ flex: 1 }} />;
+  }
 
   return (
     <TouchableOpacity
-      style={{ height: totalH, flex: 1, borderRadius: 2, overflow: "hidden" }}
+      style={{ flex: 1, justifyContent: "flex-end" }}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={{ height: topH, backgroundColor: topColor }} />
-      <View style={{ height: bottomH, backgroundColor: bottomColor }} />
+      <Animated.View style={animStyle}>
+        <View style={{ flex: topFlex, backgroundColor: topColor }} />
+        <View style={{ flex: bottomFlex, backgroundColor: bottomColor }} />
+      </Animated.View>
     </TouchableOpacity>
   );
 }
@@ -85,7 +155,7 @@ function navigateToDay(dateStr: string) {
   router.push({ pathname: "/(tabs)/summary", params: { date: dateStr } });
 }
 
-function FeedingChart({ data }: { data: TrendDay[] }) {
+function FeedingChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
   const hasOz = data.some((d) => d.feedOz > 0);
   const maxVal = Math.max(
     ...data.map((d) => (hasOz ? d.feedOz : d.feedCount)),
@@ -113,12 +183,14 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
       <View style={{ height: CHART_HEIGHT, position: "relative" }}>
         {/* Bars */}
         <View style={{ height: CHART_HEIGHT, flexDirection: "row", alignItems: "flex-end", gap: 2 }}>
-          {data.map((day) => (
+          {data.map((day, i) => (
             <Bar
               key={day.date}
               height={hasOz ? day.feedOz : day.feedCount}
               color={colors.amber}
               maxHeight={maxVal}
+              index={i}
+              revealKey={revealKey}
               onPress={() => navigateToDay(day.date)}
             />
           ))}
@@ -168,7 +240,7 @@ function FeedingChart({ data }: { data: TrendDay[] }) {
   );
 }
 
-function SleepChart({ data }: { data: TrendDay[] }) {
+function SleepChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
   const maxHrs = Math.max(
     ...data.map((d) => d.nightSleepHrs + d.napHrs),
     1
@@ -184,7 +256,7 @@ function SleepChart({ data }: { data: TrendDay[] }) {
       </Text>
 
       <View style={{ height: CHART_HEIGHT }} className="flex-row items-end gap-0.5">
-        {data.map((day) => (
+        {data.map((day, i) => (
           <StackedBar
             key={day.date}
             bottom={day.nightSleepHrs}
@@ -192,6 +264,8 @@ function SleepChart({ data }: { data: TrendDay[] }) {
             bottomColor={colors.navyBorder}
             topColor={colors.honey}
             maxHeight={maxHrs}
+            index={i}
+            revealKey={revealKey}
             onPress={() => navigateToDay(day.date)}
           />
         ))}
@@ -228,7 +302,7 @@ function SleepChart({ data }: { data: TrendDay[] }) {
   );
 }
 
-function DiaperChart({ data }: { data: TrendDay[] }) {
+function DiaperChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
   const maxCount = Math.max(...data.map((d) => d.diaperCount), 1);
 
   return (
@@ -239,14 +313,7 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
       <Text className="text-xs text-ash mb-3">Daily diaper count</Text>
 
       <View style={{ height: CHART_HEIGHT }} className="flex-row items-end gap-0.5">
-        {data.map((day) => {
-          const total = day.diaperCount;
-          const totalH =
-            maxCount > 0
-              ? Math.max(2, (total / maxCount) * CHART_HEIGHT)
-              : 2;
-          const wetH = total > 0 ? (day.diaperWet / total) * totalH : 1;
-          const dirtyH = total > 0 ? (day.diaperDirty / total) * totalH : 1;
+        {data.map((day, i) => {
           return (
             <StackedBar
               key={day.date}
@@ -255,6 +322,8 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
               bottomColor={colors.honey}
               topColor="#92400e"
               maxHeight={maxCount}
+              index={i}
+              revealKey={revealKey}
               onPress={() => navigateToDay(day.date)}
             />
           );
@@ -292,7 +361,7 @@ function DiaperChart({ data }: { data: TrendDay[] }) {
   );
 }
 
-function PumpChart({ data }: { data: TrendDay[] }) {
+function PumpChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }) {
   const hasData = data.some((d) => d.pumpOz > 0 || d.pumpCount > 0);
   if (!hasData) return null;
 
@@ -312,12 +381,14 @@ function PumpChart({ data }: { data: TrendDay[] }) {
       </Text>
 
       <View style={{ height: CHART_HEIGHT }} className="flex-row items-end gap-0.5">
-        {data.map((day) => (
+        {data.map((day, i) => (
           <Bar
             key={day.date}
             height={hasOz ? day.pumpOz : day.pumpCount}
             color={colors.ember}
             maxHeight={maxVal}
+            index={i}
+            revealKey={revealKey}
             onPress={() => navigateToDay(day.date)}
           />
         ))}
@@ -350,10 +421,12 @@ function PumpChart({ data }: { data: TrendDay[] }) {
 }
 
 export default function Trends() {
+  const queryClient = useQueryClient();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
 
   const [range, setRange] = useState<7 | 14 | 30>(7);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Pre-fetch all ranges so switching is instant
   const trends7 = useTrends(baby?.id, 7);
@@ -363,8 +436,27 @@ export default function Trends() {
   const trendsMap = { 7: trends7, 14: trends14, 30: trends30 } as const;
   const { data: trendData, isLoading } = trendsMap[range];
 
+  // revealKey changes when range or data changes, triggering bar animations
+  const revealKey = `${range}-${trendData?.length ?? 0}`;
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["trends"] });
+    setRefreshing(false);
+  }, [queryClient]);
+
   return (
-    <ScrollView className="flex-1 bg-midnight">
+    <ScrollView
+      className="flex-1 bg-midnight"
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.amber}
+          colors={[colors.amber]}
+        />
+      }
+    >
       <View className="px-4 pt-4 pb-10">
         {/* Range Selector */}
         <View className="flex-row bg-navy-raise rounded-lg p-1 mb-5 border border-navy-border">
@@ -393,10 +485,10 @@ export default function Trends() {
           </View>
         ) : trendData && trendData.length > 0 ? (
           <>
-            <FeedingChart data={trendData} />
-            <PumpChart data={trendData} />
-            <SleepChart data={trendData} />
-            <DiaperChart data={trendData} />
+            <FeedingChart data={trendData} revealKey={revealKey} />
+            <PumpChart data={trendData} revealKey={revealKey} />
+            <SleepChart data={trendData} revealKey={revealKey} />
+            <DiaperChart data={trendData} revealKey={revealKey} />
 
             <Text className="text-xs text-ash text-center mt-2">
               Tap a bar to view that day's summary

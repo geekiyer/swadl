@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { View, Text, ScrollView, Pressable, Modal, FlatList } from "react-native";
+import { View, Text, ScrollView, Pressable, Modal, FlatList, RefreshControl } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { StatusCard } from "../../components/StatusCard";
@@ -55,26 +55,46 @@ export default function Dashboard() {
   const { data: nextTasks } = useNextTasks(3);
   const completeChore = useCompleteChore();
 
+  const [refreshing, setRefreshing] = useState(false);
+
   useDashboardRealtime();
   useEnsureTogetherShift(careMode.mode);
 
+  const invalidateDashboard = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
+    queryClient.invalidateQueries({ queryKey: ["latest-diaper"] });
+    queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
+    queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
+    queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+    queryClient.invalidateQueries({ queryKey: ["next-tasks"] });
+  }, [queryClient]);
+
   // Refetch dashboard data whenever screen comes into focus (e.g. returning from a logger)
-  useFocusEffect(
-    useCallback(() => {
-      queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
-      queryClient.invalidateQueries({ queryKey: ["latest-diaper"] });
-      queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
-      queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
-      queryClient.invalidateQueries({ queryKey: ["next-tasks"] });
-    }, [queryClient])
-  );
+  useFocusEffect(invalidateDashboard);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    invalidateDashboard();
+    // Give queries a moment to refetch
+    await new Promise((r) => setTimeout(r, 800));
+    setRefreshing(false);
+  }, [invalidateDashboard]);
 
   const isTogether = careMode.isTogether;
   const caregiverName = activeShift?.caregiver_display_name;
 
   return (
-    <ScrollView className="flex-1 bg-midnight">
+    <ScrollView
+      className="flex-1 bg-midnight"
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.amber}
+          colors={[colors.amber]}
+        />
+      }
+    >
       <View className="px-4 pt-4 pb-8">
         {/* Header */}
         <View className="mb-6">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,9 @@ import {
   ScrollView,
   Share,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useBabies, useSummary, type SummaryData } from "../../lib/queries";
 import { colors } from "../../constants/theme";
@@ -67,11 +69,13 @@ const DOT_COLORS: Record<string, string> = {
 };
 
 export default function Summary() {
+  const queryClient = useQueryClient();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
 
   const params = useLocalSearchParams<{ date?: string }>();
   const unit = useUnitStore((s) => s.unit);
+  const [refreshing, setRefreshing] = useState(false);
   const [date, setDate] = useState(() => params.date ?? formatDate(new Date()));
   const [viewMode, setViewMode] = useState<ViewMode>("day");
 
@@ -96,6 +100,12 @@ export default function Summary() {
 
   const today = formatDate(new Date());
   const isToday = viewMode === "day" ? date === today : weekStart <= today && weekEnd >= today;
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await queryClient.invalidateQueries({ queryKey: ["summary"] });
+    setRefreshing(false);
+  }, [queryClient]);
 
   function buildShareText(s: SummaryData): string {
     const header = viewMode === "day"
@@ -144,7 +154,17 @@ export default function Summary() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-midnight">
+    <ScrollView
+      className="flex-1 bg-midnight"
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={colors.amber}
+          colors={[colors.amber]}
+        />
+      }
+    >
       <View className="px-4 pt-4 pb-10">
         <View className="flex-row items-center justify-between mb-3">
           <View />
