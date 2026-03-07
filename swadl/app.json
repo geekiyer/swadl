@@ -14,7 +14,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.swadl.app"
+      "bundleIdentifier": "com.swadl.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +38,15 @@
       "expo-sharing",
       "expo-font",
       "expo-splash-screen",
+      "expo-notifications",
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5c46791f-8a3c-4e26-8a58-39df65abbe03"
+      }
+    },
+    "owner": "gopal87us"
   }
 }

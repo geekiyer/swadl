@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -10,8 +10,16 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
 import { Swipeable } from "react-native-gesture-handler";
+import { Springs } from "../../constants/animation";
+import { Check, Plus } from "lucide-react-native";
 import {
   useAllChores,
   useCompleteChore,
@@ -26,7 +34,6 @@ import {
 import { useCareMode } from "../../lib/careMode";
 import { usePressSpring } from "../../hooks/usePressSpring";
 import { shadows, colors } from "../../constants/theme";
-import { Plus } from "lucide-react-native";
 
 const CATEGORIES = [
   { key: "feeding_prep", label: "Feeding Prep" },
@@ -46,6 +53,140 @@ const RECURRENCE_OPTIONS = [
 
 function categoryLabel(key: string) {
   return CATEGORIES.find((c) => c.key === key)?.label ?? key;
+}
+
+interface ChoreRowProps {
+  item: ChoreWithStatus;
+  isTogether: boolean;
+  isOwnChore: boolean;
+  onComplete: (item: ChoreWithStatus) => void;
+  onSelfClaim: (item: ChoreWithStatus) => void;
+  onAssign: (item: ChoreWithStatus) => void;
+  onLongPress: (item: ChoreWithStatus) => void;
+  renderRightActions: (item: ChoreWithStatus) => React.ReactNode;
+}
+
+function ChoreRow({
+  item,
+  isTogether,
+  isOwnChore,
+  onComplete,
+  onSelfClaim,
+  onAssign,
+  onLongPress,
+  renderRightActions,
+}: ChoreRowProps) {
+  const checkProgress = useSharedValue(item.completed_today ? 1 : 0);
+  const rowOpacity = useSharedValue(1);
+
+  const recurrence = item.recurrence as Record<string, string>;
+
+  function fireComplete() {
+    onComplete(item);
+  }
+
+  function handleTapComplete() {
+    if (item.completed_today) return;
+    checkProgress.value = withSpring(1, Springs.microFeedback);
+    rowOpacity.value = withTiming(0.4, { duration: 400 }, () => {
+      runOnJS(fireComplete)();
+    });
+  }
+
+  const circleStyle = useAnimatedStyle(() => ({
+    backgroundColor:
+      checkProgress.value > 0
+        ? `rgba(52, 199, 89, ${checkProgress.value})`
+        : "transparent",
+    borderColor:
+      checkProgress.value > 0.5 ? colors.success : colors.navyBorder,
+  }));
+
+  const checkmarkStyle = useAnimatedStyle(() => ({
+    opacity: checkProgress.value,
+    transform: [{ scale: checkProgress.value }],
+  }));
+
+  const rowStyle = useAnimatedStyle(() => ({
+    opacity: rowOpacity.value,
+  }));
+
+  return (
+    <Swipeable renderRightActions={() => renderRightActions(item)}>
+      <Animated.View style={rowStyle}>
+        <Pressable
+          onLongPress={() => onLongPress(item)}
+          className="flex-row items-center bg-navy-card border-b border-navy-border px-4 py-3"
+        >
+          {/* Animated complete button */}
+          <Pressable onPress={handleTapComplete} hitSlop={8} disabled={item.completed_today}>
+            <Animated.View
+              className="w-7 h-7 rounded-full border-2 mr-3 items-center justify-center"
+              style={circleStyle}
+            >
+              <Animated.View style={checkmarkStyle}>
+                <Check size={14} strokeWidth={2.5} color={colors.white} />
+              </Animated.View>
+            </Animated.View>
+          </Pressable>
+
+          {/* Content */}
+          <View className="flex-1">
+            <Text
+              className={`text-base ${
+                item.completed_today
+                  ? "text-ash line-through"
+                  : "font-body-medium text-white"
+              }`}
+            >
+              {item.title}
+            </Text>
+            <View className="flex-row items-center mt-0.5">
+              <Text className="text-xs text-ash">
+                {recurrence?.type === "daily"
+                  ? "Daily"
+                  : recurrence?.type === "every-x-days"
+                    ? `Every ${recurrence.interval_days} days`
+                    : recurrence?.type === "weekly"
+                      ? "Weekly"
+                      : "One-time"}
+                {recurrence?.time ? ` at ${recurrence.time}` : ""}
+              </Text>
+              {item.assignee_name && (
+                <Text className="text-xs text-honey ml-2">
+                  {item.assignee_name}
+                </Text>
+              )}
+            </View>
+          </View>
+
+          {/* Assign / Claim button */}
+          {isTogether ? (
+            <TouchableOpacity
+              className="px-3 py-1.5 rounded-md bg-navy-raise"
+              onPress={() => onSelfClaim(item)}
+              disabled={isOwnChore}
+            >
+              <Text
+                className={`text-xs font-body-medium ${
+                  isOwnChore ? "text-success" : "text-amber"
+                }`}
+              >
+                {isOwnChore ? "Mine" : "I got it"}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              className="px-3 py-1.5 rounded-md bg-navy-raise"
+              onPress={() => onAssign(item)}
+            >
+              <Text className="text-xs text-ash">Assign</Text>
+            </TouchableOpacity>
+          )}
+        </Pressable>
+      </Animated.View>
+    </Swipeable>
+  );
 }
 
 export default function Chores() {
@@ -236,85 +377,17 @@ export default function Chores() {
   }
 
   function renderChoreItem({ item }: { item: ChoreWithStatus }) {
-    const recurrence = item.recurrence as Record<string, string>;
     return (
-      <Swipeable renderRightActions={() => renderRightActions(item)}>
-        <Pressable
-          onLongPress={() => openEditChore(item)}
-          className="flex-row items-center bg-navy-card border-b border-navy-border px-4 py-3"
-        >
-          {/* Complete button */}
-          <TouchableOpacity
-            className={`w-7 h-7 rounded-full border-2 mr-3 items-center justify-center ${
-              item.completed_today
-                ? "bg-success border-success"
-                : "border-navy-border"
-            }`}
-            onPress={() => handleComplete(item)}
-            disabled={item.completed_today}
-          >
-            {item.completed_today && (
-              <Text className="text-white text-xs font-body-bold">✓</Text>
-            )}
-          </TouchableOpacity>
-
-          {/* Content */}
-          <View className="flex-1">
-            <Text
-              className={`text-base ${
-                item.completed_today
-                  ? "text-ash line-through"
-                  : "font-body-medium text-white"
-              }`}
-            >
-              {item.title}
-            </Text>
-            <View className="flex-row items-center mt-0.5">
-              <Text className="text-xs text-ash">
-                {recurrence?.type === "daily"
-                  ? "Daily"
-                  : recurrence?.type === "every-x-days"
-                    ? `Every ${recurrence.interval_days} days`
-                    : recurrence?.type === "weekly"
-                      ? "Weekly"
-                      : "One-time"}
-                {recurrence?.time ? ` at ${recurrence.time}` : ""}
-              </Text>
-              {item.assignee_name && (
-                <Text className="text-xs text-honey ml-2">
-                  {item.assignee_name}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          {/* Assign / Claim button */}
-          {isTogether ? (
-            <TouchableOpacity
-              className={`px-3 py-1.5 rounded-md ${
-                item.assigned_to === profile?.id ? "bg-navy-raise" : "bg-navy-raise"
-              }`}
-              onPress={() => handleSelfClaim(item)}
-              disabled={item.assigned_to === profile?.id}
-            >
-              <Text
-                className={`text-xs font-body-medium ${
-                  item.assigned_to === profile?.id ? "text-success" : "text-amber"
-                }`}
-              >
-                {item.assigned_to === profile?.id ? "Mine" : "I got it"}
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              className="px-3 py-1.5 rounded-md bg-navy-raise"
-              onPress={() => setAssigningChore(item)}
-            >
-              <Text className="text-xs text-ash">Assign</Text>
-            </TouchableOpacity>
-          )}
-        </Pressable>
-      </Swipeable>
+      <ChoreRow
+        item={item}
+        isTogether={isTogether}
+        isOwnChore={item.assigned_to === profile?.id}
+        onComplete={handleComplete}
+        onSelfClaim={handleSelfClaim}
+        onAssign={setAssigningChore}
+        onLongPress={openEditChore}
+        renderRightActions={renderRightActions}
+      />
     );
   }
 

@@ -37,6 +37,7 @@ export type Database = {
           display_name: string;
           role: "admin" | "caregiver" | "restricted";
           avatar_url: string | null;
+          push_token: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -46,6 +47,7 @@ export type Database = {
           display_name: string;
           role?: "admin" | "caregiver" | "restricted";
           avatar_url?: string | null;
+          push_token?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -54,6 +56,7 @@ export type Database = {
           display_name?: string;
           role?: "admin" | "caregiver" | "restricted";
           avatar_url?: string | null;
+          push_token?: string | null;
           updated_at?: string;
         };
         Relationships: [

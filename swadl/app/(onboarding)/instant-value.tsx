@@ -84,7 +84,12 @@ export default function InstantValue() {
       }
 
       if (partnerEmail) {
-        console.log(`Invite to be sent to: ${partnerEmail}`);
+        await supabase.from("household_invites").insert({
+          household_id: householdId,
+          email: partnerEmail.trim().toLowerCase(),
+          role: "caregiver",
+          invited_by: session.user.id,
+        });
       }
 
       setChores(

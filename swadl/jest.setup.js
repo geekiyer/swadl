@@ -68,6 +68,25 @@ jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
 
+// Mock expo-notifications
+jest.mock("expo-notifications", () => ({
+  getPermissionsAsync: jest.fn().mockResolvedValue({ status: "granted" }),
+  requestPermissionsAsync: jest.fn().mockResolvedValue({ status: "granted" }),
+  getExpoPushTokenAsync: jest.fn().mockResolvedValue({ data: "ExponentPushToken[mock]" }),
+  setNotificationHandler: jest.fn(),
+  setNotificationChannelAsync: jest.fn(),
+  addNotificationReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+  addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+  removeNotificationSubscription: jest.fn(),
+  AndroidImportance: { MAX: 5 },
+}));
+
+// Mock expo-constants
+jest.mock("expo-constants", () => ({
+  expoConfig: { extra: { eas: { projectId: "mock-project-id" } } },
+  easConfig: { projectId: "mock-project-id" },
+}));
+
 // Mock expo-haptics
 jest.mock("expo-haptics", () => ({
   impactAsync: jest.fn(),

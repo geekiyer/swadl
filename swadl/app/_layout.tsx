@@ -25,12 +25,14 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useOfflineSync } from "../hooks/useOfflineSync";
+import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useThemeStore } from "../lib/theme";
 
 SplashScreen.preventAutoHideAsync();
 
-function OfflineSyncProvider() {
+function BackgroundProviders() {
   useOfflineSync();
+  usePushNotifications();
   return null;
 }
 
@@ -80,7 +82,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View className={themeMode === "light" ? "light flex-1" : "flex-1"}>
         <QueryClientProvider client={queryClient}>
-          <OfflineSyncProvider />
+          <BackgroundProviders />
           <StatusBar style={themeMode === "light" ? "dark" : "light"} />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />

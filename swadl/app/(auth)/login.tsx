@@ -8,22 +8,66 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetSending, setResetSending] = useState(false);
 
   async function handleLogin() {
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     setLoading(false);
 
     if (error) {
-      Alert.alert("Error", error.message);
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        Alert.alert(
+          "Email Not Confirmed",
+          "Please check your email and click the confirmation link before signing in.",
+          [
+            { text: "OK", style: "cancel" },
+            {
+              text: "Resend Email",
+              onPress: async () => {
+                const { error: resendErr } = await supabase.auth.resend({
+                  type: "signup",
+                  email,
+                });
+                if (resendErr) {
+                  Alert.alert("Error", resendErr.message);
+                } else {
+                  Alert.alert("Sent", "Confirmation email resent. Check your inbox.");
+                }
+              },
+            },
+          ]
+        );
+      } else {
+        Alert.alert("Error", error.message);
+      }
       return;
     }
 
-    // Route through root index which checks for profile, invites, or onboarding
     router.replace("/");
+  }
+
+  async function handleForgotPassword() {
+    if (!email.trim()) {
+      Alert.alert("Enter Email", "Please enter your email address first, then tap Forgot Password.");
+      return;
+    }
+
+    setResetSending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim());
+    setResetSending(false);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      Alert.alert(
+        "Reset Link Sent",
+        "Check your email for a password reset link."
+      );
+    }
   }
 
   return (
@@ -45,13 +89,23 @@ export default function Login() {
         keyboardType="email-address"
       />
       <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-2 text-base text-white"
         placeholder="Password"
         placeholderTextColor={colors.ash}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
+
+      <TouchableOpacity
+        className="self-end mb-6"
+        onPress={handleForgotPassword}
+        disabled={resetSending}
+      >
+        <Text className="text-ash text-sm">
+          {resetSending ? "Sending..." : "Forgot password?"}
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         className="bg-amber rounded-2xl py-4 mb-4"

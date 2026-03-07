@@ -165,6 +165,41 @@ export default function Settings() {
     }
   }
 
+  async function handleDeleteAccount() {
+    Alert.alert(
+      "Delete Account",
+      "This will permanently delete your account and all your data. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const { data: { session } } = await supabase.auth.getSession();
+              if (!session) return;
+
+              // Delete profile (cascading DB constraints handle related data)
+              const { error } = await supabase
+                .from("profiles")
+                .delete()
+                .eq("id", session.user.id);
+
+              if (error) throw error;
+
+              await supabase.auth.signOut();
+              setSession(null);
+              router.replace("/(auth)/login");
+            } catch (err: unknown) {
+              const message = err instanceof Error ? err.message : "Failed to delete account";
+              Alert.alert("Error", message);
+            }
+          },
+        },
+      ]
+    );
+  }
+
   async function handleSignOut() {
     Alert.alert("Sign Out", "Are you sure?", [
       { text: "Cancel", style: "cancel" },
@@ -384,6 +419,16 @@ export default function Settings() {
             Sign Out
           </Text>
         </TouchableOpacity>
+
+        {/* Delete Account */}
+        <TouchableOpacity
+          className="py-4 mt-3"
+          onPress={handleDeleteAccount}
+        >
+          <Text className="text-ash text-center text-sm">
+            Delete Account
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Edit Baby Modal */}
@@ -419,7 +464,7 @@ export default function Settings() {
                 value={babyDob}
                 onChangeText={setBabyDob}
                 placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.ash}
+                placeholderTextColor={tc.ash}
               />
 
               <Text className="text-xs text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
@@ -583,7 +628,7 @@ export default function Settings() {
               <TextInput
                 className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
                 placeholder="Email address"
-                placeholderTextColor={colors.ash}
+                placeholderTextColor={tc.ash}
                 value={inviteEmail}
                 onChangeText={setInviteEmail}
                 autoCapitalize="none"
