@@ -61,10 +61,10 @@ const svgForeground = `
   </g>
 </svg>`;
 
-// Splash icon — bee on midnight background
+// Splash icon — bee on midnight background (1024x1024 for Retina clarity)
 const svgSplash = `
-<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(100 100) scale(1.3) translate(-50 -50)">
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(512 512) scale(6.5) translate(-50 -50)">
     <ellipse cx="24" cy="36" rx="18" ry="10" fill="#F59E0B" fill-opacity="0.88" transform="rotate(-28 24 36)"/>
     <ellipse cx="22" cy="48" rx="12" ry="6.5" fill="#F59E0B" fill-opacity="0.55" transform="rotate(-18 22 48)"/>
     <ellipse cx="76" cy="36" rx="18" ry="10" fill="#F59E0B" fill-opacity="0.88" transform="rotate(28 76 36)"/>
@@ -125,10 +125,10 @@ async function generate() {
 
   // Splash icon (bee on transparent for midnight bg)
   await sharp(Buffer.from(svgSplash))
-    .resize(200, 200)
+    .resize(1024, 1024)
     .png()
     .toFile(join(assetsDir, "splash-icon.png"));
-  console.log("Generated splash-icon.png");
+  console.log("Generated splash-icon.png (1024x1024)");
 }
 
 generate().catch(console.error);

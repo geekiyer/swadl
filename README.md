@@ -1,33 +1,93 @@
-# Swadl
+<p align="center">
+  <img src="swadl/assets/icon.png" alt="Swadl" width="120" height="120" style="border-radius: 24px;" />
+</p>
 
-A multi-caregiver parenting workload management app built with React Native and Expo. Swadl is not another baby tracker — it's an operational layer that reduces cognitive load, coordinates caregivers, and anticipates tasks before they become emergencies.
+<h1 align="center">Swadl</h1>
 
-## Tech Stack
+<p align="center">
+  <strong>Parenting workload management for modern families</strong>
+</p>
 
-- **Framework:** React Native + Expo SDK 55
-- **Navigation:** Expo Router (file-based routing)
-- **Styling:** NativeWind v4 + Tailwind CSS
-- **Backend:** Supabase (PostgreSQL, Auth, Realtime, Edge Functions)
-- **State:** Zustand (local/UI) + React Query (server state)
-- **Animations:** react-native-reanimated 4 + react-native-gesture-handler 2
-- **Icons:** lucide-react-native
-- **Fonts:** Fraunces (display), Outfit (body), JetBrains Mono (data)
+<p align="center">
+  Swadl is not another baby tracker. It's an operational layer that reduces cognitive load,<br/>
+  coordinates caregivers, and anticipates tasks before they become emergencies.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Expo_SDK-55-000020?style=flat-square&logo=expo" alt="Expo SDK 55" />
+  <img src="https://img.shields.io/badge/React_Native-0.76-61DAFB?style=flat-square&logo=react" alt="React Native" />
+  <img src="https://img.shields.io/badge/Supabase-PostgreSQL-3FCF8E?style=flat-square&logo=supabase" alt="Supabase" />
+  <img src="https://img.shields.io/badge/TypeScript-5.3-3178C6?style=flat-square&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tests-120_passing-22C55E?style=flat-square" alt="Tests" />
+</p>
+
+---
+
+<!--
+## Screenshots
+
+Add screenshots here once available. Recommended layout:
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" width="200" alt="Dashboard" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/chores.png" width="200" alt="Chore Manager" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/trends.png" width="200" alt="Trends" />
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/summary.png" width="200" alt="Summary" />
+</p>
+
+Place screenshots in swadl/docs/screenshots/ and uncomment this section.
+-->
 
 ## Features
 
-- **Adaptive Care Modes** — Together, Shifts, or Nanny mode. The entire UI adapts based on how your household shares care.
-- **Quick Logging** — Feed, diaper, sleep, and pump logs in 1-2 taps with offline queuing.
-- **Dashboard** — Real-time status cards, mood tracking, next tasks, and activity feed.
-- **Chore Manager** — Recurring and one-off tasks with swipe-to-complete and caregiver assignment.
-- **Shift Handoffs** — Automatic briefing generation for caregiver transitions.
-- **Daily Briefings** — Shareable summaries for partners, grandparents, or pediatricians.
-- **Summary & Trends** — Daily/weekly stats and animated bar charts with staggered reveal for feeding, sleep, pump, and diapers.
-- **Partner Invites** — Invite caregivers via email during onboarding or from Settings (sent via Supabase Auth admin API).
-- **Account Deletion** — Full cascading deletion of all user data and auth account via edge function.
-- **Multi-Baby Support** — Schema supports multiple babies per household from day one.
-- **Offline Support** — Quick Log entries queue locally and sync when connectivity resumes.
-- **Pull-to-Refresh** — Dashboard, Summary, and Trends screens support pull-to-refresh.
-- **Light/Dark Mode** — Toggle in Settings, persisted via Zustand.
+| | Feature | Description |
+|---|---|---|
+| **Adaptive Care Modes** | Together / Shifts / Nanny | The entire UI adapts based on how your household shares care |
+| **Quick Logging** | Feed, Diaper, Sleep, Pump | 1-2 taps with offline queuing and confirmation animations |
+| **Dashboard** | Status cards, mood, tasks | Real-time overview with pull-to-refresh |
+| **Chore Manager** | Recurring + one-off tasks | Swipe-to-complete, animated checkmarks, caregiver assignment |
+| **Shift Handoffs** | Auto-generated briefings | Structured summaries for caregiver transitions |
+| **Summary** | Day/week stats | Shareable reports for partners and pediatricians |
+| **Trends** | Animated bar charts | Staggered reveal animations, 7/14/30 day ranges |
+| **Partner Invites** | Email invitations | Sent via Supabase Auth admin API |
+| **Light/Dark Mode** | Theme toggle | Persisted preference, dark-first design |
+| **Multi-Baby** | Multiple babies per household | Supported from day one |
+
+## Design
+
+<table>
+  <tr>
+    <td align="center"><strong>Midnight</strong><br/><code>#080E1A</code><br/><img src="https://via.placeholder.com/40/080E1A/080E1A" width="40" height="40" alt="midnight"/></td>
+    <td align="center"><strong>Navy Card</strong><br/><code>#0F1D32</code><br/><img src="https://via.placeholder.com/40/0F1D32/0F1D32" width="40" height="40" alt="navy-card"/></td>
+    <td align="center"><strong>Navy Raise</strong><br/><code>#162A46</code><br/><img src="https://via.placeholder.com/40/162A46/162A46" width="40" height="40" alt="navy-raise"/></td>
+    <td align="center"><strong>Amber</strong><br/><code>#F59E0B</code><br/><img src="https://via.placeholder.com/40/F59E0B/F59E0B" width="40" height="40" alt="amber"/></td>
+    <td align="center"><strong>Ember</strong><br/><code>#F97316</code><br/><img src="https://via.placeholder.com/40/F97316/F97316" width="40" height="40" alt="ember"/></td>
+    <td align="center"><strong>White</strong><br/><code>#F8FAFC</code><br/><img src="https://via.placeholder.com/40/F8FAFC/F8FAFC" width="40" height="40" alt="white"/></td>
+  </tr>
+</table>
+
+**Typography:** Fraunces 900 (display) / Outfit (body) / JetBrains Mono (data)
+
+**Iconography:** [Lucide](https://lucide.dev) icons throughout &mdash; Home, ClipboardList, BarChart3, CheckSquare, Settings (tabs), Baby, Moon, Droplets (status cards)
+
+All tokens live in `constants/theme.ts` and `constants/animation.ts`. See `docs/brand.md` for the full spec.
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | React Native + Expo SDK 55 |
+| Navigation | Expo Router (file-based) |
+| Styling | NativeWind v4 + Tailwind CSS 3.3.2 |
+| Backend | Supabase (PostgreSQL, Auth, Realtime, Edge Functions) |
+| State | Zustand (local/UI) + React Query (server state) |
+| Animations | react-native-reanimated 4 + react-native-gesture-handler 2 |
+| Icons | lucide-react-native |
+| Testing | Jest 29 + jest-expo 55 + React Native Testing Library |
+| CI/CD | EAS Build + EAS Submit |
 
 ## Getting Started
 
@@ -64,6 +124,7 @@ npm run android  # Run on Android emulator
 ### Generate App Icon
 
 ```bash
+npm install --no-save sharp   # required locally only
 node scripts/generate-icon.mjs
 ```
 
@@ -72,7 +133,7 @@ node scripts/generate-icon.mjs
 ```
 swadl/
 ├── app/
-│   ├── (auth)/           # Login and signup
+│   ├── (auth)/           # Login and signup (eye toggle, forgot password)
 │   ├── (onboarding)/     # 3-step onboarding flow
 │   ├── (tabs)/           # Main app screens
 │   │   ├── index.tsx     # Dashboard
@@ -82,12 +143,12 @@ swadl/
 │   │   └── settings.tsx  # Settings and household
 │   ├── log/[type].tsx    # Quick Log (feed/diaper/sleep/pump)
 │   └── briefing.tsx      # Adaptive briefing / shift handoff
-├── components/           # Reusable UI components
-├── constants/            # Design tokens, animation configs
-├── hooks/                # Custom hooks (press spring, log burst)
+├── components/           # StatusCard, TaskItem, MoodPicker, ActivityFeed, etc.
+├── constants/            # Design tokens, animation configs, chore templates
+├── hooks/                # usePressSpring, useLogBurst, useOfflineSync, usePushNotifications
 ├── lib/                  # Supabase client, React Query hooks, Zustand store
 ├── types/                # TypeScript types (generated from Supabase schema)
-├── __tests__/            # Jest test suites
+├── __tests__/            # 14 suites, 120 tests
 └── supabase/
     ├── migrations/       # SQL schema migrations
     └── functions/        # Edge Functions (Deno)
@@ -106,7 +167,7 @@ npm test                  # Run all 14 suites (120 tests)
 npx jest --no-coverage    # Without coverage report
 ```
 
-Uses Jest 29 + jest-expo 55 + React Native Testing Library. Jest 30 is incompatible with jest-expo 55.
+> Jest 30 is incompatible with jest-expo 55 &mdash; pin to Jest ^29.7.0.
 
 ## Build & Deploy
 
@@ -118,11 +179,11 @@ eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_URL --value <url>
 eas secret:create --scope project --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value <key>
 
 # Build
-eas build --platform ios --profile preview     # Device build
-eas build --platform ios --profile production   # App Store build
+eas build --platform ios --profile preview      # Device build
+eas build --platform ios --profile production    # App Store build
 ```
 
-Apple builds with 2FA require an [app-specific password](https://support.apple.com/en-us/102654).
+> Apple builds with 2FA require an [app-specific password](https://support.apple.com/en-us/102654).
 
 ### Deploy Edge Functions
 
@@ -137,16 +198,14 @@ supabase functions deploy compute-next-tasks
 
 ### Supabase Configuration
 
-- **Authentication > URL Configuration > Site URL:** `swadl://`
-- **Authentication > URL Configuration > Redirect URLs:** `swadl://`, `exp+swadl://`
-- **Email confirmation** must be enabled
+| Setting | Value |
+|---|---|
+| Authentication > Site URL | `swadl://` |
+| Authentication > Redirect URLs | `swadl://`, `exp+swadl://` |
+| Email confirmation | Enabled |
 
-## Design
+---
 
-Dark-first UI with midnight (#080E1A) backgrounds, navy card surfaces, amber primary accent, and ember secondary accent. All colors, spacing, and typography are tokenized in `constants/theme.ts`. Animation configs live in `constants/animation.ts`.
-
-See `swadl/CLAUDE.md` for full implementation details, database schema, and coding conventions.
-
-## License
-
-Private — All rights reserved.
+<p align="center">
+  <sub>Built with care, for caregivers.</sub>
+</p>
