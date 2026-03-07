@@ -49,7 +49,7 @@ export default function Index() {
               id: session!.user.id,
               household_id: invite.household_id,
               display_name:
-                session!.user.email?.split("@")[0] ?? "Caregiver",
+                session!.user.user_metadata?.display_name ?? session!.user.email?.split("@")[0] ?? "Caregiver",
               role: invite.role ?? "caregiver",
             });
 

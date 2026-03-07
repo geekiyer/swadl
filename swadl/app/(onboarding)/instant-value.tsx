@@ -47,7 +47,7 @@ export default function InstantValue() {
       const { error: profileErr } = await supabase.from("profiles").insert({
         id: session.user.id,
         household_id: householdId,
-        display_name: session.user.email?.split("@")[0] ?? "Parent",
+        display_name: session.user.user_metadata?.display_name ?? session.user.email?.split("@")[0] ?? "Parent",
         role: "admin",
       });
 
@@ -84,16 +84,20 @@ export default function InstantValue() {
       }
 
       if (partnerEmail) {
-        await supabase.functions.invoke("send-invite", {
+        const { data: inviteResult, error: inviteErr } = await supabase.functions.invoke("send-invite", {
           body: {
             email: partnerEmail,
             household_id: householdId,
             household_name: `${babyName}'s Family`,
-            invited_by_name: session.user.email?.split("@")[0] ?? "Your partner",
+            invited_by_name: session.user.user_metadata?.display_name ?? session.user.email?.split("@")[0] ?? "Your partner",
             invited_by: session.user.id,
             role: "caregiver",
           },
         });
+
+        if (inviteErr || inviteResult?.error) {
+          Alert.alert("Invite Issue", "Household created, but the invite email couldn't be sent. You can resend from Settings.");
+        }
       }
 
       setChores(

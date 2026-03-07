@@ -62,28 +62,13 @@ serve(async (req: Request) => {
       );
     }
 
-    // Check if user already exists in auth
-    const { data: existingUsers } = await supabase.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(
-      (u) => u.email?.toLowerCase() === normalizedEmail
-    );
-
-    if (existingUser) {
-      // User exists — they'll be auto-joined on next login via the household_invites row
-      return new Response(
-        JSON.stringify({
-          sent: true,
-          method: "existing_user",
-          message: "User already has an account. They will be added to your household on next login.",
-        }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // User doesn't exist — send invite email via Supabase Auth
     const senderName = invited_by_name ?? "Someone";
     const familyName = household_name ?? "their family";
 
+    // Send invite email via Supabase Auth admin API.
+    // - If user doesn't exist: creates auth user + sends invite email
+    // - If user exists but unconfirmed: re-sends invite email
+    // - If user exists and confirmed: may error — that's fine, we have the household_invites row
     const { error: authErr } = await supabase.auth.admin.inviteUserByEmail(
       normalizedEmail,
       {
@@ -97,14 +82,15 @@ serve(async (req: Request) => {
     );
 
     if (authErr) {
-      // If invite fails (e.g. email already invited via auth), still succeed
-      // since we already have the household_invites row
-      if (authErr.message?.includes("already been invited")) {
+      // "already been registered" or "already been invited" means user exists.
+      // The household_invites row ensures auto-join on their next login.
+      const msg = authErr.message?.toLowerCase() ?? "";
+      if (msg.includes("already") || msg.includes("registered") || msg.includes("invited")) {
         return new Response(
           JSON.stringify({
             sent: true,
-            method: "already_invited",
-            message: "Invite email was already sent previously.",
+            method: "existing_user",
+            message: "This user already has an account. They will be added to your household on their next login.",
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );

@@ -6,6 +6,7 @@ import { colors } from "../../constants/theme";
 import { Eye, EyeOff } from "lucide-react-native";
 
 export default function Signup() {
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,8 +15,16 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSignup() {
+    if (!displayName.trim()) {
+      Alert.alert("Error", "Please enter your name.");
+      return;
+    }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName.trim() } },
+    });
     setLoading(false);
 
     if (error) {
@@ -83,6 +92,15 @@ export default function Signup() {
         Create Account
       </Text>
 
+      <TextInput
+        className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+        style={{ fontSize: 16, height: 48 }}
+        placeholder="Your Name"
+        placeholderTextColor={colors.ash}
+        value={displayName}
+        onChangeText={setDisplayName}
+        autoFocus
+      />
       <TextInput
         className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
         style={{ fontSize: 16, height: 48 }}
