@@ -446,6 +446,27 @@ export default function Settings() {
           </View>
         </View>
 
+        {/* Legal */}
+        <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+          Legal
+        </Text>
+        <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden mb-6">
+          <TouchableOpacity
+            className="flex-row justify-between items-center p-4"
+            onPress={() => router.push("/privacy")}
+          >
+            <Text className="text-base font-body-medium text-white">Privacy Policy</Text>
+            <Text className="text-ash text-sm">→</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-row justify-between items-center p-4 border-t border-navy-border"
+            onPress={() => router.push("/terms")}
+          >
+            <Text className="text-base font-body-medium text-white">Terms of Service</Text>
+            <Text className="text-ash text-sm">→</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Sign Out */}
         <TouchableOpacity
           className="border border-danger rounded-2xl py-4 mt-4"
