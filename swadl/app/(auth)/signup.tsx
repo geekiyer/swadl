@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Pressable, Alert } from "react-native";
 import { Link } from "expo-router";
 import { supabase } from "../../lib/supabase";
 import { colors } from "../../constants/theme";
+import { Eye, EyeOff } from "lucide-react-native";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,7 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [resending, setResending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSignup() {
     setLoading(true);
@@ -90,14 +92,23 @@ export default function Signup() {
         autoCapitalize="none"
         keyboardType="email-address"
       />
-      <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
-        placeholder="Password"
-        placeholderTextColor={colors.ash}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <View className="flex-row items-center border border-navy-border bg-navy-raise rounded-xl mb-6">
+        <TextInput
+          className="flex-1 px-4 py-3 text-base text-white"
+          placeholder="Password"
+          placeholderTextColor={colors.ash}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+        />
+        <Pressable onPress={() => setShowPassword(!showPassword)} className="px-3">
+          {showPassword ? (
+            <EyeOff size={20} color={colors.ash} />
+          ) : (
+            <Eye size={20} color={colors.ash} />
+          )}
+        </Pressable>
+      </View>
 
       <TouchableOpacity
         className="bg-amber rounded-2xl py-4 mb-4"
