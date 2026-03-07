@@ -29,7 +29,7 @@ serve(async (req: Request) => {
     if (!email || !household_id || !invited_by) {
       return new Response(
         JSON.stringify({ error: "email, household_id, and invited_by are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -58,7 +58,7 @@ serve(async (req: Request) => {
     if (inviteErr) {
       return new Response(
         JSON.stringify({ error: inviteErr.message }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -112,7 +112,7 @@ serve(async (req: Request) => {
 
       return new Response(
         JSON.stringify({ error: authErr.message }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -127,7 +127,7 @@ serve(async (req: Request) => {
   } catch (err) {
     return new Response(
       JSON.stringify({ error: String(err) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

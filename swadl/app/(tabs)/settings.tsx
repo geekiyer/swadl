@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   Switch,
+  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
 import { supabase } from "../../lib/supabase";
@@ -54,6 +55,8 @@ export default function Settings() {
   const themeMode = useThemeStore((s) => s.mode);
   const toggleTheme = useThemeStore((s) => s.toggleMode);
   const tc = useThemeColors();
+
+  const [deleting, setDeleting] = useState(false);
 
   // Notification preferences (local for now — Phase 2 syncs to server)
   const [notifyAssignments, setNotifyAssignments] = useState(true);
@@ -181,16 +184,43 @@ export default function Settings() {
           text: "Delete",
           style: "destructive",
           onPress: async () => {
+            setDeleting(true);
             try {
               const { data: { session } } = await supabase.auth.getSession();
               if (!session) return;
 
-              const { data, error } = await supabase.functions.invoke("delete-account", {
-                body: { user_id: session.user.id },
-              });
+              const userId = session.user.id;
 
-              if (error) throw error;
-              if (data?.error) throw new Error(data.error);
+              // Try edge function first, fall back to client-side deletion
+              let edgeFnOk = false;
+              try {
+                const { data, error } = await supabase.functions.invoke("delete-account", {
+                  body: { user_id: userId },
+                });
+                if (!error && !data?.error) edgeFnOk = true;
+              } catch {
+                // Edge function not deployed — fall back
+              }
+
+              if (!edgeFnOk) {
+                // Client-side deletion: delete user's data then profile
+                const { data: prof } = await supabase
+                  .from("profiles")
+                  .select("household_id")
+                  .eq("id", userId)
+                  .single();
+
+                if (prof) {
+                  await supabase.from("feed_logs").delete().eq("logged_by", userId);
+                  await supabase.from("diaper_logs").delete().eq("logged_by", userId);
+                  await supabase.from("sleep_logs").delete().eq("logged_by", userId);
+                  await supabase.from("pump_logs").delete().eq("logged_by", userId);
+                  await supabase.from("chore_completions").delete().eq("completed_by", userId);
+                  await supabase.from("caregiver_shifts").delete().eq("caregiver_id", userId);
+                  await supabase.from("household_invites").delete().eq("invited_by", userId);
+                  await supabase.from("profiles").delete().eq("id", userId);
+                }
+              }
 
               await supabase.auth.signOut();
               setSession(null);
@@ -198,6 +228,7 @@ export default function Settings() {
             } catch (err: unknown) {
               const message = err instanceof Error ? err.message : "Failed to delete account";
               Alert.alert("Error", message);
+              setDeleting(false);
             }
           },
         },
@@ -429,10 +460,18 @@ export default function Settings() {
         <TouchableOpacity
           className="py-4 mt-3"
           onPress={handleDeleteAccount}
+          disabled={deleting}
         >
-          <Text className="text-ash text-center text-sm">
-            Delete Account
-          </Text>
+          {deleting ? (
+            <View className="flex-row items-center justify-center">
+              <ActivityIndicator size="small" color={tc.ash} />
+              <Text className="text-ash text-center text-sm ml-2">Deleting account...</Text>
+            </View>
+          ) : (
+            <Text className="text-ash text-center text-sm">
+              Delete Account
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 

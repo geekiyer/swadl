@@ -35,7 +35,7 @@ serve(async (req: Request) => {
     if (!user_id) {
       return new Response(
         JSON.stringify({ error: "user_id is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -44,7 +44,7 @@ serve(async (req: Request) => {
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -60,7 +60,7 @@ serve(async (req: Request) => {
     if (!caller || caller.id !== user_id) {
       return new Response(
         JSON.stringify({ error: "You can only delete your own account" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -159,7 +159,7 @@ serve(async (req: Request) => {
     if (authDeleteErr) {
       return new Response(
         JSON.stringify({ error: `Data deleted but auth removal failed: ${authDeleteErr.message}` }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -170,7 +170,7 @@ serve(async (req: Request) => {
   } catch (err) {
     return new Response(
       JSON.stringify({ error: String(err) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
