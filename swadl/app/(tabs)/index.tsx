@@ -157,7 +157,11 @@ export default function Dashboard() {
   }, [queryClient]);
 
   // Refetch dashboard data whenever screen comes into focus (e.g. returning from a logger)
-  useFocusEffect(invalidateDashboard);
+  useFocusEffect(
+    useCallback(() => {
+      invalidateDashboard();
+    }, [invalidateDashboard])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

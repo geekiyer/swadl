@@ -145,8 +145,11 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
       } else if (!data) {
         Alert.alert("Error", "Could not update sleep record. Please try again.");
       } else {
-        queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
-        queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["latest-sleep"] }),
+          queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
+          queryClient.invalidateQueries({ queryKey: ["log-history"] }),
+        ]);
         onSuccess ? onSuccess() : router.back();
       }
     } catch (err: unknown) {
@@ -187,8 +190,11 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
       if (error) {
         Alert.alert("Error", error.message);
       } else {
-        queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
-        queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["latest-sleep"] }),
+          queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
+          queryClient.invalidateQueries({ queryKey: ["log-history"] }),
+        ]);
         onSuccess ? onSuccess() : router.back();
       }
     } catch (err: unknown) {

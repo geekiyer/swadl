@@ -120,8 +120,11 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     if (error) {
       Alert.alert("Error", error.message);
     } else {
-      queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["latest-feed"] }),
+        queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
+        queryClient.invalidateQueries({ queryKey: ["log-history"] }),
+      ]);
       onSuccess ? onSuccess() : router.back();
     }
   }
@@ -159,8 +162,11 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     if (error) {
       Alert.alert("Error", error.message);
     } else {
-      queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["latest-feed"] }),
+        queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
+        queryClient.invalidateQueries({ queryKey: ["log-history"] }),
+      ]);
       onSuccess ? onSuccess() : router.back();
     }
   }

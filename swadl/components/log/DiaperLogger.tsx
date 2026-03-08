@@ -28,6 +28,7 @@ const POOP_COLORS = [
 
 const CONSISTENCIES = [
   { key: "liquid", label: "Liquid" },
+  { key: "runny", label: "Runny" },
   { key: "mushy", label: "Mushy" },
   { key: "soft", label: "Soft" },
   { key: "formed", label: "Formed" },
@@ -92,8 +93,11 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
     if (error) {
       Alert.alert("Error", error.message);
     } else {
-      queryClient.invalidateQueries({ queryKey: ["latest-diaper"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["latest-diaper"] }),
+        queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
+        queryClient.invalidateQueries({ queryKey: ["log-history"] }),
+      ]);
       onSuccess ? onSuccess() : router.back();
     }
   }

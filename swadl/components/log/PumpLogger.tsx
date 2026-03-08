@@ -162,8 +162,11 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
     if (error) {
       Alert.alert("Error", error.message);
     } else {
-      queryClient.invalidateQueries({ queryKey: ["latest-pump"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["latest-pump"] }),
+        queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
+        queryClient.invalidateQueries({ queryKey: ["log-history"] }),
+      ]);
       onSuccess ? onSuccess() : router.back();
     }
   }
