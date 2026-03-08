@@ -204,7 +204,7 @@ supabase functions deploy compute-next-tasks
 
 ## Website
 
-The marketing website is at [swadl.vercel.app](https://swadl.vercel.app) (custom domain: `www.swadl.app`).
+The marketing website is at [swadl.vercel.app](https://swadl.vercel.app)
 
 | | |
 |---|---|
