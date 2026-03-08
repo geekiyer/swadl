@@ -27,7 +27,7 @@ export const colors = {
   textLightBody:     '#D0C4B8',  // body text (dark mode)
   textLightSecondary:'#8A7A68',  // secondary text (dark mode)
   textLightMuted:    '#5A4A38',  // muted text (dark mode)
-  textLightPlaceholder:'#4A3A2A',// placeholder, inactive tabs (dark mode)
+  textLightPlaceholder:'#8A7A6A',// placeholder, inactive tabs (dark mode)
 
   // ── Category: Feed (warm amber/orange) ──
   feedPrimary:   '#E88A30',   // primary accent

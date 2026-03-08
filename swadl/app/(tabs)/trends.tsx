@@ -605,18 +605,6 @@ function TextSummaryView({ data, range, theme }: { data: TrendDay[]; range: numb
       />
 
       <SummaryStatCard
-        icon={<MoonIcon size={24} theme={theme} />}
-        title="Sleep"
-        theme={theme}
-        stats={[
-          { label: `${rangeLabel} total sleep`, value: formatHrsMin(totalSleepHrs) },
-          { label: "Avg sleep / day", value: formatHrsMin(avgSleepHrs) },
-          { label: "Avg night sleep", value: formatHrsMin(avgNightHrs) },
-          { label: "Avg nap time", value: formatHrsMin(avgNapHrs) },
-        ]}
-      />
-
-      <SummaryStatCard
         icon={<DiaperIcon size={24} theme={theme} />}
         title="Diapers"
         theme={theme}
@@ -628,22 +616,32 @@ function TextSummaryView({ data, range, theme }: { data: TrendDay[]; range: numb
         ]}
       />
 
-      {(totalPumpCount > 0) && (
-        <SummaryStatCard
-          icon={<PumpIcon size={24} theme={theme} />}
-          title="Pumping"
-          theme={theme}
-          stats={[
-            { label: `${rangeLabel} sessions`, value: `${totalPumpCount}` },
-            ...(hasPumpOz
-              ? [
-                  { label: "Total pumped", value: `${totalPumpOz.toFixed(1)} oz / ${Math.round(totalPumpOz * 29.5735)} ml` },
-                  { label: "Avg / day", value: `${avgPumpOz.toFixed(1)} oz / ${Math.round(avgPumpOz * 29.5735)} ml` },
-                ]
-              : []),
-          ]}
-        />
-      )}
+      <SummaryStatCard
+        icon={<PumpIcon size={24} theme={theme} />}
+        title="Pumping"
+        theme={theme}
+        stats={[
+          { label: `${rangeLabel} sessions`, value: `${totalPumpCount}` },
+          ...(hasPumpOz
+            ? [
+                { label: "Total pumped", value: `${totalPumpOz.toFixed(1)} oz / ${Math.round(totalPumpOz * 29.5735)} ml` },
+                { label: "Avg / day", value: `${avgPumpOz.toFixed(1)} oz / ${Math.round(avgPumpOz * 29.5735)} ml` },
+              ]
+            : []),
+        ]}
+      />
+
+      <SummaryStatCard
+        icon={<MoonIcon size={24} theme={theme} />}
+        title="Sleep"
+        theme={theme}
+        stats={[
+          { label: `${rangeLabel} total sleep`, value: formatHrsMin(totalSleepHrs) },
+          { label: "Avg sleep / day", value: formatHrsMin(avgSleepHrs) },
+          { label: "Avg night sleep", value: formatHrsMin(avgNightHrs) },
+          { label: "Avg nap time", value: formatHrsMin(avgNapHrs) },
+        ]}
+      />
     </View>
   );
 }
@@ -686,6 +684,7 @@ export default function Trends() {
           onRefresh={onRefresh}
           tintColor={colors.feedPrimary}
           colors={[colors.feedPrimary]}
+          progressViewOffset={insets.top}
         />
       }
     >
@@ -748,9 +747,9 @@ export default function Trends() {
           viewMode === "chart" ? (
             <>
               <FeedingChart data={trendData} revealKey={revealKey} />
+              <DiaperChart data={trendData} revealKey={revealKey} />
               <PumpChart data={trendData} revealKey={revealKey} />
               <SleepChart data={trendData} revealKey={revealKey} />
-              <DiaperChart data={trendData} revealKey={revealKey} />
 
               <Text className="text-xs text-text-secondary text-center mt-2">
                 Tap a bar to view that day's summary

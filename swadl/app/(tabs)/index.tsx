@@ -19,6 +19,7 @@ import {
   useLatestFeed,
   useLatestDiaper,
   useLatestSleep,
+  useLatestPump,
   useActiveShift,
   useDashboardRealtime,
   useEnsureTogetherShift,
@@ -53,7 +54,7 @@ export default function Dashboard() {
   const { data: babies } = useBabies();
   const [selectedBabyId, setSelectedBabyId] = useState<string | null>(null);
   const [babyPickerVisible, setBabyPickerVisible] = useState(false);
-  const [historyKind, setHistoryKind] = useState<"feed" | "diaper" | "sleep" | null>(null);
+  const [historyKind, setHistoryKind] = useState<"feed" | "diaper" | "sleep" | "pump" | null>(null);
   const tc = useThemeColors();
   const insets = useSafeAreaInsets();
 
@@ -67,6 +68,7 @@ export default function Dashboard() {
   const { data: latestFeed } = useLatestFeed(resolvedBabyId ?? undefined);
   const { data: latestDiaper } = useLatestDiaper(resolvedBabyId ?? undefined);
   const { data: latestSleep } = useLatestSleep(resolvedBabyId ?? undefined);
+  const { data: latestPump } = useLatestPump(resolvedBabyId ?? undefined);
   const { careMode } = useCareMode();
   const { data: activeShift } = useActiveShift();
 
@@ -112,6 +114,7 @@ export default function Dashboard() {
             onRefresh={onRefresh}
             tintColor={colors.feedPrimary}
             colors={[colors.feedPrimary]}
+            progressViewOffset={insets.top}
           />
         }
       >
@@ -264,30 +267,44 @@ export default function Dashboard() {
             </Pressable>
           )}
 
-          {/* Status Cards — 3-column: feed, sleep, diaper */}
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
-            <StatusCard
-              type="feed"
-              label="Last Fed"
-              value={timeAgo(latestFeed?.started_at)}
-              onPress={() => setHistoryKind("feed")}
-            />
-            <StatusCard
-              type="sleep"
-              label="Last Sleep"
-              value={
-                latestSleep?.started_at && !latestSleep?.ended_at
-                  ? "Sleeping"
-                  : timeAgo(latestSleep?.ended_at ?? latestSleep?.started_at)
-              }
-              onPress={() => setHistoryKind("sleep")}
-            />
-            <StatusCard
-              type="diaper"
-              label="Last Diaper"
-              value={timeAgo(latestDiaper?.logged_at)}
-              onPress={() => setHistoryKind("diaper")}
-            />
+          {/* Status Cards — 2×2 grid */}
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
+            <View style={{ width: '48%', flexGrow: 1 }}>
+              <StatusCard
+                type="feed"
+                label="Last Fed"
+                value={timeAgo(latestFeed?.started_at)}
+                onPress={() => setHistoryKind("feed")}
+              />
+            </View>
+            <View style={{ width: '48%', flexGrow: 1 }}>
+              <StatusCard
+                type="diaper"
+                label="Last Diaper"
+                value={timeAgo(latestDiaper?.logged_at)}
+                onPress={() => setHistoryKind("diaper")}
+              />
+            </View>
+            <View style={{ width: '48%', flexGrow: 1 }}>
+              <StatusCard
+                type="pump"
+                label="Last Pumped"
+                value={timeAgo(latestPump?.started_at)}
+                onPress={() => setHistoryKind("pump")}
+              />
+            </View>
+            <View style={{ width: '48%', flexGrow: 1 }}>
+              <StatusCard
+                type="sleep"
+                label="Last Sleep"
+                value={
+                  latestSleep?.started_at && !latestSleep?.ended_at
+                    ? "Sleeping"
+                    : timeAgo(latestSleep?.ended_at ?? latestSleep?.started_at)
+                }
+                onPress={() => setHistoryKind("sleep")}
+              />
+            </View>
           </View>
 
 

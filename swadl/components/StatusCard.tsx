@@ -6,8 +6,9 @@ import { useThemeColors } from "../lib/theme";
 import { BottleIcon } from "./icons/BottleIcon";
 import { MoonIcon } from "./icons/MoonIcon";
 import { DiaperIcon } from "./icons/DiaperIcon";
+import { PumpIcon } from "./icons/PumpIcon";
 
-type StatusCardType = 'feed' | 'sleep' | 'diaper';
+type StatusCardType = 'feed' | 'sleep' | 'diaper' | 'pump';
 
 interface StatusCardProps {
   type: StatusCardType;
@@ -20,6 +21,7 @@ const CARD_ICONS: Record<StatusCardType, typeof BottleIcon> = {
   feed: BottleIcon,
   sleep: MoonIcon,
   diaper: DiaperIcon,
+  pump: PumpIcon,
 };
 
 export function StatusCard({ type, label, value, onPress }: StatusCardProps) {

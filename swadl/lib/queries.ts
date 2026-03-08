@@ -1526,7 +1526,7 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
 // ============================================================
 
 export function useLogHistory(
-  kind: "feed" | "diaper" | "sleep" | undefined,
+  kind: "feed" | "diaper" | "sleep" | "pump" | undefined,
   babyId: string | undefined,
   limit = 20
 ) {
@@ -1677,6 +1677,44 @@ export function useLogHistory(
             detail: duration,
             loggedBy: nameMap[s.logged_by] ?? "Unknown",
             raw: s as unknown as Record<string, unknown>,
+          });
+        });
+      } else if (kind === "pump") {
+        const { data: pumps } = await supabase
+          .from("pump_logs")
+          .select("*")
+          .eq("baby_id", babyId)
+          .order("started_at", { ascending: false })
+          .limit(limit);
+
+        const ids = new Set<string>();
+        (pumps as PumpLog[] | null)?.forEach((p) => ids.add(p.logged_by));
+        const nameMap = await getNameMap(ids);
+
+        (pumps as PumpLog[] | null)?.forEach((p) => {
+          const dur = p.ended_at
+            ? `${Math.round((new Date(p.ended_at).getTime() - new Date(p.started_at).getTime()) / 60000)} min`
+            : "in progress";
+          const pumpDetailParts = [dur, p.amount_oz ? `${p.amount_oz} oz / ${Math.round(p.amount_oz * 29.5735)} ml` : ""].filter(Boolean);
+          if (p.notes) {
+            try {
+              const parsed = JSON.parse(p.notes);
+              const parts: string[] = [];
+              if (parsed.left_oz) parts.push(`L: ${parsed.left_oz} oz / ${Math.round(parsed.left_oz * 29.5735)} ml`);
+              if (parsed.right_oz) parts.push(`R: ${parsed.right_oz} oz / ${Math.round(parsed.right_oz * 29.5735)} ml`);
+              if (parts.length > 0) pumpDetailParts.push(parts.join(", "));
+            } catch {
+              pumpDetailParts.push(p.notes);
+            }
+          }
+          items.push({
+            id: p.id,
+            kind: "pump",
+            timestamp: p.started_at,
+            label: "pumped",
+            detail: pumpDetailParts.join(" · "),
+            loggedBy: nameMap[p.logged_by] ?? "Unknown",
+            raw: p as unknown as Record<string, unknown>,
           });
         });
       }

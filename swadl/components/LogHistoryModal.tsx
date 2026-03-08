@@ -7,8 +7,9 @@ import { colors, shadows } from "../constants/theme";
 import { BottleIcon } from "./icons/BottleIcon";
 import { MoonIcon } from "./icons/MoonIcon";
 import { DiaperIcon } from "./icons/DiaperIcon";
+import { PumpIcon } from "./icons/PumpIcon";
 
-type LogKind = "feed" | "diaper" | "sleep";
+type LogKind = "feed" | "diaper" | "sleep" | "pump";
 
 interface LogHistoryModalProps {
   kind: LogKind | null;
@@ -21,12 +22,14 @@ const TITLES: Record<LogKind, string> = {
   feed: "Feed History",
   diaper: "Diaper History",
   sleep: "Sleep History",
+  pump: "Pump History",
 };
 
 const ICONS: Record<LogKind, typeof BottleIcon> = {
   feed: BottleIcon,
   sleep: MoonIcon,
   diaper: DiaperIcon,
+  pump: PumpIcon,
 };
 
 function formatTime(dateStr: string): string {
@@ -93,6 +96,18 @@ function computeDaySummary(kind: LogKind, items: ActivityItem[]): string {
       ? mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
       : `${mins}m`;
     return `${timeStr} total  ·  ${items.length} nap${items.length !== 1 ? "s" : ""}`;
+  }
+
+  if (kind === "pump") {
+    let totalOz = 0;
+    items.forEach((item) => {
+      const raw = item.raw;
+      if (raw.amount_oz) totalOz += Number(raw.amount_oz);
+    });
+    const parts: string[] = [];
+    if (totalOz > 0) parts.push(`${totalOz} oz / ${Math.round(totalOz * 29.5735)} ml`);
+    parts.push(`${items.length} session${items.length !== 1 ? "s" : ""}`);
+    return parts.join("  ·  ");
   }
 
   return "";

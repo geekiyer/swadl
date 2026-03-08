@@ -129,15 +129,15 @@ export default function Summary() {
         : "",
       s.avgOzPerBottle != null ? `  Avg ${displayVolume(s.avgOzPerBottle, unit)}/bottle` : "",
       "",
-      "PUMPING",
-      `${s.pumpCount} sessions · ${displayVolume(s.pumpTotalOz, unit)} · ${s.pumpTotalMin} min`,
-      "",
       "DIAPERS",
       `${s.diaperCount} changes`,
       ...Object.entries(s.diaperByType).map(
         ([type, count]) => `  ${type}: ${count}`
       ),
       s.lowWetWarning ? "  Warning: Low wet diaper count" : "",
+      "",
+      "PUMPING",
+      `${s.pumpCount} sessions · ${displayVolume(s.pumpTotalOz, unit)} · ${s.pumpTotalMin} min`,
       "",
       "SLEEP",
       `${Math.round(s.sleepTotalMin / 60 * 10) / 10} hrs total · ${s.napCount} nap(s)`,
@@ -168,6 +168,7 @@ export default function Summary() {
           onRefresh={onRefresh}
           tintColor={colors.feedPrimary}
           colors={[colors.feedPrimary]}
+          progressViewOffset={insets.top}
         />
       }
     >
@@ -291,35 +292,6 @@ export default function Summary() {
               </View>
             </View>
 
-            {/* Pump Summary */}
-            {summary.pumpCount > 0 && (
-              <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-                <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
-                  Pumping
-                </Text>
-                <View className="flex-row justify-between">
-                  <View className="items-center flex-1">
-                    <Text className="text-2xl text-text-primary font-mono-bold">
-                      {summary.pumpCount}
-                    </Text>
-                    <Text className="text-xs text-text-secondary font-body">sessions</Text>
-                  </View>
-                  <View className="items-center flex-1">
-                    <Text className="text-2xl text-text-primary font-mono-bold">
-                      {displayVolume(summary.pumpTotalOz, unit).split(" ")[0]}
-                    </Text>
-                    <Text className="text-xs text-text-secondary font-body">{unit}</Text>
-                  </View>
-                  <View className="items-center flex-1">
-                    <Text className="text-2xl text-text-primary font-mono-bold">
-                      {summary.pumpTotalMin}
-                    </Text>
-                    <Text className="text-xs text-text-secondary font-body">min</Text>
-                  </View>
-                </View>
-              </View>
-            )}
-
             {/* Diaper Summary */}
             <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
               <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
@@ -341,6 +313,37 @@ export default function Summary() {
                     Fewer than 6 wet diapers — consider checking hydration
                   </Text>
                 </View>
+              )}
+            </View>
+
+            {/* Pump Summary */}
+            <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+                Pumping
+              </Text>
+              {summary.pumpCount > 0 ? (
+                <View className="flex-row justify-between">
+                  <View className="items-center flex-1">
+                    <Text className="text-2xl text-text-primary font-mono-bold">
+                      {summary.pumpCount}
+                    </Text>
+                    <Text className="text-xs text-text-secondary font-body">sessions</Text>
+                  </View>
+                  <View className="items-center flex-1">
+                    <Text className="text-2xl text-text-primary font-mono-bold">
+                      {displayVolume(summary.pumpTotalOz, unit).split(" ")[0]}
+                    </Text>
+                    <Text className="text-xs text-text-secondary font-body">{unit}</Text>
+                  </View>
+                  <View className="items-center flex-1">
+                    <Text className="text-2xl text-text-primary font-mono-bold">
+                      {summary.pumpTotalMin}
+                    </Text>
+                    <Text className="text-xs text-text-secondary font-body">min</Text>
+                  </View>
+                </View>
+              ) : (
+                <Text className="text-sm text-text-secondary font-body">No pump sessions</Text>
               )}
             </View>
 
