@@ -3,6 +3,15 @@
     "version": ">= 12.0.0",
     "appVersionSource": "remote"
   },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "gopal87us@gmail.com",
+        "ascAppId": "6760244624",
+        "appleTeamId": "TXN4Z93WMJ"
+      }
+    }
+  },
   "build": {
     "development": {
       "developmentClient": true,
