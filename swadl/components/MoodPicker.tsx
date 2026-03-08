@@ -2,6 +2,8 @@ import { useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import Animated from "react-native-reanimated";
 import { usePressSpring } from "../hooks/usePressSpring";
+import { colors } from "../constants/theme";
+import { useThemeColors } from "../lib/theme";
 
 const MOODS = [
   { key: "happy", label: "Happy", icon: "\u{1F60A}" },
@@ -27,23 +29,31 @@ function MoodButton({
   onPress: () => void;
 }) {
   const { animStyle, handlers } = usePressSpring();
+  const tc = useThemeColors();
 
   return (
     <Animated.View style={animStyle} className="flex-1">
       <Pressable
-        className={`py-3 px-2 rounded-xl border items-center ${
-          selected
-            ? "bg-navy-raise border-amber"
-            : "bg-navy-raise border-navy-border"
-        }`}
+        style={{
+          paddingVertical: 12,
+          paddingHorizontal: 8,
+          borderRadius: 12,
+          borderWidth: selected ? 2 : 1,
+          alignItems: 'center',
+          backgroundColor: tc.raisedBg,
+          borderColor: selected ? colors.feedPrimary : tc.border,
+        }}
         onPress={onPress}
         {...handlers}
       >
         <Text className="text-xl">{mood.icon}</Text>
         <Text
-          className={`text-[10px] mt-1 font-body-semibold ${
-            selected ? "text-honey" : "text-ash"
-          }`}
+          style={{
+            fontSize: 10,
+            marginTop: 4,
+            fontFamily: 'Nunito_600SemiBold',
+            color: selected ? colors.feedPrimary : tc.textSecondary,
+          }}
         >
           {mood.label}
         </Text>

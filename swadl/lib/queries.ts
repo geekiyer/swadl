@@ -1411,7 +1411,7 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
         } else if (f.type === "solids") label = "fed solids";
 
         const detailParts: string[] = [];
-        if (f.amount_oz) detailParts.push(`${f.amount_oz} oz`);
+        if (f.amount_oz) detailParts.push(`${f.amount_oz} oz / ${Math.round(f.amount_oz * 29.5735)} ml`);
         if (f.duration_min) detailParts.push(`${f.duration_min} min`);
         // Add content info to detail (brand name, etc.) but skip generic "Formula"/"Breastmilk" already in label
         if (contentInfo && !["Formula", "Breastmilk"].includes(contentInfo)) {
@@ -1487,14 +1487,14 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
         const dur = p.ended_at
           ? `${Math.round((new Date(p.ended_at).getTime() - new Date(p.started_at).getTime()) / 60000)} min`
           : "in progress";
-        const pumpDetailParts = [dur, p.amount_oz ? `${p.amount_oz} oz` : ""].filter(Boolean);
+        const pumpDetailParts = [dur, p.amount_oz ? `${p.amount_oz} oz / ${Math.round(p.amount_oz * 29.5735)} ml` : ""].filter(Boolean);
         // Add notes (L/R breakdown, etc.)
         if (p.notes) {
           try {
             const parsed = JSON.parse(p.notes);
             const parts: string[] = [];
-            if (parsed.left_oz) parts.push(`L: ${parsed.left_oz} oz`);
-            if (parsed.right_oz) parts.push(`R: ${parsed.right_oz} oz`);
+            if (parsed.left_oz) parts.push(`L: ${parsed.left_oz} oz / ${Math.round(parsed.left_oz * 29.5735)} ml`);
+            if (parsed.right_oz) parts.push(`R: ${parsed.right_oz} oz / ${Math.round(parsed.right_oz * 29.5735)} ml`);
             if (parts.length > 0) pumpDetailParts.push(parts.join(", "));
           } catch {
             pumpDetailParts.push(p.notes);
@@ -1517,6 +1517,171 @@ export function useRecentActivity(babyId: string | undefined, limit = 10) {
       );
 
       return items.slice(0, limit);
+    },
+  });
+}
+
+// ============================================================
+// Log History (single activity type)
+// ============================================================
+
+export function useLogHistory(
+  kind: "feed" | "diaper" | "sleep" | undefined,
+  babyId: string | undefined,
+  limit = 20
+) {
+  return useQuery({
+    queryKey: ["log-history", kind, babyId, limit],
+    enabled: !!kind && !!babyId,
+    queryFn: async () => {
+      if (!kind || !babyId) return [];
+
+      // Fetch profile names
+      const getNameMap = async (ids: Set<string>) => {
+        if (ids.size === 0) return {};
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, display_name")
+          .in("id", [...ids]);
+        return Object.fromEntries(
+          (profiles as Pick<Profile, "id" | "display_name">[])?.map((p) => [
+            p.id,
+            p.display_name,
+          ]) ?? []
+        );
+      };
+
+      const items: ActivityItem[] = [];
+
+      if (kind === "feed") {
+        const { data: feeds } = await supabase
+          .from("feed_logs")
+          .select("*")
+          .eq("baby_id", babyId)
+          .order("started_at", { ascending: false })
+          .limit(limit);
+
+        const ids = new Set<string>();
+        (feeds as FeedLog[] | null)?.forEach((f) => ids.add(f.logged_by));
+        const nameMap = await getNameMap(ids);
+
+        (feeds as FeedLog[] | null)?.forEach((f) => {
+          let label = "logged a feed";
+          let contentInfo = "";
+          if (f.notes) {
+            try {
+              const parsed = JSON.parse(f.notes);
+              if (parsed.brand) contentInfo = parsed.brand;
+              else if (parsed.content === "formula") contentInfo = "Formula";
+              else if (parsed.content === "breastmilk") contentInfo = "Breastmilk";
+            } catch {
+              contentInfo = f.notes;
+            }
+          }
+          if (f.type === "breast_left") label = "breastfed (left)";
+          else if (f.type === "breast_right") label = "breastfed (right)";
+          else if (f.type === "bottle") {
+            if (contentInfo.toLowerCase().includes("formula")) label = "gave a formula bottle";
+            else if (contentInfo.toLowerCase().includes("breastmilk")) label = "gave a breastmilk bottle";
+            else label = "gave a bottle";
+          } else if (f.type === "solids") label = "fed solids";
+
+          const detailParts: string[] = [];
+          if (f.amount_oz) detailParts.push(`${f.amount_oz} oz / ${Math.round(f.amount_oz * 29.5735)} ml`);
+          if (f.duration_min) detailParts.push(`${f.duration_min} min`);
+          if (contentInfo && !["Formula", "Breastmilk"].includes(contentInfo)) {
+            detailParts.push(contentInfo);
+          }
+          items.push({
+            id: f.id,
+            kind: "feed",
+            timestamp: f.started_at,
+            label,
+            detail: detailParts.join(" · "),
+            loggedBy: nameMap[f.logged_by] ?? "Unknown",
+            raw: f as unknown as Record<string, unknown>,
+          });
+        });
+      } else if (kind === "diaper") {
+        const { data: diapers } = await supabase
+          .from("diaper_logs")
+          .select("*")
+          .eq("baby_id", babyId)
+          .order("logged_at", { ascending: false })
+          .limit(limit);
+
+        const ids = new Set<string>();
+        (diapers as DiaperLog[] | null)?.forEach((d) => ids.add(d.logged_by));
+        const nameMap = await getNameMap(ids);
+
+        const DIAPER_LABELS: Record<string, string> = {
+          wet: "changed a wet diaper",
+          dirty: "changed a dirty diaper",
+          both: "changed a wet + dirty diaper",
+          dry: "did a diaper check (dry)",
+        };
+
+        (diapers as DiaperLog[] | null)?.forEach((d) => {
+          let diaperDetail = "";
+          if (d.notes) {
+            try {
+              const parsed = JSON.parse(d.notes);
+              const parts: string[] = [];
+              if (parsed.color) parts.push(parsed.color);
+              if (parsed.consistency) parts.push(parsed.consistency);
+              if (parsed.rash) parts.push("Rash");
+              if (parsed.blowout) parts.push("Blowout");
+              diaperDetail = parts.join(" · ");
+            } catch {
+              diaperDetail = d.notes;
+            }
+          }
+          items.push({
+            id: d.id,
+            kind: "diaper",
+            timestamp: d.logged_at,
+            label: DIAPER_LABELS[d.type] ?? "changed a diaper",
+            detail: diaperDetail,
+            loggedBy: nameMap[d.logged_by] ?? "Unknown",
+            raw: d as unknown as Record<string, unknown>,
+          });
+        });
+      } else if (kind === "sleep") {
+        const { data: sleeps } = await supabase
+          .from("sleep_logs")
+          .select("*")
+          .eq("baby_id", babyId)
+          .order("started_at", { ascending: false })
+          .limit(limit);
+
+        const ids = new Set<string>();
+        (sleeps as SleepLog[] | null)?.forEach((s) => ids.add(s.logged_by));
+        const nameMap = await getNameMap(ids);
+
+        const locLabel: Record<string, string> = {
+          crib: "crib", bassinet: "bassinet", co_sleep: "co-sleep",
+          stroller: "stroller", car: "car", arms: "arms",
+        };
+
+        (sleeps as SleepLog[] | null)?.forEach((s) => {
+          const duration = s.ended_at
+            ? `${Math.round((new Date(s.ended_at).getTime() - new Date(s.started_at).getTime()) / 60000)} min`
+            : "";
+          const isAwake = !!s.ended_at;
+          const loc = locLabel[s.location] ?? s.location;
+          items.push({
+            id: s.id,
+            kind: "sleep",
+            timestamp: s.started_at,
+            label: isAwake ? `logged sleep in ${loc}` : `put baby down in ${loc}`,
+            detail: duration,
+            loggedBy: nameMap[s.logged_by] ?? "Unknown",
+            raw: s as unknown as Record<string, unknown>,
+          });
+        });
+      }
+
+      return items;
     },
   });
 }

@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies, useLatestSleep } from "../../lib/queries";
 import { TimePicker } from "./TimePicker";
+import { colors } from "../../constants/theme";
 
 const LOCATIONS = [
   { key: "crib", label: "Crib" },
@@ -200,22 +201,23 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
   if (step === "choose") {
     return (
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text className="text-ash mb-4">Where are they sleeping?</Text>
+        <Text className="text-text-secondary mb-4">Where are they sleeping?</Text>
         <View className="flex-row flex-wrap gap-2 mb-6">
           {LOCATIONS.map((loc) => (
             <TouchableOpacity
               key={loc.key}
               className={`px-4 py-3 rounded-2xl border flex-1 min-w-[90px] items-center ${
                 location === loc.key
-                  ? "bg-amber border-amber"
-                  : "bg-navy-card border-navy-border"
+                  ? "bg-feed-primary border-feed-primary"
+                  : "bg-card-bg border-border-main"
               }`}
               onPress={() => setLocation(loc.key)}
             >
               <Text
                 className={`text-sm font-body-medium ${
-                  location === loc.key ? "text-midnight" : "text-ash"
+                  location === loc.key ? "" : "text-text-secondary"
                 }`}
+                style={location === loc.key ? { color: colors.textDark } : undefined}
               >
                 {loc.label}
               </Text>
@@ -224,20 +226,20 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
         </View>
 
         <TouchableOpacity
-          className="bg-amber rounded-2xl py-4 mb-4"
+          className="bg-feed-primary rounded-2xl py-4 mb-4"
           onPress={() => startSleep(location)}
           disabled={saving}
         >
-          <Text className="text-midnight text-center font-body-semibold text-base">
+          <Text className="text-center font-body-semibold text-base" style={{ color: colors.textDark }}>
             {saving ? "Starting..." : "Start Sleep Timer"}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          className="border border-navy-border rounded-2xl py-4"
+          className="border border-border-main rounded-2xl py-4"
           onPress={() => setStep("manual")}
         >
-          <Text className="text-ash text-center font-body-medium text-base">
+          <Text className="text-text-secondary text-center font-body-medium text-base">
             Log a Past Sleep
           </Text>
         </TouchableOpacity>
@@ -249,22 +251,23 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
   if (step === "manual") {
     return (
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text className="text-ash mb-4">Where did they sleep?</Text>
+        <Text className="text-text-secondary mb-4">Where did they sleep?</Text>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {LOCATIONS.map((loc) => (
             <TouchableOpacity
               key={loc.key}
               className={`px-4 py-3 rounded-2xl border flex-1 min-w-[90px] items-center ${
                 location === loc.key
-                  ? "bg-amber border-amber"
-                  : "bg-navy-card border-navy-border"
+                  ? "bg-feed-primary border-feed-primary"
+                  : "bg-card-bg border-border-main"
               }`}
               onPress={() => setLocation(loc.key)}
             >
               <Text
                 className={`text-sm font-body-medium ${
-                  location === loc.key ? "text-midnight" : "text-ash"
+                  location === loc.key ? "" : "text-text-secondary"
                 }`}
+                style={location === loc.key ? { color: colors.textDark } : undefined}
               >
                 {loc.label}
               </Text>
@@ -276,17 +279,17 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
         <TimePicker value={manualEnd} onChange={setManualEnd} label="Woke up at" />
 
         <TouchableOpacity
-          className="bg-amber rounded-2xl py-4 mb-3"
+          className="bg-feed-primary rounded-2xl py-4 mb-3"
           onPress={saveManualSleep}
           disabled={saving}
         >
-          <Text className="text-midnight text-center font-body-semibold text-base">
+          <Text className="text-center font-body-semibold text-base" style={{ color: colors.textDark }}>
             {saving ? "Saving..." : "Save Sleep"}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity className="py-3" onPress={() => setStep("choose")}>
-          <Text className="text-ash text-center">Back</Text>
+          <Text className="text-text-secondary text-center">Back</Text>
         </TouchableOpacity>
       </ScrollView>
     );
@@ -295,20 +298,20 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
   // Step 2: Timer running
   return (
     <View className="items-center">
-      <Text className="text-ash mb-1">
+      <Text className="text-text-secondary mb-1">
         Sleeping in {LOCATIONS.find((l) => l.key === location)?.label}
       </Text>
-      <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 60 }}>
+      <Text className="text-5xl mb-2 font-mono-bold text-text-primary" style={{ letterSpacing: -1, lineHeight: 60 }}>
         {formatTimer(elapsed)}
       </Text>
-      <Text className="text-ash mb-8">Sleeping...</Text>
+      <Text className="text-text-secondary mb-8">Sleeping...</Text>
 
       <TouchableOpacity
-        className="bg-amber rounded-2xl py-4 px-12"
+        className="bg-feed-primary rounded-2xl py-4 px-12"
         onPress={stopSleep}
         disabled={saving}
       >
-        <Text className="text-midnight font-body-semibold text-base">
+        <Text className="font-body-semibold text-base" style={{ color: colors.textDark }}>
           {saving ? "Saving..." : "Woke Up"}
         </Text>
       </TouchableOpacity>

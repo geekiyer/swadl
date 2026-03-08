@@ -7,6 +7,7 @@ import { useBabies, useLatestPump } from "../../lib/queries";
 import { useUnitStore, parseInputToOz } from "../../lib/store";
 import { UnitToggle } from "../UnitToggle";
 import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
 
 const PUMP_TYPES = [
   { key: "manual", label: "Manual" },
@@ -29,6 +30,7 @@ interface PumpLoggerProps {
 }
 
 export function PumpLogger({ onSuccess }: PumpLoggerProps) {
+  const tc = useThemeColors();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const { data: latestPump } = useLatestPump(baby?.id);
@@ -170,7 +172,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
   if (step === "setup") {
     return (
       <View>
-        <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+        <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
           Pump Type
         </Text>
         <View className="flex-row flex-wrap gap-2 mb-5">
@@ -179,14 +181,14 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
               key={pt.key}
               className={`px-4 py-3 rounded-2xl border flex-1 min-w-[140px] items-center ${
                 pumpType === pt.key
-                  ? "bg-ember border-ember"
-                  : "bg-navy-card border-navy-border"
+                  ? "bg-pump-primary border-pump-primary"
+                  : "bg-card-bg border-border-main"
               }`}
               onPress={() => setPumpType(pt.key)}
             >
               <Text
                 className={`text-sm font-body-medium ${
-                  pumpType === pt.key ? "text-white" : "text-ash"
+                  pumpType === pt.key ? "text-text-primary" : "text-text-secondary"
                 }`}
               >
                 {pt.label}
@@ -195,7 +197,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
           ))}
         </View>
 
-        <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+        <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
           Side
         </Text>
         <View className="flex-row gap-2 mb-8">
@@ -204,14 +206,14 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
               key={s.key}
               className={`px-4 py-3 rounded-2xl border flex-1 items-center ${
                 side === s.key
-                  ? "bg-ember border-ember"
-                  : "bg-navy-card border-navy-border"
+                  ? "bg-pump-primary border-pump-primary"
+                  : "bg-card-bg border-border-main"
               }`}
               onPress={() => setSide(s.key)}
             >
               <Text
                 className={`text-sm font-body-medium ${
-                  side === s.key ? "text-white" : "text-ash"
+                  side === s.key ? "text-text-primary" : "text-text-secondary"
                 }`}
               >
                 {s.label}
@@ -221,11 +223,11 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
         </View>
 
         <TouchableOpacity
-          className="bg-amber rounded-2xl py-4"
+          className="bg-feed-primary rounded-2xl py-4"
           onPress={startPumping}
           disabled={saving}
         >
-          <Text className="text-midnight text-center font-body-semibold text-base">
+          <Text className="text-center font-body-semibold text-base" style={{ color: colors.textDark }}>
             {saving ? "Starting..." : "Start Pumping"}
           </Text>
         </TouchableOpacity>
@@ -237,20 +239,20 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
   if (step === "pumping") {
     return (
       <View className="items-center">
-        <Text className="text-ash mb-1">
+        <Text className="text-text-secondary mb-1">
           {PUMP_TYPES.find((p) => p.key === pumpType)?.label} ·{" "}
           {SIDES.find((s) => s.key === side)?.label}
         </Text>
-        <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 60 }}>
+        <Text className="text-5xl mb-2 font-mono-bold text-text-primary" style={{ letterSpacing: -1, lineHeight: 60 }}>
           {formatTimer(elapsed)}
         </Text>
-        <Text className="text-ash mb-8">Pumping...</Text>
+        <Text className="text-text-secondary mb-8">Pumping...</Text>
 
         <TouchableOpacity
-          className="bg-ember rounded-2xl py-4 px-12"
+          className="bg-pump-primary rounded-2xl py-4 px-12"
           onPress={stopPumping}
         >
-          <Text className="text-white font-body-semibold text-base">
+          <Text className="text-text-primary font-body-semibold text-base">
             Stop Pumping
           </Text>
         </TouchableOpacity>
@@ -266,7 +268,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
             router.back();
           }}
         >
-          <Text className="text-ash text-center text-sm">Discard</Text>
+          <Text className="text-text-secondary text-center text-sm">Discard</Text>
         </TouchableOpacity>
       </View>
     );
@@ -278,8 +280,8 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
   return (
     <View>
       <View className="items-center mb-4">
-        <Text className="text-ash mb-1">Session Complete</Text>
-        <Text className="text-3xl font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 40 }}>{formatTimer(elapsed)}</Text>
+        <Text className="text-text-secondary mb-1">Session Complete</Text>
+        <Text className="text-3xl font-mono-bold text-text-primary" style={{ letterSpacing: -1, lineHeight: 40 }}>{formatTimer(elapsed)}</Text>
       </View>
 
       <UnitToggle />
@@ -287,13 +289,13 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
       {showBothSides ? (
         <View className="flex-row gap-3 mt-3 mb-4">
           <View className="flex-1">
-            <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+            <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
               Left ({unit})
             </Text>
             <TextInput
-              className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 text-base text-white"
+              className="border border-border-main bg-raised-bg rounded-xl px-4 py-3 text-base text-text-primary"
               placeholder="0"
-              placeholderTextColor={colors.ash}
+              placeholderTextColor={tc.textSecondary}
               value={leftAmount}
               onChangeText={setLeftAmount}
               keyboardType="decimal-pad"
@@ -301,13 +303,13 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
             />
           </View>
           <View className="flex-1">
-            <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+            <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
               Right ({unit})
             </Text>
             <TextInput
-              className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 text-base text-white"
+              className="border border-border-main bg-raised-bg rounded-xl px-4 py-3 text-base text-text-primary"
               placeholder="0"
-              placeholderTextColor={colors.ash}
+              placeholderTextColor={tc.textSecondary}
               value={rightAmount}
               onChangeText={setRightAmount}
               keyboardType="decimal-pad"
@@ -316,13 +318,13 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
         </View>
       ) : (
         <View className="mt-3 mb-4">
-          <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+          <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
             Amount ({unit})
           </Text>
           <TextInput
-            className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 text-base text-white"
+            className="border border-border-main bg-raised-bg rounded-xl px-4 py-3 text-base text-text-primary"
             placeholder="e.g. 4.5"
-            placeholderTextColor={colors.ash}
+            placeholderTextColor={tc.textSecondary}
             value={side === "left" ? leftAmount : rightAmount}
             onChangeText={side === "left" ? setLeftAmount : setRightAmount}
             keyboardType="decimal-pad"
@@ -331,24 +333,24 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
         </View>
       )}
 
-      <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
         Notes (optional)
       </Text>
       <TextInput
-        className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-6 text-base text-white"
+        className="border border-border-main bg-raised-bg rounded-xl px-4 py-3 mb-6 text-base text-text-primary"
         placeholder="e.g. letdown took longer than usual"
-        placeholderTextColor={colors.ash}
+        placeholderTextColor={tc.textSecondary}
         value={notes}
         onChangeText={setNotes}
         multiline
       />
 
       <TouchableOpacity
-        className="bg-amber rounded-2xl py-4 mb-3"
+        className="bg-feed-primary rounded-2xl py-4 mb-3"
         onPress={savePumpSession}
         disabled={saving}
       >
-        <Text className="text-midnight text-center font-body-semibold text-base">
+        <Text className="text-center font-body-semibold text-base" style={{ color: colors.textDark }}>
           {saving ? "Saving..." : "Save"}
         </Text>
       </TouchableOpacity>
@@ -363,7 +365,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
           router.back();
         }}
       >
-        <Text className="text-ash text-center">Discard</Text>
+        <Text className="text-text-secondary text-center">Discard</Text>
       </TouchableOpacity>
     </View>
   );

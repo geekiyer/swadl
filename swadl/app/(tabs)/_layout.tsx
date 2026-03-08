@@ -12,10 +12,7 @@ export default function TabsLayout() {
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        headerShown: true,
-        headerStyle: { backgroundColor: tc.midnight },
-        headerTintColor: tc.white,
-        headerTitleStyle: { fontFamily: "Outfit_600SemiBold" },
+        headerShown: false,
         animation: "none",
       }}
     >

@@ -2,12 +2,12 @@ import { colors } from "../../constants/theme";
 
 // Test the particle color cycling logic from LogConfirmation
 
-const PARTICLE_COLORS = [colors.amber, colors.honey, colors.cream];
+const PARTICLE_COLORS = [colors.feedPrimary, colors.diaperPrimary, colors.cream];
 
 describe("LogConfirmation particle colors", () => {
-  it("uses amber brand family colors", () => {
-    expect(PARTICLE_COLORS).toContain(colors.amber);
-    expect(PARTICLE_COLORS).toContain(colors.honey);
+  it("uses category and brand colors", () => {
+    expect(PARTICLE_COLORS).toContain(colors.feedPrimary);
+    expect(PARTICLE_COLORS).toContain(colors.diaperPrimary);
     expect(PARTICLE_COLORS).toContain(colors.cream);
   });
 
@@ -19,14 +19,14 @@ describe("LogConfirmation particle colors", () => {
       assignedColors.push(PARTICLE_COLORS[i % PARTICLE_COLORS.length]);
     }
 
-    // First 3 should be amber, honey, cream
-    expect(assignedColors[0]).toBe(colors.amber);
-    expect(assignedColors[1]).toBe(colors.honey);
+    // First 3 should be feedPrimary, diaperPrimary, cream
+    expect(assignedColors[0]).toBe(colors.feedPrimary);
+    expect(assignedColors[1]).toBe(colors.diaperPrimary);
     expect(assignedColors[2]).toBe(colors.cream);
 
     // Then it cycles
-    expect(assignedColors[3]).toBe(colors.amber);
-    expect(assignedColors[4]).toBe(colors.honey);
+    expect(assignedColors[3]).toBe(colors.feedPrimary);
+    expect(assignedColors[4]).toBe(colors.diaperPrimary);
 
     expect(assignedColors).toHaveLength(particleCount);
   });

@@ -60,23 +60,23 @@ export function TimePicker({ value, onChange, label = "When" }: TimePickerProps)
 
   return (
     <View className="mb-4">
-      <Text className="text-[11px] font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
         {label}
       </Text>
       <View className="flex-row gap-2">
         <TouchableOpacity
-          className="bg-navy-card border border-navy-border rounded-xl px-4 py-3 flex-1"
+          className="bg-card-bg border border-border-main rounded-xl px-4 py-3 flex-1"
           onPress={openTimePicker}
         >
-          <Text className="text-base text-white font-mono">
+          <Text className="text-base text-text-primary font-mono">
             {formatTimeShort(value)}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-navy-card border border-navy-border rounded-xl px-4 py-3"
+          className="bg-card-bg border border-border-main rounded-xl px-4 py-3"
           onPress={openDatePicker}
         >
-          <Text className="text-base text-ash">
+          <Text className="text-base text-text-secondary">
             {isToday(value) ? "Today" : value.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
           </Text>
         </TouchableOpacity>
@@ -90,7 +90,7 @@ export function TimePicker({ value, onChange, label = "When" }: TimePickerProps)
           onChange={handleChange}
           maximumDate={new Date()}
           themeVariant={themeMode}
-          textColor={tc.white}
+          textColor={tc.textPrimary}
         />
       )}
     </View>

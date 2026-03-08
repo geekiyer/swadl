@@ -16,6 +16,7 @@ import { useUnitStore, useFormulaBrandStore, parseInputToOz } from "../../lib/st
 import { UnitToggle } from "../UnitToggle";
 import { TimePicker } from "./TimePicker";
 import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
 
 type FeedCategory = "breastfeed" | "bottle";
 type BreastSide = "breast_left" | "breast_right";
@@ -26,6 +27,7 @@ interface FeedLoggerProps {
 }
 
 export function FeedLogger({ onSuccess }: FeedLoggerProps) {
+  const tc = useThemeColors();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
   const queryClient = useQueryClient();
@@ -168,20 +170,20 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     return (
       <View className="gap-3">
         <TouchableOpacity
-          className="bg-navy-card border border-navy-border rounded-2xl px-6 py-6 items-center"
+          className="bg-card-bg border border-border-main rounded-2xl px-6 py-6 items-center"
           onPress={() => setCategory("breastfeed")}
         >
-          <Text className="text-amber font-body-bold text-lg">Breastfeed</Text>
-          <Text className="text-ash text-sm mt-1">
+          <Text className="text-feed-primary font-body-bold text-lg">Breastfeed</Text>
+          <Text className="text-text-secondary text-sm mt-1">
             Timer for left or right
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="bg-navy-card border border-navy-border rounded-2xl px-6 py-6 items-center"
+          className="bg-card-bg border border-border-main rounded-2xl px-6 py-6 items-center"
           onPress={() => setCategory("bottle")}
         >
-          <Text className="text-ember font-body-bold text-lg">Bottle</Text>
-          <Text className="text-ash text-sm mt-1">
+          <Text className="text-pump-primary font-body-bold text-lg">Bottle</Text>
+          <Text className="text-text-secondary text-sm mt-1">
             Formula or breastmilk
           </Text>
         </TouchableOpacity>
@@ -195,33 +197,33 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     if (!side) {
       return (
         <View>
-          <Text className="text-ash mb-4">Which side?</Text>
+          <Text className="text-text-secondary mb-4">Which side?</Text>
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
+              className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => {
                 setSide("breast_left");
                 startTimer();
               }}
             >
-              <Text className="text-amber font-body-semibold text-base">
+              <Text className="text-feed-primary font-body-semibold text-base">
                 Left
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
+              className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => {
                 setSide("breast_right");
                 startTimer();
               }}
             >
-              <Text className="text-amber font-body-semibold text-base">
+              <Text className="text-feed-primary font-body-semibold text-base">
                 Right
               </Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="mt-4 py-3" onPress={resetAll}>
-            <Text className="text-ash text-center">Back</Text>
+            <Text className="text-text-secondary text-center">Back</Text>
           </TouchableOpacity>
         </View>
       );
@@ -231,36 +233,36 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     return (
       <View>
         <View className="items-center">
-          <Text className="text-5xl mb-2 font-mono-bold text-white" style={{ letterSpacing: -1, lineHeight: 60 }}>
+          <Text className="text-5xl mb-2 font-mono-bold text-text-primary" style={{ letterSpacing: -1, lineHeight: 60 }}>
             {formatElapsed(elapsed)}
           </Text>
-          <Text className="text-ash mb-6">
+          <Text className="text-text-secondary mb-6">
             {side === "breast_left" ? "Left breast" : "Right breast"}
           </Text>
 
           {timing ? (
             <TouchableOpacity
-              className="bg-ember rounded-2xl px-8 py-4 mb-4"
+              className="bg-pump-primary rounded-2xl px-8 py-4 mb-4"
               onPress={stopTimer}
             >
-              <Text className="text-white font-body-semibold text-base">
+              <Text className="text-text-primary font-body-semibold text-base">
                 Stop Timer
               </Text>
             </TouchableOpacity>
           ) : elapsed > 0 ? (
             <TouchableOpacity
-              className="bg-amber rounded-xl py-4 px-8 mb-4"
+              className="bg-feed-primary rounded-xl py-4 px-8 mb-4"
               onPress={saveBreast}
               disabled={saving}
             >
-              <Text className="text-midnight font-body-semibold text-base">
+              <Text className="font-body-semibold text-base" style={{ color: colors.textDark }}>
                 {saving ? "Saving..." : "Save"}
               </Text>
             </TouchableOpacity>
           ) : null}
         </View>
         <TouchableOpacity className="mt-2 py-3" onPress={resetAll}>
-          <Text className="text-ash text-center">Cancel</Text>
+          <Text className="text-text-secondary text-center">Cancel</Text>
         </TouchableOpacity>
       </View>
     );
@@ -272,27 +274,27 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     if (!bottleContent) {
       return (
         <View>
-          <Text className="text-ash mb-4">What's in the bottle?</Text>
+          <Text className="text-text-secondary mb-4">What's in the bottle?</Text>
           <View className="flex-row gap-3 mb-4">
             <TouchableOpacity
-              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
+              className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => setBottleContent("formula")}
             >
-              <Text className="text-ember font-body-semibold text-base">
+              <Text className="text-pump-primary font-body-semibold text-base">
                 Formula
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1"
+              className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1"
               onPress={() => setBottleContent("breastmilk")}
             >
-              <Text className="text-ember font-body-semibold text-base">
+              <Text className="text-pump-primary font-body-semibold text-base">
                 Breastmilk
               </Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity className="mt-2 py-3" onPress={resetAll}>
-            <Text className="text-ash text-center">Back</Text>
+            <Text className="text-text-secondary text-center">Back</Text>
           </TouchableOpacity>
         </View>
       );
@@ -308,11 +310,11 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
 
       return (
         <View className="flex-1">
-          <Text className="text-ash mb-3">Type to search formula brand</Text>
+          <Text className="text-text-secondary mb-3">Type to search formula brand</Text>
           <TextInput
-            className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-3 text-base text-white"
+            className="border border-border-main bg-raised-bg rounded-xl px-4 py-3 mb-3 text-base text-text-primary"
             placeholder="Start typing brand name..."
-            placeholderTextColor={colors.ash}
+            placeholderTextColor={tc.textSecondary}
             value={brandSearch}
             onChangeText={setBrandSearch}
             autoFocus
@@ -325,18 +327,18 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
               style={{ maxHeight: 350 }}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  className="py-3 px-2 border-b border-navy-border"
+                  className="py-3 px-2 border-b border-border-main"
                   onPress={() => {
                     setFormulaBrand(item);
                     setLastBrand(item);
                     setBrandSearch("");
                   }}
                 >
-                  <Text className="text-base text-white">{item}</Text>
+                  <Text className="text-base text-text-primary">{item}</Text>
                 </TouchableOpacity>
               )}
               ListEmptyComponent={
-                <Text className="text-ash text-center py-4">
+                <Text className="text-text-secondary text-center py-4">
                   No brands found
                 </Text>
               }
@@ -346,7 +348,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
             className="mt-3 py-3"
             onPress={() => setBottleContent(null)}
           >
-            <Text className="text-ash text-center">Back</Text>
+            <Text className="text-text-secondary text-center">Back</Text>
           </TouchableOpacity>
         </View>
       );
@@ -356,7 +358,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     return (
       <View>
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-sm text-ash">
+          <Text className="text-sm text-text-secondary">
             {bottleContent === "formula"
               ? `Formula - ${formulaBrand}`
               : "Breastmilk"}{" "}
@@ -365,13 +367,13 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
           <UnitToggle />
         </View>
 
-        <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+        <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
           Amount ({unit})
         </Text>
         <TextInput
-          className="border border-navy-border bg-navy-raise rounded-xl px-4 py-3 mb-4 text-base text-white"
+          className="border border-border-main bg-raised-bg rounded-xl px-4 py-3 mb-4 text-base text-text-primary"
           placeholder={unit === "oz" ? "e.g. 4" : "e.g. 120"}
-          placeholderTextColor={colors.ash}
+          placeholderTextColor={tc.textSecondary}
           value={amountOz}
           onChangeText={setAmountOz}
           keyboardType="decimal-pad"
@@ -381,11 +383,14 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
         <TimePicker value={bottleTime} onChange={setBottleTime} />
 
         <TouchableOpacity
-          className={`rounded-xl py-4 ${amountOz ? "bg-amber" : "bg-navy-raise border border-navy-border"}`}
+          className={`rounded-xl py-4 ${amountOz ? "bg-feed-primary" : "bg-raised-bg border border-border-main"}`}
           onPress={saveBottle}
           disabled={!amountOz || saving}
         >
-          <Text className={`text-center font-body-semibold text-base ${amountOz ? "text-midnight" : "text-ash"}`}>
+          <Text
+            className={`text-center font-body-semibold text-base ${amountOz ? "" : "text-text-secondary"}`}
+            style={amountOz ? { color: colors.textDark } : undefined}
+          >
             {saving ? "Saving..." : "Save"}
           </Text>
         </TouchableOpacity>
@@ -401,7 +406,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
             setAmountOz("");
           }}
         >
-          <Text className="text-ash text-center">
+          <Text className="text-text-secondary text-center">
             {bottleContent === "formula" ? "Change brand" : "Change type"}
           </Text>
         </TouchableOpacity>

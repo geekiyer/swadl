@@ -17,6 +17,7 @@ import {
   SWIPE_EXIT_WIDTH,
 } from "../constants/animation";
 import { colors } from "../constants/theme";
+import { useThemeColors } from "../lib/theme";
 import { Check } from "lucide-react-native";
 
 interface TaskItemProps {
@@ -37,6 +38,7 @@ export function TaskItem({
   onPress,
 }: TaskItemProps) {
   const { animStyle, handlers } = usePressSpring(PRESS_SCALE_DENSE);
+  const tc = useThemeColors();
   const translateX = useSharedValue(0);
   const rowOpacity = useSharedValue(1);
   const checkProgress = useSharedValue(isCompleted ? 1 : 0);
@@ -47,7 +49,6 @@ export function TaskItem({
 
   function handleTapComplete() {
     if (isCompleted) return;
-    // Animate circle fill + checkmark, then fade row out
     checkProgress.value = withSpring(1, Springs.microFeedback);
     rowOpacity.value = withTiming(0.4, { duration: 400 }, () => {
       runOnJS(fireComplete)();
@@ -89,7 +90,7 @@ export function TaskItem({
       : 'transparent',
     borderColor: checkProgress.value > 0.5
       ? colors.success
-      : colors.navyBorder,
+      : tc.border,
   }));
 
   const checkmarkStyle = useAnimatedStyle(() => ({
@@ -124,7 +125,7 @@ export function TaskItem({
         <GestureDetector gesture={pan}>
           <Animated.View style={swipeStyle}>
             <View
-              className="flex-row items-center bg-navy-raise border border-navy-border rounded-xl p-3.5"
+              style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: tc.raisedBg, borderWidth: 1, borderColor: tc.border, borderRadius: 12, padding: 14 }}
               onTouchEnd={() => {
                 if (translateX.value < 1) {
                   onPress?.();
@@ -146,18 +147,21 @@ export function TaskItem({
 
               <View className="flex-1">
                 <Text
-                  className={`text-sm font-body-semibold ${
-                    isCompleted ? "text-ash line-through" : "text-white"
-                  }`}
+                  style={{
+                    fontSize: 14,
+                    fontFamily: 'Nunito_600SemiBold',
+                    color: isCompleted ? tc.textMuted : tc.textPrimary,
+                    textDecorationLine: isCompleted ? 'line-through' : 'none',
+                  }}
                 >
                   {title}
                 </Text>
                 <View className="flex-row mt-0.5">
                   {time && (
-                    <Text className="text-xs text-ash font-mono">{time}</Text>
+                    <Text style={{ fontSize: 12, color: tc.textSecondary, fontFamily: 'JetBrainsMono_400Regular' }}>{time}</Text>
                   )}
                   {assignee && (
-                    <Text className="text-xs text-honey ml-2 font-body-medium">
+                    <Text style={{ fontSize: 12, color: colors.feedPrimary, fontFamily: 'Nunito_500Medium', marginLeft: 8 }}>
                       {assignee}
                     </Text>
                   )}

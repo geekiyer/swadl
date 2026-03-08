@@ -11,6 +11,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { colors } from "../constants/theme";
+import { useThemeColors } from "../lib/theme";
 import type { ActivityItem } from "../lib/queries";
 
 const TABLE_MAP: Record<ActivityItem["kind"], string> = {
@@ -60,6 +61,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
+  const tc = useThemeColors();
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -211,6 +213,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
   function invalidateAll() {
     queryClient.invalidateQueries({ queryKey: ["recent-activity"] });
+    queryClient.invalidateQueries({ queryKey: ["log-history"] });
     queryClient.invalidateQueries({ queryKey: ["latest-feed"] });
     queryClient.invalidateQueries({ queryKey: ["latest-diaper"] });
     queryClient.invalidateQueries({ queryKey: ["latest-sleep"] });
@@ -233,15 +236,16 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
             key={o.key}
             className={`px-4 py-2.5 rounded-xl border ${
               value === o.key
-                ? "bg-amber border-amber"
-                : "bg-navy-card border-navy-border"
+                ? "bg-feed-primary border-feed-primary"
+                : "bg-card-bg border-border-main"
             }`}
             onPress={() => onChange(o.key)}
           >
             <Text
               className={`text-sm font-body-medium ${
-                value === o.key ? "text-midnight" : "text-ash"
+                value !== o.key ? "text-text-secondary" : ""
               }`}
+              style={value === o.key ? { color: colors.charcoal } : undefined}
             >
               {o.label}
             </Text>
@@ -254,23 +258,23 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View className="flex-1 justify-end">
-        <View className="bg-midnight border-t border-navy-border rounded-t-3xl px-6 pt-6 pb-10 max-h-[85%]">
+        <View className="bg-screen-bg border-t border-border-main rounded-t-3xl px-6 pt-6 pb-10 max-h-[85%]">
           <View className="flex-row items-center justify-between mb-1">
-            <Text className="text-xl font-display text-white">
+            <Text className="text-xl font-display text-text-primary">
               Edit {item.kind.charAt(0).toUpperCase() + item.kind.slice(1)} Log
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <Text className="text-ash text-base">Cancel</Text>
+              <Text className="text-text-secondary text-base">Cancel</Text>
             </TouchableOpacity>
           </View>
-          <Text className="text-xs text-ash font-mono mb-5">
+          <Text className="text-xs text-text-secondary font-mono mb-5">
             {formatDate(item.timestamp)} at {formatTime(item.timestamp)}
           </Text>
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {item.kind === "feed" && (
               <>
-                <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
                   Type
                 </Text>
                 <OptionRow
@@ -281,16 +285,16 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
                 {(feedType === "bottle" || feedType === "solids") && (
                   <>
-                    <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+                    <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
                       Amount (oz)
                     </Text>
                     <TextInput
-                      className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                      className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                       style={{ fontSize: 16, height: 48 }}
                       value={amountOz}
                       onChangeText={setAmountOz}
                       keyboardType="decimal-pad"
-                      placeholderTextColor={colors.ash}
+                      placeholderTextColor={colors.textPlaceholder}
                       placeholder="e.g. 4"
                     />
                   </>
@@ -299,30 +303,30 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
                 {(feedType === "breast_left" ||
                   feedType === "breast_right") && (
                   <>
-                    <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+                    <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
                       Duration (minutes)
                     </Text>
                     <TextInput
-                      className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                      className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                       style={{ fontSize: 16, height: 48 }}
                       value={durationMin}
                       onChangeText={setDurationMin}
                       keyboardType="number-pad"
-                      placeholderTextColor={colors.ash}
+                      placeholderTextColor={colors.textPlaceholder}
                       placeholder="e.g. 15"
                     />
                   </>
                 )}
 
-                <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
                   Notes
                 </Text>
                 <TextInput
-                  className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                  className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                   style={{ fontSize: 16, height: 48 }}
                   value={notes}
                   onChangeText={setNotes}
-                  placeholderTextColor={colors.ash}
+                  placeholderTextColor={colors.textPlaceholder}
                   placeholder="Optional notes"
                 />
               </>
@@ -330,7 +334,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
             {item.kind === "diaper" && (
               <>
-                <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
                   Type
                 </Text>
                 <OptionRow
@@ -343,7 +347,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
             {item.kind === "sleep" && (
               <>
-                <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
                   Location
                 </Text>
                 <OptionRow
@@ -356,39 +360,39 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
             {item.kind === "pump" && (
               <>
-                <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
                   Amount (oz)
                 </Text>
                 <TextInput
-                  className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                  className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                   style={{ fontSize: 16, height: 48 }}
                   value={pumpAmountOz}
                   onChangeText={setPumpAmountOz}
                   keyboardType="decimal-pad"
-                  placeholderTextColor={colors.ash}
+                  placeholderTextColor={colors.textPlaceholder}
                   placeholder="e.g. 4.5"
                 />
 
-                <Text className="text-[11px] font-body-bold text-ash uppercase mb-1">
+                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
                   Notes
                 </Text>
                 <TextInput
-                  className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                  className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                   style={{ fontSize: 16, height: 48 }}
                   value={notes}
                   onChangeText={setNotes}
-                  placeholderTextColor={colors.ash}
+                  placeholderTextColor={colors.textPlaceholder}
                   placeholder="Optional notes"
                 />
               </>
             )}
 
             <TouchableOpacity
-              className="bg-amber rounded-2xl py-4 mb-3"
+              className="bg-feed-primary rounded-2xl py-4 mb-3"
               onPress={handleSave}
               disabled={saving}
             >
-              <Text className="text-midnight text-center font-body-semibold text-base">
+              <Text className="text-center font-body-semibold text-base" style={{ color: colors.charcoal }}>
                 {saving ? "Saving..." : "Save Changes"}
               </Text>
             </TouchableOpacity>

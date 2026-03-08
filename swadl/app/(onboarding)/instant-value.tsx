@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { randomUUID } from "expo-crypto";
 import { supabase } from "../../lib/supabase";
 import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
 import { useOnboardingStore } from "../../lib/store";
 import { CHORE_TEMPLATES } from "../../constants/chore-templates";
 
@@ -23,6 +24,7 @@ interface SeededChore {
 export default function InstantValue() {
   const { babyName, dateOfBirth, feedingMethod, partnerEmail, careMode, reset } =
     useOnboardingStore();
+  const tc = useThemeColors();
   const [loading, setLoading] = useState(true);
   const [chores, setChores] = useState<SeededChore[]>([]);
   const [starting, setStarting] = useState(false);
@@ -144,22 +146,22 @@ export default function InstantValue() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-midnight justify-center items-center">
-        <ActivityIndicator size="large" color={colors.amber} />
-        <Text className="text-ash mt-4 font-body">Setting up your household...</Text>
+      <View className="flex-1 bg-screen-bg justify-center items-center">
+        <ActivityIndicator size="large" color={colors.feedPrimary} />
+        <Text className="text-text-secondary mt-4 font-body">Setting up your household...</Text>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-midnight px-6 pt-16">
-      <Text className="text-xs text-amber font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
+    <View className="flex-1 bg-screen-bg px-6 pt-16">
+      <Text className="text-xs text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
         Step 3 of 3
       </Text>
-      <Text className="text-2xl text-white font-display mb-2" style={{ letterSpacing: -0.5 }}>
+      <Text className="text-2xl text-text-primary font-display mb-2" style={{ letterSpacing: -0.5 }}>
         You're all set!
       </Text>
-      <Text className="text-ash font-body mb-6">
+      <Text className="text-text-secondary font-body mb-6">
         We've created {chores.length} recurring tasks based on {babyName}'s
         needs. Here's what's on your plate:
       </Text>
@@ -169,15 +171,15 @@ export default function InstantValue() {
         keyExtractor={(item) => item.title}
         className="flex-1 mb-4"
         renderItem={({ item }) => (
-          <View className="flex-row items-center bg-navy-card border border-navy-border rounded-xl p-3 mb-2">
-            <View className="w-8 h-8 rounded-lg bg-navy-raise items-center justify-center mr-3">
-              <Text className="text-amber text-xs font-body-bold">
+          <View className="flex-row items-center bg-card-bg border border-border-main rounded-xl p-3 mb-2">
+            <View className="w-8 h-8 rounded-lg bg-raised-bg items-center justify-center mr-3">
+              <Text className="text-feed-primary text-xs font-body-bold">
                 {item.category.charAt(0).toUpperCase()}
               </Text>
             </View>
             <View className="flex-1">
-              <Text className="text-base font-body-semibold text-white">{item.title}</Text>
-              <Text className="text-sm text-ash font-body">
+              <Text className="text-base font-body-semibold text-text-primary">{item.title}</Text>
+              <Text className="text-sm text-text-secondary font-body">
                 {item.recurrence.type === "daily" ? "Daily" : "Weekly"}
                 {item.recurrence.time ? ` at ${item.recurrence.time}` : ""}
               </Text>
@@ -187,11 +189,14 @@ export default function InstantValue() {
       />
 
       <TouchableOpacity
-        className={`rounded-2xl py-4 mb-8 ${starting ? "bg-navy-raise border border-navy-border" : "bg-amber"}`}
+        className={`rounded-2xl py-4 mb-8 ${starting ? "bg-raised-bg border border-border-main" : "bg-feed-primary"}`}
         onPress={handleStartShift}
         disabled={starting}
       >
-        <Text className={`text-center font-body-semibold text-base ${starting ? "text-ash" : "text-midnight"}`}>
+        <Text
+          className={`text-center font-body-semibold text-base ${starting ? "text-text-secondary" : ""}`}
+          style={!starting ? { color: colors.charcoal } : undefined}
+        >
           {starting ? "Starting..." : "Start My First Shift"}
         </Text>
       </TouchableOpacity>

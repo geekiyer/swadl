@@ -3,23 +3,25 @@
 @tailwind utilities;
 
 :root {
-  --color-midnight: 8 14 26;
-  --color-navy-deep: 10 22 40;
-  --color-navy-card: 15 29 50;
-  --color-navy-raise: 22 42 70;
-  --color-navy-border: 30 51 84;
-  --color-text-primary: 255 255 255;
-  --color-text-secondary: 155 163 181;
-  --color-text-muted: 200 205 216;
+  --color-screen-bg: 255 249 240;
+  --color-card-bg: 255 255 255;
+  --color-raised-bg: 255 245 232;
+  --color-border: 240 228 212;
+  --color-text-primary: 46 31 16;
+  --color-text-body: 74 56 40;
+  --color-text-secondary: 138 117 96;
+  --color-text-muted: 184 168 152;
+  --color-text-placeholder: 196 180 164;
 }
 
-.light {
-  --color-midnight: 248 249 251;
-  --color-navy-deep: 248 249 251;
-  --color-navy-card: 255 255 255;
-  --color-navy-raise: 241 243 247;
-  --color-navy-border: 226 230 237;
-  --color-text-primary: 15 29 50;
-  --color-text-secondary: 74 85 104;
-  --color-text-muted: 155 163 181;
+.dark {
+  --color-screen-bg: 26 22 18;
+  --color-card-bg: 34 30 24;
+  --color-raised-bg: 42 36 24;
+  --color-border: 48 40 32;
+  --color-text-primary: 245 237 226;
+  --color-text-body: 208 196 184;
+  --color-text-secondary: 138 122 104;
+  --color-text-muted: 90 74 56;
+  --color-text-placeholder: 74 58 42;
 }

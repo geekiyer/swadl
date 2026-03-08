@@ -12,6 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies } from "../../lib/queries";
 import { TimePicker } from "./TimePicker";
+import { colors } from "../../constants/theme";
 import { useThemeColors } from "../../lib/theme";
 
 type DiaperType = "wet" | "dirty" | "both" | "dry";
@@ -103,43 +104,43 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       <View>
         <TimePicker value={logTime} onChange={setLogTime} />
 
-        <Text className="text-ash mb-4">What kind of diaper?</Text>
+        <Text className="text-text-secondary mb-4">What kind of diaper?</Text>
         <View className="flex-row flex-wrap gap-3">
           <TouchableOpacity
-            className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
+            className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
             onPress={() => logDiaper("wet")}
             disabled={saving}
           >
-            <Text className="text-amber font-body-semibold text-base">Wet</Text>
-            <Text className="text-ash text-xs mt-1">Pee only</Text>
+            <Text className="text-feed-primary font-body-semibold text-base">Wet</Text>
+            <Text className="text-text-secondary text-xs mt-1">Pee only</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
+            className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
             onPress={() => setDiaperType("dirty")}
             disabled={saving}
           >
-            <Text className="text-honey font-body-semibold text-base">
+            <Text className="text-feed-primary font-body-semibold text-base">
               Dirty
             </Text>
-            <Text className="text-ash text-xs mt-1">Poop</Text>
+            <Text className="text-text-secondary text-xs mt-1">Poop</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
+            className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
             onPress={() => setDiaperType("both")}
             disabled={saving}
           >
-            <Text className="text-ember font-body-semibold text-base">
+            <Text className="text-pump-primary font-body-semibold text-base">
               Both
             </Text>
-            <Text className="text-ash text-xs mt-1">Wet + Poop</Text>
+            <Text className="text-text-secondary text-xs mt-1">Wet + Poop</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="bg-navy-card border border-navy-border rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
+            className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
             onPress={() => logDiaper("dry")}
             disabled={saving}
           >
-            <Text className="text-ash font-body-semibold text-base">Dry</Text>
-            <Text className="text-ash text-xs mt-1">Just a check</Text>
+            <Text className="text-text-secondary font-body-semibold text-base">Dry</Text>
+            <Text className="text-text-secondary text-xs mt-1">Just a check</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -149,13 +150,13 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
   // Step 2: Poop details (for dirty or both)
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <Text className="text-ash mb-4">
+      <Text className="text-text-secondary mb-4">
         {diaperType === "dirty" ? "Dirty diaper" : "Wet + dirty diaper"} —
         optional details
       </Text>
 
       {/* Poop Color */}
-      <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
         Poop Color
       </Text>
       <View className="flex-row flex-wrap gap-2 mb-5">
@@ -163,7 +164,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
           <TouchableOpacity
             key={c.key}
             className={`rounded-xl px-4 py-2.5 flex-row items-center border ${
-              poopColor === c.key ? "border-amber bg-navy-raise" : "border-navy-border bg-navy-card"
+              poopColor === c.key ? "border-feed-primary bg-raised-bg" : "border-border-main bg-card-bg"
             }`}
             onPress={() => setPoopColor(poopColor === c.key ? null : c.key)}
           >
@@ -172,7 +173,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
               style={{ backgroundColor: c.color }}
             />
             <Text
-              className={`text-sm ${poopColor === c.key ? "text-amber font-body-medium" : "text-ash"}`}
+              className={`text-sm ${poopColor === c.key ? "text-feed-primary font-body-medium" : "text-text-secondary"}`}
             >
               {c.label}
             </Text>
@@ -181,7 +182,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       </View>
 
       {/* Consistency */}
-      <Text className="text-[11px] font-body-bold text-ash uppercase mb-2">
+      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
         Consistency
       </Text>
       <View className="flex-row flex-wrap gap-2 mb-5">
@@ -190,15 +191,15 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
             key={c.key}
             className={`rounded-xl px-4 py-2.5 border ${
               consistency === c.key
-                ? "border-amber bg-navy-raise"
-                : "border-navy-border bg-navy-card"
+                ? "border-feed-primary bg-raised-bg"
+                : "border-border-main bg-card-bg"
             }`}
             onPress={() =>
               setConsistency(consistency === c.key ? null : c.key)
             }
           >
             <Text
-              className={`text-sm ${consistency === c.key ? "text-amber font-body-medium" : "text-ash"}`}
+              className={`text-sm ${consistency === c.key ? "text-feed-primary font-body-medium" : "text-text-secondary"}`}
             >
               {c.label}
             </Text>
@@ -207,32 +208,32 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       </View>
 
       {/* Flags */}
-      <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-5">
+      <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-5">
         <View className="flex-row items-center justify-between mb-3">
           <View>
-            <Text className="text-base font-body-medium text-white">Diaper Rash</Text>
-            <Text className="text-sm text-ash">
+            <Text className="text-base font-body-medium text-text-primary">Diaper Rash</Text>
+            <Text className="text-sm text-text-secondary">
               Redness or irritation
             </Text>
           </View>
           <Switch
             value={hasRash}
             onValueChange={setHasRash}
-            trackColor={{ false: tc.navyBorder, true: tc.amber }}
+            trackColor={{ false: tc.border, true: colors.feedPrimary }}
             thumbColor="#FFFFFF"
           />
         </View>
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-base font-body-medium text-white">Blowout</Text>
-            <Text className="text-sm text-ash">
+            <Text className="text-base font-body-medium text-text-primary">Blowout</Text>
+            <Text className="text-sm text-text-secondary">
               Leaked out of the diaper
             </Text>
           </View>
           <Switch
             value={isBlowout}
             onValueChange={setIsBlowout}
-            trackColor={{ false: tc.navyBorder, true: tc.amber }}
+            trackColor={{ false: tc.border, true: colors.feedPrimary }}
             thumbColor="#FFFFFF"
           />
         </View>
@@ -240,7 +241,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
 
       {/* Save */}
       <TouchableOpacity
-        className="bg-amber rounded-2xl py-4 mb-3"
+        className="bg-feed-primary rounded-2xl py-4 mb-3"
         onPress={() =>
           logDiaper(diaperType, {
             color: poopColor ?? undefined,
@@ -251,7 +252,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
         }
         disabled={saving}
       >
-        <Text className="text-midnight text-center font-body-semibold text-base">
+        <Text className="text-center font-body-semibold text-base" style={{ color: colors.textDark }}>
           {saving ? "Saving..." : "Save"}
         </Text>
       </TouchableOpacity>
@@ -266,7 +267,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
           setIsBlowout(false);
         }}
       >
-        <Text className="text-ash text-center">Back</Text>
+        <Text className="text-text-secondary text-center">Back</Text>
       </TouchableOpacity>
     </ScrollView>
   );

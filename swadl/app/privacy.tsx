@@ -3,16 +3,16 @@ import { router } from "expo-router";
 
 export default function PrivacyPolicy() {
   return (
-    <ScrollView className="flex-1 bg-midnight">
+    <ScrollView className="flex-1 bg-screen-bg">
       <View className="px-6 pt-14 pb-10">
         <TouchableOpacity className="mb-6" onPress={() => router.back()}>
-          <Text className="text-amber text-base">← Back</Text>
+          <Text className="text-feed-primary text-base">← Back</Text>
         </TouchableOpacity>
 
-        <Text className="text-2xl font-display text-white mb-1">
+        <Text className="text-2xl font-display text-text-primary mb-1">
           Privacy Policy
         </Text>
-        <Text className="text-sm text-ash font-mono mb-8">
+        <Text className="text-sm text-text-secondary font-mono mb-8">
           Effective Date: March 7, 2026
         </Text>
 
@@ -136,7 +136,7 @@ export default function PrivacyPolicy() {
 }
 
 function Bold({ children }: { children: React.ReactNode }) {
-  return <Text className="font-body-bold text-white">{children}</Text>;
+  return <Text className="font-body-bold text-text-primary">{children}</Text>;
 }
 
 function Section({
@@ -150,10 +150,10 @@ function Section({
 }) {
   return (
     <View className={last ? "" : "mb-6"}>
-      <Text className="text-base font-body-semibold text-white mb-2">
+      <Text className="text-base font-body-semibold text-text-primary mb-2">
         {title}
       </Text>
-      <Text className="text-sm text-ash leading-5 font-body">{children}</Text>
+      <Text className="text-sm text-text-secondary leading-5 font-body">{children}</Text>
     </View>
   );
 }

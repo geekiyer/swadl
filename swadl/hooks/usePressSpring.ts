@@ -9,10 +9,6 @@ export function usePressSpring(scale = PRESS_SCALE) {
     transform: [{
       scale: withSpring(pressed.value === 1 ? scale : 1, Springs.snappy),
     }],
-    shadowOpacity: withSpring(
-      pressed.value === 1 ? 0.08 : 0.18,
-      Springs.snappy
-    ),
   }));
 
   const handlers = {

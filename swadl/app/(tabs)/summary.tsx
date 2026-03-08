@@ -12,6 +12,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useBabies, useSummary, type SummaryData } from "../../lib/queries";
 import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
+import { NurseryMobileArt } from "../../components/NurseryMobileArt";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnitStore, displayVolume } from "../../lib/store";
 import { UnitToggle } from "../../components/UnitToggle";
 
@@ -62,16 +65,18 @@ function getWeekEnd(weekStartStr: string): string {
 }
 
 const DOT_COLORS: Record<string, string> = {
-  feed: colors.amber,
-  diaper: colors.honey,
-  sleep: colors.info,
-  pump: colors.ember,
+  feed: colors.feedPrimary,
+  diaper: colors.diaperPrimary,
+  sleep: colors.sleepPrimary,
+  pump: colors.pumpPrimary,
 };
 
 export default function Summary() {
   const queryClient = useQueryClient();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
+  const tc = useThemeColors();
+  const insets = useSafeAreaInsets();
 
   const params = useLocalSearchParams<{ date?: string }>();
   const unit = useUnitStore((s) => s.unit);
@@ -154,49 +159,54 @@ export default function Summary() {
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-midnight"
+    <View className="flex-1 bg-screen-bg">
+      <ScrollView
+        style={{ flex: 1 }}
       refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
-          tintColor={colors.amber}
-          colors={[colors.amber]}
+          tintColor={colors.feedPrimary}
+          colors={[colors.feedPrimary]}
         />
       }
     >
-      <View className="px-4 pt-4 pb-10">
-        <View className="flex-row items-center justify-between mb-3">
-          <View />
+      <View style={{ paddingHorizontal: 16, paddingTop: insets.top + 16, paddingBottom: 40 }}>
+        <View style={{ position: 'relative', minHeight: 60 }}>
+          <NurseryMobileArt theme={tc.mode} screen="summary" />
+        </View>
+        <View className="flex-row items-center mb-3">
           <UnitToggle />
         </View>
 
         {/* Day / Week Toggle */}
-        <View className="flex-row bg-navy-card border border-navy-border rounded-xl p-1 mb-4">
+        <View className="flex-row bg-card-bg border border-border-main rounded-xl p-1 mb-4">
           <TouchableOpacity
             className={`flex-1 py-2 rounded-lg items-center ${
-              viewMode === "day" ? "bg-amber" : ""
+              viewMode === "day" ? "bg-feed-primary" : ""
             }`}
             onPress={() => setViewMode("day")}
           >
             <Text
               className={`text-sm font-body-semibold ${
-                viewMode === "day" ? "text-midnight" : "text-ash"
+                viewMode === "day" ? "" : "text-text-secondary"
               }`}
+              style={viewMode === "day" ? { color: colors.charcoal } : undefined}
             >
               Day
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             className={`flex-1 py-2 rounded-lg items-center ${
-              viewMode === "week" ? "bg-amber" : ""
+              viewMode === "week" ? "bg-feed-primary" : ""
             }`}
             onPress={() => setViewMode("week")}
           >
             <Text
               className={`text-sm font-body-semibold ${
-                viewMode === "week" ? "text-midnight" : "text-ash"
+                viewMode === "week" ? "" : "text-text-secondary"
               }`}
+              style={viewMode === "week" ? { color: colors.charcoal } : undefined}
             >
               Week
             </Text>
@@ -206,12 +216,12 @@ export default function Summary() {
         {/* Date Picker */}
         <View className="flex-row items-center justify-between mb-5">
           <TouchableOpacity
-            className="w-10 h-10 rounded-full bg-navy-raise items-center justify-center"
+            className="w-10 h-10 rounded-full bg-raised-bg items-center justify-center"
             onPress={() => shiftDate(-1)}
           >
-            <Text className="text-lg text-ash">{"\u2039"}</Text>
+            <Text className="text-lg text-text-secondary">{"\u2039"}</Text>
           </TouchableOpacity>
-          <Text className="text-base font-body-semibold text-white">
+          <Text className="text-base font-body-semibold text-text-primary">
             {viewMode === "day"
               ? isToday
                 ? "Today"
@@ -220,13 +230,13 @@ export default function Summary() {
           </Text>
           <TouchableOpacity
             className={`w-10 h-10 rounded-full items-center justify-center ${
-              isToday ? "bg-navy-card" : "bg-navy-raise"
+              isToday ? "bg-card-bg" : "bg-raised-bg"
             }`}
             onPress={() => shiftDate(1)}
             disabled={isToday}
           >
             <Text
-              className={`text-lg ${isToday ? "text-navy-border" : "text-ash"}`}
+              className={`text-lg ${isToday ? "text-navy-border" : "text-text-secondary"}`}
             >
               {"\u203A"}
             </Text>
@@ -235,46 +245,46 @@ export default function Summary() {
 
         {isLoading ? (
           <View className="py-20 items-center">
-            <ActivityIndicator size="large" color={colors.amber} />
+            <ActivityIndicator size="large" color={colors.feedPrimary} />
           </View>
         ) : summary ? (
           <>
             {/* Feeding Summary */}
-            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+            <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Feeding
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-mono-bold">{summary.feedCount}</Text>
-                  <Text className="text-xs text-ash font-body">feeds</Text>
+                  <Text className="text-2xl text-text-primary font-mono-bold">{summary.feedCount}</Text>
+                  <Text className="text-xs text-text-secondary font-body">feeds</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-mono-bold">
+                  <Text className="text-2xl text-text-primary font-mono-bold">
                     {displayVolume(summary.feedTotalOz, unit).split(" ")[0]}
                   </Text>
-                  <Text className="text-xs text-ash font-body">{unit}</Text>
+                  <Text className="text-xs text-text-secondary font-body">{unit}</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-mono-bold">
+                  <Text className="text-2xl text-text-primary font-mono-bold">
                     {summary.feedTotalMin}
                   </Text>
-                  <Text className="text-xs text-ash font-body">min</Text>
+                  <Text className="text-xs text-text-secondary font-body">min</Text>
                 </View>
               </View>
-              <View className="border-t border-navy-border pt-2 mt-1">
+              <View className="border-t border-border-main pt-2 mt-1">
                 {Object.entries(summary.feedByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-ash font-body">
+                  <Text key={type} className="text-sm text-text-secondary font-body">
                     {type}: {count}
                   </Text>
                 ))}
                 {summary.avgTimeBetweenFeeds != null && (
-                  <Text className="text-sm text-ash font-body">
+                  <Text className="text-sm text-text-secondary font-body">
                     Avg {summary.avgTimeBetweenFeeds} min between feeds
                   </Text>
                 )}
                 {summary.avgOzPerBottle != null && (
-                  <Text className="text-sm text-ash font-body">
+                  <Text className="text-sm text-text-secondary font-body">
                     Avg {displayVolume(summary.avgOzPerBottle, unit)} per bottle
                   </Text>
                 )}
@@ -283,51 +293,51 @@ export default function Summary() {
 
             {/* Pump Summary */}
             {summary.pumpCount > 0 && (
-              <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
-                <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
+                <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                   Pumping
                 </Text>
                 <View className="flex-row justify-between">
                   <View className="items-center flex-1">
-                    <Text className="text-2xl text-white font-mono-bold">
+                    <Text className="text-2xl text-text-primary font-mono-bold">
                       {summary.pumpCount}
                     </Text>
-                    <Text className="text-xs text-ash font-body">sessions</Text>
+                    <Text className="text-xs text-text-secondary font-body">sessions</Text>
                   </View>
                   <View className="items-center flex-1">
-                    <Text className="text-2xl text-white font-mono-bold">
+                    <Text className="text-2xl text-text-primary font-mono-bold">
                       {displayVolume(summary.pumpTotalOz, unit).split(" ")[0]}
                     </Text>
-                    <Text className="text-xs text-ash font-body">{unit}</Text>
+                    <Text className="text-xs text-text-secondary font-body">{unit}</Text>
                   </View>
                   <View className="items-center flex-1">
-                    <Text className="text-2xl text-white font-mono-bold">
+                    <Text className="text-2xl text-text-primary font-mono-bold">
                       {summary.pumpTotalMin}
                     </Text>
-                    <Text className="text-xs text-ash font-body">min</Text>
+                    <Text className="text-xs text-text-secondary font-body">min</Text>
                   </View>
                 </View>
               </View>
             )}
 
             {/* Diaper Summary */}
-            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+            <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Diapers
               </Text>
-              <Text className="text-2xl text-white font-mono-bold mb-1">
+              <Text className="text-2xl text-text-primary font-mono-bold mb-1">
                 {summary.diaperCount}
               </Text>
               <View className="flex-row flex-wrap gap-x-4">
                 {Object.entries(summary.diaperByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-ash font-body">
+                  <Text key={type} className="text-sm text-text-secondary font-body">
                     {type}: {count}
                   </Text>
                 ))}
               </View>
               {summary.lowWetWarning && (
-                <View className="bg-navy-raise rounded-lg p-2 mt-2 border-l-[3px] border-amber">
-                  <Text className="text-sm text-amber font-body">
+                <View className="bg-raised-bg rounded-lg p-2 mt-2 border-l-[3px] border-feed-primary">
+                  <Text className="text-sm text-feed-primary font-body">
                     Fewer than 6 wet diapers — consider checking hydration
                   </Text>
                 </View>
@@ -335,33 +345,33 @@ export default function Summary() {
             </View>
 
             {/* Sleep Summary */}
-            <View className="bg-navy-card border border-navy-border rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+            <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
+              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Sleep
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-mono-bold">
+                  <Text className="text-2xl text-text-primary font-mono-bold">
                     {Math.round((summary.sleepTotalMin / 60) * 10) / 10}
                   </Text>
-                  <Text className="text-xs text-ash font-body">hours</Text>
+                  <Text className="text-xs text-text-secondary font-body">hours</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-mono-bold">{summary.napCount}</Text>
-                  <Text className="text-xs text-ash font-body">naps</Text>
+                  <Text className="text-2xl text-text-primary font-mono-bold">{summary.napCount}</Text>
+                  <Text className="text-xs text-text-secondary font-body">naps</Text>
                 </View>
                 <View className="items-center flex-1">
-                  <Text className="text-2xl text-white font-mono-bold">
+                  <Text className="text-2xl text-text-primary font-mono-bold">
                     {summary.longestStretchMin}
                   </Text>
-                  <Text className="text-xs text-ash font-body">min longest</Text>
+                  <Text className="text-xs text-text-secondary font-body">min longest</Text>
                 </View>
               </View>
-              <View className="border-t border-navy-border pt-2 mt-1">
-                <Text className="text-sm text-ash font-body">
+              <View className="border-t border-border-main pt-2 mt-1">
+                <Text className="text-sm text-text-secondary font-body">
                   Night (7PM-7AM): {Math.round(summary.nightSleepMin)} min
                 </Text>
-                <Text className="text-sm text-ash font-body">
+                <Text className="text-sm text-text-secondary font-body">
                   Day (7AM-7PM): {Math.round(summary.daySleepMin)} min
                 </Text>
               </View>
@@ -369,60 +379,61 @@ export default function Summary() {
 
             {/* Activity Log */}
             <View className="mb-4">
-              <Text className="text-[11px] text-ash uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Activity Log
               </Text>
               {summary.activityLog.length > 0 ? (
-                <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden">
+                <View className="bg-card-bg border border-border-main rounded-2xl overflow-hidden">
                   {summary.activityLog.map((item, i) => (
                     <View
                       key={item.id}
                       className={`flex-row items-center px-4 py-3 ${
-                        i > 0 ? "border-t border-navy-border" : ""
+                        i > 0 ? "border-t border-border-main" : ""
                       }`}
                     >
                       <View
                         className="w-2 h-2 rounded-full mr-3"
-                        style={{ backgroundColor: DOT_COLORS[item.kind] ?? colors.ash }}
+                        style={{ backgroundColor: DOT_COLORS[item.kind] ?? tc.textSecondary }}
                       />
                       <View className="flex-1">
-                        <Text className="text-sm font-body-medium text-white">
+                        <Text className="text-sm font-body-medium text-text-primary">
                           {item.label}
                         </Text>
-                        <Text className="text-xs text-ash font-body">
+                        <Text className="text-xs text-text-secondary font-body">
                           {item.loggedBy}
                           {item.detail ? ` \u00B7 ${item.detail}` : ""}
                         </Text>
                       </View>
-                      <Text className="text-xs text-ash font-mono">
+                      <Text className="text-xs text-text-secondary font-mono">
                         {formatTime(item.timestamp)}
                       </Text>
                     </View>
                   ))}
                 </View>
               ) : (
-                <View className="bg-navy-card border border-navy-border rounded-2xl p-4 items-center">
-                  <Text className="text-ash font-body">No activity logged</Text>
+                <View className="bg-card-bg border border-border-main rounded-2xl p-4 items-center">
+                  <Text className="text-text-secondary font-body">No activity logged</Text>
                 </View>
               )}
             </View>
 
             {/* Share */}
             <TouchableOpacity
-              className="border border-navy-border rounded-2xl py-4"
+              className="border border-border-main rounded-2xl py-4"
               onPress={handleShare}
             >
-              <Text className="text-center font-body-semibold text-base text-ash">
+              <Text className="text-center font-body-semibold text-base text-text-secondary">
                 Share for Pediatrician
               </Text>
             </TouchableOpacity>
           </>
         ) : (
           <View className="py-20 items-center">
-            <Text className="text-ash font-body">No data available</Text>
+            <Text className="text-text-secondary font-body">No data available</Text>
           </View>
         )}
       </View>
     </ScrollView>
+    </View>
   );
 }

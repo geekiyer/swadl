@@ -8,16 +8,19 @@ import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../lib/store";
 import { useFonts } from "expo-font";
 import {
-  Fraunces_900Black,
-  Fraunces_900Black_Italic,
-} from "@expo-google-fonts/fraunces";
+  Baloo2_400Regular,
+  Baloo2_500Medium,
+  Baloo2_600SemiBold,
+  Baloo2_700Bold,
+  Baloo2_800ExtraBold,
+} from "@expo-google-fonts/baloo-2";
 import {
-  Outfit_400Regular,
-  Outfit_500Medium,
-  Outfit_600SemiBold,
-  Outfit_700Bold,
-  Outfit_800ExtraBold,
-} from "@expo-google-fonts/outfit";
+  Nunito_400Regular,
+  Nunito_500Medium,
+  Nunito_600SemiBold,
+  Nunito_700Bold,
+  Nunito_800ExtraBold,
+} from "@expo-google-fonts/nunito";
 import {
   JetBrainsMono_400Regular,
   JetBrainsMono_700Bold,
@@ -44,13 +47,16 @@ export default function RootLayout() {
   const [ready, setReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
-    Fraunces_900Black,
-    Fraunces_900Black_Italic,
-    Outfit_400Regular,
-    Outfit_500Medium,
-    Outfit_600SemiBold,
-    Outfit_700Bold,
-    Outfit_800ExtraBold,
+    Baloo2_400Regular,
+    Baloo2_500Medium,
+    Baloo2_600SemiBold,
+    Baloo2_700Bold,
+    Baloo2_800ExtraBold,
+    Nunito_400Regular,
+    Nunito_500Medium,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
     JetBrainsMono_400Regular,
     JetBrainsMono_700Bold,
   });
@@ -80,10 +86,10 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View className={themeMode === "light" ? "light flex-1" : "flex-1"}>
+      <View className={themeMode === "dark" ? "dark flex-1" : "flex-1"}>
         <QueryClientProvider client={queryClient}>
           <BackgroundProviders />
-          <StatusBar style={themeMode === "light" ? "dark" : "light"} />
+          <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="(auth)" />

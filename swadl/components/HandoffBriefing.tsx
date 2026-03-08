@@ -12,16 +12,16 @@ interface HandoffBriefingProps {
 
 export function HandoffBriefing({ points }: HandoffBriefingProps) {
   return (
-    <View className="bg-navy-card border border-navy-border rounded-2xl p-5" style={shadows.sm}>
+    <View className="bg-card-bg border border-border-main rounded-2xl p-5" style={shadows.sm}>
       {points.map((point, index) => (
         <View
           key={index}
-          className={`${index > 0 ? "mt-3 pt-3 border-t border-navy-border" : ""}`}
+          className={`${index > 0 ? "mt-3 pt-3 border-t border-border-main" : ""}`}
         >
-          <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+          <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
             {point.label}
           </Text>
-          <Text className="text-base mt-1 text-white font-body">{point.summary}</Text>
+          <Text className="text-base mt-1 text-text-primary font-body">{point.summary}</Text>
         </View>
       ))}
     </View>

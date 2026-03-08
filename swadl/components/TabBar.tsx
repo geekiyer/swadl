@@ -40,14 +40,14 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   });
 
   return (
-    <View style={{ backgroundColor: tc.navyCard, borderTopWidth: 1, borderTopColor: tc.navyBorder, paddingBottom: insets.bottom }}>
+    <View style={{ backgroundColor: tc.cardBg, borderTopWidth: 1.5, borderTopColor: tc.border, paddingBottom: insets.bottom }}>
       <View style={{ flexDirection: "row", height: 56, alignItems: "center", justifyContent: "space-around" }}>
         {visibleRoutes.map((route) => {
           const routeIndex = state.routes.indexOf(route);
           const isFocused = state.index === routeIndex;
           const Icon = TAB_ICONS[route.name] ?? Home;
           const label = TAB_LABELS[route.name] ?? route.name;
-          const tintColor = isFocused ? colors.amber : tc.ash;
+          const tintColor = isFocused ? colors.feedPrimary : tc.textPlaceholder;
 
           return (
             <Pressable
@@ -59,17 +59,20 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 }
               }}
             >
-              <Icon size={24} strokeWidth={1.5} color={tintColor} />
+              <Icon size={22} strokeWidth={2} color={tintColor} />
               <Text
                 style={{
-                  fontFamily: "JetBrainsMono_400Regular",
-                  fontSize: 10,
+                  fontFamily: "Nunito_800ExtraBold",
+                  fontSize: 9,
                   marginTop: 2,
                   color: tintColor,
                 }}
               >
                 {label}
               </Text>
+              {isFocused && (
+                <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: colors.feedPrimary, marginTop: 2 }} />
+              )}
             </Pressable>
           );
         })}

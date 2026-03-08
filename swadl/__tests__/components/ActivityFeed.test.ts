@@ -1,44 +1,54 @@
 import { colors } from "../../constants/theme";
 
-// Test the DOT_COLORS mapping and timeLabel logic from ActivityFeed
+// Test the category config mapping from ActivityFeed
 // Since the component depends on useRecentActivity, we test pure logic.
 
-type ActivityKind = "feed" | "diaper" | "sleep" | "pump";
+type ActivityKind = "feed" | "diaper" | "sleep" | "pump" | "growth" | "routine";
 
-const DOT_COLORS: Record<ActivityKind, string> = {
-  feed: colors.amber,
-  diaper: colors.honey,
-  sleep: colors.info,
-  pump: colors.ember,
+const CATEGORY_BG_COLORS: Record<ActivityKind, string> = {
+  feed: colors.feedBg,
+  diaper: colors.diaperBg,
+  sleep: colors.sleepBg,
+  pump: colors.pumpBg,
+  growth: colors.growthBg,
+  routine: colors.routineBg,
 };
 
-describe("ActivityFeed DOT_COLORS", () => {
-  it("maps feed to amber", () => {
-    expect(DOT_COLORS.feed).toBe(colors.amber);
+describe("ActivityFeed category backgrounds", () => {
+  it("maps feed to feedBg", () => {
+    expect(CATEGORY_BG_COLORS.feed).toBe(colors.feedBg);
   });
 
-  it("maps diaper to honey", () => {
-    expect(DOT_COLORS.diaper).toBe(colors.honey);
+  it("maps diaper to diaperBg", () => {
+    expect(CATEGORY_BG_COLORS.diaper).toBe(colors.diaperBg);
   });
 
-  it("maps sleep to info (blue)", () => {
-    expect(DOT_COLORS.sleep).toBe(colors.info);
+  it("maps sleep to sleepBg", () => {
+    expect(CATEGORY_BG_COLORS.sleep).toBe(colors.sleepBg);
   });
 
-  it("maps pump to ember", () => {
-    expect(DOT_COLORS.pump).toBe(colors.ember);
+  it("maps pump to pumpBg", () => {
+    expect(CATEGORY_BG_COLORS.pump).toBe(colors.pumpBg);
+  });
+
+  it("maps growth to growthBg", () => {
+    expect(CATEGORY_BG_COLORS.growth).toBe(colors.growthBg);
+  });
+
+  it("maps routine to routineBg", () => {
+    expect(CATEGORY_BG_COLORS.routine).toBe(colors.routineBg);
   });
 
   it("all activity kinds have a unique color", () => {
-    const values = Object.values(DOT_COLORS);
+    const values = Object.values(CATEGORY_BG_COLORS);
     const unique = new Set(values);
     expect(unique.size).toBe(values.length);
   });
 
   it("covers all activity types", () => {
-    const kinds: ActivityKind[] = ["feed", "diaper", "sleep", "pump"];
+    const kinds: ActivityKind[] = ["feed", "diaper", "sleep", "pump", "growth", "routine"];
     kinds.forEach((kind) => {
-      expect(DOT_COLORS[kind]).toBeDefined();
+      expect(CATEGORY_BG_COLORS[kind]).toBeDefined();
     });
   });
 });

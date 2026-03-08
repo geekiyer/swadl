@@ -7,17 +7,17 @@ export function UnitToggle() {
 
   return (
     <Pressable
-      className="flex-row bg-navy-raise rounded-lg p-0.5 self-end border border-navy-border"
+      className="flex-row bg-raised-bg rounded-lg p-0.5 self-end border border-border-main"
       onPress={toggleUnit}
     >
       <View
         className={`px-3 py-1 rounded-md ${
-          unit === "oz" ? "bg-navy-card" : ""
+          unit === "oz" ? "bg-card-bg" : ""
         }`}
       >
         <Text
           className={`text-xs font-body-bold ${
-            unit === "oz" ? "text-amber" : "text-ash"
+            unit === "oz" ? "text-feed-primary" : "text-text-secondary"
           }`}
         >
           oz
@@ -25,12 +25,12 @@ export function UnitToggle() {
       </View>
       <View
         className={`px-3 py-1 rounded-md ${
-          unit === "ml" ? "bg-navy-card" : ""
+          unit === "ml" ? "bg-card-bg" : ""
         }`}
       >
         <Text
           className={`text-xs font-body-bold ${
-            unit === "ml" ? "text-amber" : "text-ash"
+            unit === "ml" ? "text-feed-primary" : "text-text-secondary"
           }`}
         >
           ml

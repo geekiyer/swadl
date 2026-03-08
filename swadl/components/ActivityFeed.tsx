@@ -3,12 +3,25 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { useRecentActivity, type ActivityItem } from "../lib/queries";
 import { shadows, colors } from "../constants/theme";
 import { EditLogModal } from "./EditLogModal";
+import { useThemeColors } from "../lib/theme";
+import { BottleIcon } from "./icons/BottleIcon";
+import { DiaperIcon } from "./icons/DiaperIcon";
+import { MoonIcon } from "./icons/MoonIcon";
+import { PumpIcon } from "./icons/PumpIcon";
+import { RulerBabyIcon } from "./icons/RulerBabyIcon";
+import { ClockRoutineIcon } from "./icons/ClockRoutineIcon";
 
-const DOT_COLORS: Record<ActivityItem["kind"], string> = {
-  feed: colors.amber,
-  diaper: colors.honey,
-  sleep: colors.info,
-  pump: colors.ember,
+const CATEGORY_CONFIG: Record<string, {
+  Icon: typeof BottleIcon;
+  bgLight: string;
+  bgDark: string;
+}> = {
+  feed: { Icon: BottleIcon, bgLight: colors.feedBg, bgDark: 'rgba(224,138,48,0.1)' },
+  diaper: { Icon: DiaperIcon, bgLight: colors.diaperBg, bgDark: 'rgba(88,180,120,0.08)' },
+  sleep: { Icon: MoonIcon, bgLight: colors.sleepBg, bgDark: 'rgba(120,140,210,0.08)' },
+  pump: { Icon: PumpIcon, bgLight: colors.pumpBg, bgDark: 'rgba(200,100,105,0.08)' },
+  growth: { Icon: RulerBabyIcon, bgLight: colors.growthBg, bgDark: 'rgba(130,110,200,0.08)' },
+  routine: { Icon: ClockRoutineIcon, bgLight: colors.routineBg, bgDark: 'rgba(180,160,60,0.08)' },
 };
 
 function timeLabel(dateStr: string): string {
@@ -22,44 +35,68 @@ function timeLabel(dateStr: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
+function CategoryIcon({ kind, theme }: { kind: string; theme: 'light' | 'dark' }) {
+  const config = CATEGORY_CONFIG[kind];
+  if (!config) return null;
+  const bg = theme === 'light' ? config.bgLight : config.bgDark;
+
+  return (
+    <View style={{
+      width: 38, height: 38, borderRadius: 12,
+      backgroundColor: bg,
+      alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      <config.Icon size={26} theme={theme} />
+    </View>
+  );
+}
+
 export function ActivityFeed({ babyId }: { babyId: string | undefined }) {
   const { data: items } = useRecentActivity(babyId, 8);
   const [editItem, setEditItem] = useState<ActivityItem | null>(null);
+  const tc = useThemeColors();
 
   if (!items || items.length === 0) {
     return (
-      <View className="bg-navy-card border border-navy-border rounded-2xl p-5 items-center" style={shadows.sm}>
-        <Text className="text-ash font-body">No recent activity</Text>
+      <View style={{ backgroundColor: tc.cardBg, borderWidth: 1, borderColor: tc.border, borderRadius: 16, padding: 20, alignItems: 'center', ...shadows.sm }}>
+        <Text style={{ color: tc.textSecondary, fontFamily: 'Nunito_400Regular' }}>No recent activity</Text>
       </View>
     );
   }
 
   return (
     <>
-      <View className="bg-navy-card border border-navy-border rounded-2xl overflow-hidden" style={shadows.sm}>
-        {items.map((item, i) => (
+      <View style={{ gap: 5 }}>
+        {items.map((item) => (
           <TouchableOpacity
             key={item.id}
-            className={`flex-row items-center px-4 py-3 ${
-              i > 0 ? "border-t border-navy-border" : ""
-            }`}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              paddingVertical: 10,
+              paddingHorizontal: 14,
+              borderRadius: 16,
+              backgroundColor: tc.cardBg,
+              borderWidth: 1,
+              borderColor: tc.border,
+              ...shadows.sm,
+            }}
             onPress={() => setEditItem(item)}
             activeOpacity={0.6}
           >
-            <View
-              className="w-2 h-2 rounded-full mr-3"
-              style={{ backgroundColor: DOT_COLORS[item.kind] }}
-            />
-            <View className="flex-1">
-              <Text className="text-sm text-white">
-                <Text className="font-body-semibold">{item.loggedBy}</Text>
-                <Text className="font-body"> {item.label}</Text>
+            <CategoryIcon kind={item.kind} theme={tc.mode} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={{ fontSize: 13, lineHeight: 17 }}>
+                <Text style={{ fontFamily: 'Nunito_800ExtraBold', color: tc.textPrimary }}>{item.loggedBy}</Text>
+                <Text style={{ fontFamily: 'Nunito_400Regular', color: tc.textBody }}> {item.label}</Text>
               </Text>
               {item.detail ? (
-                <Text className="text-xs text-ash font-body mt-0.5">{item.detail}</Text>
+                <Text style={{ fontSize: 11, color: tc.textDetail, fontFamily: 'Nunito_400Regular', marginTop: 1 }}>{item.detail}</Text>
               ) : null}
             </View>
-            <Text className="text-xs text-ash font-mono ml-2">{timeLabel(item.timestamp)}</Text>
+            <Text style={{ fontSize: 10, letterSpacing: -0.3, color: tc.textPlaceholder, fontFamily: 'JetBrainsMono_400Regular' }}>{timeLabel(item.timestamp)}</Text>
           </TouchableOpacity>
         ))}
       </View>

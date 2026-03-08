@@ -2,22 +2,18 @@ import { colors, spacing, radii, typography, shadows } from "../../constants/the
 
 describe("colors", () => {
   it("exports all required background colors", () => {
-    expect(colors.midnight).toBe("#080E1A");
-    expect(colors.navyDeep).toBeDefined();
-    expect(colors.navyCard).toBeDefined();
-    expect(colors.navyRaise).toBeDefined();
-    expect(colors.navyBorder).toBeDefined();
+    expect(colors.cream).toBe("#FFF9F0");
+    expect(colors.cardWhite).toBeDefined();
+    expect(colors.charcoal).toBeDefined();
+    expect(colors.charcoalCard).toBeDefined();
+    expect(colors.borderSoft).toBeDefined();
   });
 
-  it("exports amber brand family", () => {
-    expect(colors.amber).toBe("#F59E0B");
-    expect(colors.honey).toBe("#FBBF24");
-    expect(colors.cream).toBe("#FDE68A");
-  });
-
-  it("exports ember accent", () => {
-    expect(colors.ember).toBe("#FF6B5A");
-    expect(colors.emberDim).toBeDefined();
+  it("exports category primary colors", () => {
+    expect(colors.feedPrimary).toBe("#E88A30");
+    expect(colors.diaperPrimary).toBe("#3A8A55");
+    expect(colors.sleepPrimary).toBe("#4A5A9A");
+    expect(colors.pumpPrimary).toBe("#B85A5E");
   });
 
   it("exports semantic colors", () => {
@@ -27,8 +23,8 @@ describe("colors", () => {
     expect(colors.info).toBeDefined();
   });
 
-  it("warning matches amber (per design spec)", () => {
-    expect(colors.warning).toBe(colors.amber);
+  it("warning matches feedPrimary (per design spec)", () => {
+    expect(colors.warning).toBe(colors.feedPrimary);
   });
 });
 
@@ -61,13 +57,13 @@ describe("radii", () => {
 });
 
 describe("typography", () => {
-  it("uses Fraunces for display", () => {
-    expect(typography.display).toBe("Fraunces_900Black");
+  it("uses Baloo2 for display", () => {
+    expect(typography.display).toBe("Baloo2_800ExtraBold");
   });
 
-  it("uses Outfit for body", () => {
-    expect(typography.body.fontFamily).toBe("Outfit_400Regular");
-    expect(typography.bodyBold.fontFamily).toBe("Outfit_600SemiBold");
+  it("uses Nunito for body", () => {
+    expect(typography.body.fontFamily).toBe("Nunito_400Regular");
+    expect(typography.bodyBold.fontFamily).toBe("Nunito_700Bold");
   });
 
   it("uses JetBrains Mono for numeric data", () => {
@@ -97,7 +93,7 @@ describe("shadows", () => {
     expect(shadows.md.elevation).toBeLessThan(shadows.lg.elevation);
   });
 
-  it("amber shadow uses amber color", () => {
-    expect(shadows.amber.shadowColor).toBe("#F59E0B");
+  it("feed shadow uses feedPrimary color", () => {
+    expect(shadows.feed.shadowColor).toBe("#E88A30");
   });
 });

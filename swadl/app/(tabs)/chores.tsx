@@ -34,6 +34,9 @@ import {
 import { useCareMode } from "../../lib/careMode";
 import { usePressSpring } from "../../hooks/usePressSpring";
 import { shadows, colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
+import { NurseryMobileArt } from "../../components/NurseryMobileArt";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CATEGORIES = [
   { key: "feeding_prep", label: "Feeding Prep" },
@@ -76,6 +79,7 @@ function ChoreRow({
   onLongPress,
   renderRightActions,
 }: ChoreRowProps) {
+  const tc = useThemeColors();
   const checkProgress = useSharedValue(item.completed_today ? 1 : 0);
   const rowOpacity = useSharedValue(1);
 
@@ -99,7 +103,7 @@ function ChoreRow({
         ? `rgba(52, 199, 89, ${checkProgress.value})`
         : "transparent",
     borderColor:
-      checkProgress.value > 0.5 ? colors.success : colors.navyBorder,
+      checkProgress.value > 0.5 ? colors.success : tc.border,
   }));
 
   const checkmarkStyle = useAnimatedStyle(() => ({
@@ -116,7 +120,7 @@ function ChoreRow({
       <Animated.View style={rowStyle}>
         <Pressable
           onLongPress={() => onLongPress(item)}
-          className="flex-row items-center bg-navy-card border-b border-navy-border px-4 py-3"
+          className="flex-row items-center bg-card-bg border-b border-border-main px-4 py-3"
         >
           {/* Animated complete button */}
           <Pressable onPress={handleTapComplete} hitSlop={8} disabled={item.completed_today}>
@@ -135,14 +139,14 @@ function ChoreRow({
             <Text
               className={`text-base ${
                 item.completed_today
-                  ? "text-ash line-through"
-                  : "font-body-medium text-white"
+                  ? "text-text-secondary line-through"
+                  : "font-body-medium text-text-primary"
               }`}
             >
               {item.title}
             </Text>
             <View className="flex-row items-center mt-0.5">
-              <Text className="text-xs text-ash">
+              <Text className="text-xs text-text-secondary">
                 {recurrence?.type === "daily"
                   ? "Daily"
                   : recurrence?.type === "every-x-days"
@@ -153,7 +157,7 @@ function ChoreRow({
                 {recurrence?.time ? ` at ${recurrence.time}` : ""}
               </Text>
               {item.assignee_name && (
-                <Text className="text-xs text-honey ml-2">
+                <Text className="text-xs text-feed-primary ml-2">
                   {item.assignee_name}
                 </Text>
               )}
@@ -163,13 +167,13 @@ function ChoreRow({
           {/* Assign / Claim button */}
           {isTogether ? (
             <TouchableOpacity
-              className="px-3 py-1.5 rounded-md bg-navy-raise"
+              className="px-3 py-1.5 rounded-md bg-raised-bg"
               onPress={() => onSelfClaim(item)}
               disabled={isOwnChore}
             >
               <Text
                 className={`text-xs font-body-medium ${
-                  isOwnChore ? "text-success" : "text-amber"
+                  isOwnChore ? "text-success" : "text-feed-primary"
                 }`}
               >
                 {isOwnChore ? "Mine" : "I got it"}
@@ -177,10 +181,10 @@ function ChoreRow({
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              className="px-3 py-1.5 rounded-md bg-navy-raise"
+              className="px-3 py-1.5 rounded-md bg-raised-bg"
               onPress={() => onAssign(item)}
             >
-              <Text className="text-xs text-ash">Assign</Text>
+              <Text className="text-xs text-text-secondary">Assign</Text>
             </TouchableOpacity>
           )}
         </Pressable>
@@ -190,6 +194,8 @@ function ChoreRow({
 }
 
 export default function Chores() {
+  const tc = useThemeColors();
+  const insets = useSafeAreaInsets();
   const { data: chores } = useAllChores();
   const { data: members } = useHouseholdMembers();
   const { data: profile } = useProfile();
@@ -352,16 +358,16 @@ export default function Chores() {
       return (
         <View className="flex-row">
           <TouchableOpacity
-            className="bg-amber justify-center px-5"
+            className="bg-feed-primary justify-center px-5"
             onPress={() => handleSelfClaim(item)}
           >
-            <Text className="text-midnight font-body-semibold text-sm">I got it</Text>
+            <Text className="font-body-semibold text-sm" style={{ color: colors.charcoal }}>I got it</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-danger justify-center px-5"
             onPress={() => handleDelete(item)}
           >
-            <Text className="text-white font-body-semibold text-sm">Delete</Text>
+            <Text className="font-body-semibold text-sm" style={{ color: colors.white }}>Delete</Text>
           </TouchableOpacity>
         </View>
       );
@@ -371,7 +377,7 @@ export default function Chores() {
         className="bg-danger justify-center px-6"
         onPress={() => handleDelete(item)}
       >
-        <Text className="text-white font-body-semibold text-sm">Delete</Text>
+        <Text className="font-body-semibold text-sm" style={{ color: colors.white }}>Delete</Text>
       </TouchableOpacity>
     );
   }
@@ -392,29 +398,32 @@ export default function Chores() {
   }
 
   return (
-    <View className="flex-1 bg-midnight">
-      {/* Tab Bar */}
-      <View className="flex-row border-b border-navy-border px-4">
+    <View className="flex-1 bg-screen-bg">
+      {/* Tab Bar + Nursery Mobile */}
+      <View style={{ position: 'relative', paddingTop: insets.top }}>
+        <NurseryMobileArt theme={tc.mode} screen="chores" />
+        <View className="flex-row border-b border-border-main px-4">
         <TouchableOpacity
-          className={`py-3 mr-6 ${tab === "today" ? "border-b-2 border-amber" : ""}`}
+          className={`py-3 mr-6 ${tab === "today" ? "border-b-2 border-feed-primary" : ""}`}
           onPress={() => setTab("today")}
         >
           <Text
-            className={`text-base font-body-medium ${tab === "today" ? "text-amber" : "text-ash"}`}
+            className={`text-base font-body-medium ${tab === "today" ? "text-feed-primary" : "text-text-secondary"}`}
           >
             Today
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className={`py-3 ${tab === "all" ? "border-b-2 border-amber" : ""}`}
+          className={`py-3 ${tab === "all" ? "border-b-2 border-feed-primary" : ""}`}
           onPress={() => setTab("all")}
         >
           <Text
-            className={`text-base font-body-medium ${tab === "all" ? "text-amber" : "text-ash"}`}
+            className={`text-base font-body-medium ${tab === "all" ? "text-feed-primary" : "text-text-secondary"}`}
           >
             All Chores
           </Text>
         </TouchableOpacity>
+      </View>
       </View>
 
       {/* Chore List */}
@@ -423,15 +432,15 @@ export default function Chores() {
         keyExtractor={(item) => item.id}
         renderItem={renderChoreItem}
         renderSectionHeader={({ section: { title } }) => (
-          <View className="bg-navy-deep px-4 py-2">
-            <Text className="text-[11px] text-ash uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+          <View className="bg-raised-bg px-4 py-2">
+            <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
               {title}
             </Text>
           </View>
         )}
         ListEmptyComponent={
           <View className="flex-1 justify-center items-center py-20">
-            <Text className="text-ash text-base">
+            <Text className="text-text-secondary text-base">
               {tab === "today" ? "All done for today!" : "No chores yet"}
             </Text>
           </View>
@@ -442,7 +451,7 @@ export default function Chores() {
       <Animated.View
         style={[
           fabAnimStyle,
-          shadows.amber,
+          shadows.feed,
           { position: "absolute", bottom: 24, right: 24 },
         ]}
       >
@@ -450,9 +459,9 @@ export default function Chores() {
           onPressIn={fabHandlers.onPressIn}
           onPressOut={fabHandlers.onPressOut}
           onPress={() => setShowAdd(true)}
-          className="bg-amber w-14 h-14 rounded-full items-center justify-center"
+          className="bg-feed-primary w-14 h-14 rounded-full items-center justify-center"
         >
-          <Plus size={26} strokeWidth={1.5} color={colors.midnight} />
+          <Plus size={26} strokeWidth={1.5} color={colors.charcoal} />
         </Pressable>
       </Animated.View>
 
@@ -468,29 +477,29 @@ export default function Chores() {
           activeOpacity={1}
           onPress={() => setAssigningChore(null)}
         >
-          <View className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10">
-            <Text className="text-lg font-body-bold text-white mb-4">
+          <View className="bg-card-bg rounded-t-2xl px-6 pt-6 pb-10">
+            <Text className="text-lg font-body-bold text-text-primary mb-4">
               Assign: {assigningChore?.title}
             </Text>
 
             <TouchableOpacity
-              className="py-3 border-b border-navy-border"
+              className="py-3 border-b border-border-main"
               onPress={() =>
                 assigningChore && handleAssign(assigningChore.id, null)
               }
             >
-              <Text className="text-base text-ash">Unassigned</Text>
+              <Text className="text-base text-text-secondary">Unassigned</Text>
             </TouchableOpacity>
 
             {members?.map((member) => (
               <TouchableOpacity
                 key={member.id}
-                className="py-3 border-b border-navy-border"
+                className="py-3 border-b border-border-main"
                 onPress={() =>
                   assigningChore && handleAssign(assigningChore.id, member.id)
                 }
               >
-                <Text className="text-base text-white">
+                <Text className="text-base text-text-primary">
                   {member.display_name}
                   {assigningChore?.assigned_to === member.id ? " (current)" : ""}
                 </Text>
@@ -501,7 +510,7 @@ export default function Chores() {
               className="mt-4 py-3"
               onPress={() => setAssigningChore(null)}
             >
-              <Text className="text-ash text-center">Cancel</Text>
+              <Text className="text-text-secondary text-center">Cancel</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -520,25 +529,25 @@ export default function Chores() {
           onPress={() => setShowAdd(false)}
         >
           <TouchableOpacity activeOpacity={1}>
-            <ScrollView className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
-              <Text className="text-lg font-body-bold text-white mb-4">Add Chore</Text>
+            <ScrollView className="bg-card-bg rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
+              <Text className="text-lg font-body-bold text-text-primary mb-4">Add Chore</Text>
 
               {/* Title */}
-              <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                 Title
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                 style={{ fontSize: 16, height: 48 }}
                 placeholder="e.g. Sanitize bottles"
-                placeholderTextColor={colors.ash}
+                placeholderTextColor={colors.textSecondary}
                 value={newTitle}
                 onChangeText={setNewTitle}
                 autoFocus
               />
 
               {/* Category */}
-              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Category
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-4">
@@ -547,17 +556,18 @@ export default function Chores() {
                     key={cat.key}
                     className={`px-3 py-2 rounded-xl border ${
                       newCategory === cat.key
-                        ? "bg-amber border-amber"
-                        : "border-navy-border bg-navy-raise"
+                        ? "bg-feed-primary border-feed-primary"
+                        : "border-border-main bg-raised-bg"
                     }`}
                     onPress={() => setNewCategory(cat.key)}
                   >
                     <Text
                       className={`text-sm ${
                         newCategory === cat.key
-                          ? "text-midnight font-body-medium"
-                          : "text-ash"
+                          ? "font-body-medium"
+                          : "text-text-secondary"
                       }`}
+                      style={newCategory === cat.key ? { color: colors.charcoal } : undefined}
                     >
                       {cat.label}
                     </Text>
@@ -566,7 +576,7 @@ export default function Chores() {
               </View>
 
               {/* Recurrence */}
-              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Recurrence
               </Text>
               <View className="flex-row gap-2 mb-4">
@@ -575,17 +585,18 @@ export default function Chores() {
                     key={opt.key}
                     className={`px-4 py-2 rounded-xl border flex-1 items-center ${
                       newRecurrence === opt.key
-                        ? "bg-amber border-amber"
-                        : "border-navy-border bg-navy-raise"
+                        ? "bg-feed-primary border-feed-primary"
+                        : "border-border-main bg-raised-bg"
                     }`}
                     onPress={() => setNewRecurrence(opt.key)}
                   >
                     <Text
                       className={`text-sm ${
                         newRecurrence === opt.key
-                          ? "text-midnight font-body-medium"
-                          : "text-ash"
+                          ? "font-body-medium"
+                          : "text-text-secondary"
                       }`}
+                      style={newRecurrence === opt.key ? { color: colors.charcoal } : undefined}
                     >
                       {opt.label}
                     </Text>
@@ -596,14 +607,14 @@ export default function Chores() {
               {/* Interval days (for every-x-days) */}
               {newRecurrence === "every-x-days" && (
                 <>
-                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Every how many days?
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                    className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                 style={{ fontSize: 16, height: 48 }}
                     placeholder="e.g. 3"
-                    placeholderTextColor={colors.ash}
+                    placeholderTextColor={colors.textSecondary}
                     value={newIntervalDays}
                     onChangeText={setNewIntervalDays}
                     keyboardType="number-pad"
@@ -614,14 +625,14 @@ export default function Chores() {
               {/* Time (optional) */}
               {newRecurrence !== "one-time" && (
                 <>
-                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Time (optional)
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                    className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                 style={{ fontSize: 16, height: 48 }}
                     placeholder="e.g. 20:00"
-                    placeholderTextColor={colors.ash}
+                    placeholderTextColor={colors.textSecondary}
                     value={newTime}
                     onChangeText={setNewTime}
                   />
@@ -631,12 +642,12 @@ export default function Chores() {
               {/* Save */}
               <TouchableOpacity
                 className={`rounded-2xl py-4 mb-3 ${
-                  newTitle.trim() ? "bg-amber" : "bg-navy-raise border border-navy-border"
+                  newTitle.trim() ? "bg-feed-primary" : "bg-raised-bg border border-border-main"
                 }`}
                 onPress={handleAddChore}
                 disabled={!newTitle.trim() || createChore.isPending}
               >
-                <Text className={`text-center font-body-semibold text-base ${newTitle.trim() ? "text-midnight" : "text-ash"}`}>
+                <Text className={`text-center font-body-semibold text-base ${newTitle.trim() ? "" : "text-text-secondary"}`} style={newTitle.trim() ? { color: colors.charcoal } : undefined}>
                   {createChore.isPending ? "Adding..." : "Add Chore"}
                 </Text>
               </TouchableOpacity>
@@ -645,7 +656,7 @@ export default function Chores() {
                 className="py-3 mb-4"
                 onPress={() => setShowAdd(false)}
               >
-                <Text className="text-ash text-center">Cancel</Text>
+                <Text className="text-text-secondary text-center">Cancel</Text>
               </TouchableOpacity>
             </ScrollView>
           </TouchableOpacity>
@@ -665,20 +676,20 @@ export default function Chores() {
           onPress={() => setEditingChore(null)}
         >
           <TouchableOpacity activeOpacity={1}>
-            <ScrollView className="bg-navy-card rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
-              <Text className="text-lg font-body-bold text-white mb-4">Edit Chore</Text>
+            <ScrollView className="bg-card-bg rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
+              <Text className="text-lg font-body-bold text-text-primary mb-4">Edit Chore</Text>
 
-              <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                 Title
               </Text>
               <TextInput
-                className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                 style={{ fontSize: 16, height: 48 }}
                 value={editTitle}
                 onChangeText={setEditTitle}
               />
 
-              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Category
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-4">
@@ -687,17 +698,18 @@ export default function Chores() {
                     key={cat.key}
                     className={`px-3 py-2 rounded-xl border ${
                       editCategory === cat.key
-                        ? "bg-amber border-amber"
-                        : "border-navy-border bg-navy-raise"
+                        ? "bg-feed-primary border-feed-primary"
+                        : "border-border-main bg-raised-bg"
                     }`}
                     onPress={() => setEditCategory(cat.key)}
                   >
                     <Text
                       className={`text-sm ${
                         editCategory === cat.key
-                          ? "text-midnight font-body-medium"
-                          : "text-ash"
+                          ? "font-body-medium"
+                          : "text-text-secondary"
                       }`}
+                      style={editCategory === cat.key ? { color: colors.charcoal } : undefined}
                     >
                       {cat.label}
                     </Text>
@@ -705,7 +717,7 @@ export default function Chores() {
                 ))}
               </View>
 
-              <Text className="text-xs font-body-bold text-ash uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Recurrence
               </Text>
               <View className="flex-row gap-2 mb-4">
@@ -714,17 +726,18 @@ export default function Chores() {
                     key={opt.key}
                     className={`px-4 py-2 rounded-xl border flex-1 items-center ${
                       editRecurrence === opt.key
-                        ? "bg-amber border-amber"
-                        : "border-navy-border bg-navy-raise"
+                        ? "bg-feed-primary border-feed-primary"
+                        : "border-border-main bg-raised-bg"
                     }`}
                     onPress={() => setEditRecurrence(opt.key)}
                   >
                     <Text
                       className={`text-sm ${
                         editRecurrence === opt.key
-                          ? "text-midnight font-body-medium"
-                          : "text-ash"
+                          ? "font-body-medium"
+                          : "text-text-secondary"
                       }`}
+                      style={editRecurrence === opt.key ? { color: colors.charcoal } : undefined}
                     >
                       {opt.label}
                     </Text>
@@ -734,11 +747,11 @@ export default function Chores() {
 
               {editRecurrence === "every-x-days" && (
                 <>
-                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Every how many days?
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                    className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                 style={{ fontSize: 16, height: 48 }}
                     value={editIntervalDays}
                     onChangeText={setEditIntervalDays}
@@ -749,28 +762,28 @@ export default function Chores() {
 
               {editRecurrence !== "one-time" && (
                 <>
-                  <Text className="text-xs font-body-bold text-ash uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Time (optional)
                   </Text>
                   <TextInput
-                    className="border border-navy-border bg-navy-raise rounded-xl px-4 mb-4 text-white"
+                    className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                 style={{ fontSize: 16, height: 48 }}
                     value={editTime}
                     onChangeText={setEditTime}
                     placeholder="e.g. 20:00"
-                    placeholderTextColor={colors.ash}
+                    placeholderTextColor={colors.textSecondary}
                   />
                 </>
               )}
 
               <TouchableOpacity
                 className={`rounded-2xl py-4 mb-3 ${
-                  editTitle.trim() ? "bg-amber" : "bg-navy-raise border border-navy-border"
+                  editTitle.trim() ? "bg-feed-primary" : "bg-raised-bg border border-border-main"
                 }`}
                 onPress={handleSaveEdit}
                 disabled={!editTitle.trim() || updateChore.isPending}
               >
-                <Text className={`text-center font-body-semibold text-base ${editTitle.trim() ? "text-midnight" : "text-ash"}`}>
+                <Text className={`text-center font-body-semibold text-base ${editTitle.trim() ? "" : "text-text-secondary"}`} style={editTitle.trim() ? { color: colors.charcoal } : undefined}>
                   {updateChore.isPending ? "Saving..." : "Save Changes"}
                 </Text>
               </TouchableOpacity>
@@ -779,7 +792,7 @@ export default function Chores() {
                 className="py-3 mb-4"
                 onPress={() => setEditingChore(null)}
               >
-                <Text className="text-ash text-center">Cancel</Text>
+                <Text className="text-text-secondary text-center">Cancel</Text>
               </TouchableOpacity>
             </ScrollView>
           </TouchableOpacity>

@@ -60,7 +60,7 @@ interface BurstParticleProps {
   colorIndex: number;
 }
 
-const PARTICLE_COLORS = [colors.amber, colors.honey, colors.cream];
+const PARTICLE_COLORS = [colors.feedPrimary, colors.diaperPrimary, colors.cream];
 
 function BurstParticle({ angle, radius, progress, colorIndex }: BurstParticleProps) {
   const color = PARTICLE_COLORS[colorIndex % PARTICLE_COLORS.length];
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   checkText: {
     color: colors.white,
     fontSize: 28,
-    fontFamily: "Outfit_700Bold",
+    fontFamily: "Baloo2_700Bold",
   },
   label: {
     marginTop: 12,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   labelText: {
     color: colors.white,
     fontSize: 18,
-    fontFamily: "Outfit_600SemiBold",
+    fontFamily: "Nunito_600SemiBold",
   },
   particle: {
     position: "absolute",

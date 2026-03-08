@@ -11,13 +11,14 @@ import {
   type LogConfirmationRef,
 } from "../../components/LogConfirmation";
 import { colors } from "../../constants/theme";
+import { useThemeColors } from "../../lib/theme";
 import type { LucideIcon } from "lucide-react-native";
 
 const LOG_META: Record<string, { title: string; subtitle: string; icon: LucideIcon; color: string }> = {
-  feed: { title: "Feed", subtitle: "Log a feeding session", icon: Baby, color: colors.amber },
-  diaper: { title: "Diaper", subtitle: "Log a diaper change", icon: Droplets, color: colors.honey },
-  sleep: { title: "Sleep", subtitle: "Log a sleep session", icon: Moon, color: colors.info },
-  pump: { title: "Pump", subtitle: "Log a pump session", icon: Heart, color: colors.ember },
+  feed: { title: "Feed", subtitle: "Log a feeding session", icon: Baby, color: colors.feedPrimary },
+  diaper: { title: "Diaper", subtitle: "Log a diaper change", icon: Droplets, color: colors.feedPrimary },
+  sleep: { title: "Sleep", subtitle: "Log a sleep session", icon: Moon, color: colors.sleepPrimary },
+  pump: { title: "Pump", subtitle: "Log a pump session", icon: Heart, color: colors.pumpPrimary },
 };
 
 export default function QuickLog() {
@@ -26,6 +27,7 @@ export default function QuickLog() {
   const [showConfirm, setShowConfirm] = useState(false);
   const navigated = useRef(false);
 
+  const tc = useThemeColors();
   const meta = LOG_META[type ?? ""];
   const Icon = meta?.icon ?? Baby;
 
@@ -45,9 +47,9 @@ export default function QuickLog() {
   }, []);
 
   return (
-    <View className="flex-1 bg-midnight pt-16 px-6">
+    <View className="flex-1 bg-screen-bg pt-16 px-6">
       <TouchableOpacity onPress={() => router.back()} className="mb-6">
-        <Text className="text-ash text-base font-body-medium">
+        <Text className="text-text-secondary text-base font-body-medium">
           {type === "sleep" || type === "pump" ? "Done" : "Cancel"}
         </Text>
       </TouchableOpacity>
@@ -55,18 +57,18 @@ export default function QuickLog() {
       <View className="flex-row items-center mb-6">
         <View
           className="w-10 h-10 rounded-xl items-center justify-center mr-3"
-          style={{ backgroundColor: `${meta?.color ?? colors.amber}22` }}
+          style={{ backgroundColor: `${meta?.color ?? colors.feedPrimary}22` }}
         >
-          <Icon size={20} strokeWidth={1.5} color={meta?.color ?? colors.amber} />
+          <Icon size={20} strokeWidth={1.5} color={meta?.color ?? colors.feedPrimary} />
         </View>
         <View>
           <Text
-            className="text-2xl font-display text-white"
+            className="text-2xl font-display text-text-primary"
             style={{ letterSpacing: -1 }}
           >
             {meta?.title ?? "Log"}
           </Text>
-          <Text className="text-sm text-ash font-body">
+          <Text className="text-sm text-text-secondary font-body">
             {meta?.subtitle ?? ""}
           </Text>
         </View>
