@@ -20,7 +20,7 @@
   },
 
   "supportUrl": "mailto:swadl.support@gmail.com",
-  "privacyPolicyUrl": "TODO: Host privacy policy (e.g. Notion public page, GitHub Pages, or Netlify) and add URL here. Required by both Apple and Google.",
+  "privacyPolicyUrl": "https://swadl.vercel.app/privacy",
 
   "ageRating": "4+",
 

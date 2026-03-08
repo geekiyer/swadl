@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:root {
+  --color-cream: #FFF9F0;
+  --color-cream-warm: #FFF5E8;
+  --color-cream-gold: #FFEED8;
+  --color-charcoal: #1A1612;
+  --color-charcoal-card: #221E18;
+  --color-card-white: #FFFFFF;
+  --color-border-soft: #F0E4D4;
+
+  --color-text-dark: #2E1F10;
+  --color-text-body: #4A3828;
+  --color-text-secondary: #8A7560;
+  --color-text-muted: #B8A898;
+
+  --color-feed-primary: #E88A30;
+  --color-feed-bg: #FFF3E4;
+  --color-diaper-primary: #3A8A55;
+  --color-diaper-bg: #EDF8F0;
+  --color-sleep-primary: #4A5A9A;
+  --color-sleep-bg: #EDF0FA;
+  --color-pump-primary: #B85A5E;
+  --color-pump-bg: #FDEFF0;
+
+  --font-display: 'Baloo 2', cursive;
+  --font-body: 'Nunito', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-cream);
+  color: var(--color-text-dark);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--color-feed-primary);
+  color: var(--color-charcoal);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
