@@ -23,13 +23,12 @@ import {
   useCompleteChore,
 } from "../lib/queries";
 import { useCareMode } from "../lib/careMode";
-import { useUnitStore, displayVolume } from "../lib/store";
+import { displayVolumeBoth } from "../lib/store";
 
 function DailyBriefingView() {
   const tc = useThemeColors();
   const { data: babies } = useBabies();
   const baby = babies?.[0];
-  const unit = useUnitStore((s) => s.unit);
   const { data: totals, isLoading } = useDailyTotals(baby?.id);
   const { data: nextTasks } = useNextTasks(5);
   const completeChore = useCompleteChore();
@@ -50,12 +49,12 @@ function DailyBriefingView() {
       "",
       "FEEDING",
       `${totals.feeds} feeds today (${totals.feedBreakdown})`,
-      totals.totalOz > 0 ? `Total: ${displayVolume(totals.totalOz, unit)}` : "",
+      totals.totalOz > 0 ? `Total: ${displayVolumeBoth(totals.totalOz)}` : "",
       totals.totalFeedMin > 0 ? `Total: ${totals.totalFeedMin} min` : "",
       "",
       "PUMPING",
       totals.pumpSessions > 0
-        ? `${totals.pumpSessions} session(s), ${displayVolume(totals.pumpTotalOz, unit)}, ${totals.pumpTotalMin} min`
+        ? `${totals.pumpSessions} session(s), ${displayVolumeBoth(totals.pumpTotalOz)}, ${totals.pumpTotalMin} min`
         : "No pump sessions",
       "",
       "DIAPERS",
@@ -109,7 +108,7 @@ function DailyBriefingView() {
                 </Text>
                 <Text className="text-base text-text-secondary mt-0.5">
                   {totals.feedBreakdown}
-                  {totals.totalOz > 0 ? ` · ${displayVolume(totals.totalOz, unit)}` : ""}
+                  {totals.totalOz > 0 ? ` · ${displayVolumeBoth(totals.totalOz)}` : ""}
                   {totals.totalFeedMin > 0 ? ` · ${totals.totalFeedMin} min` : ""}
                 </Text>
               </View>
@@ -175,7 +174,7 @@ function DailyBriefingView() {
                     {totals.pumpSessions} session{totals.pumpSessions !== 1 ? "s" : ""}
                   </Text>
                   <Text className="text-base text-text-secondary mt-0.5">
-                    {totals.pumpTotalOz > 0 ? displayVolume(totals.pumpTotalOz, unit) : ""}
+                    {totals.pumpTotalOz > 0 ? displayVolumeBoth(totals.pumpTotalOz) : ""}
                     {totals.pumpTotalOz > 0 && totals.pumpTotalMin > 0 ? " · " : ""}
                     {totals.pumpTotalMin > 0 ? `${totals.pumpTotalMin} min` : ""}
                   </Text>

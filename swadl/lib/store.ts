@@ -71,6 +71,11 @@ export function displayVolume(oz: number, unit: VolumeUnit): string {
   return `${Math.round(oz * 10) / 10} oz`;
 }
 
+export function displayVolumeBoth(oz: number): string {
+  const rounded = Math.round(oz * 10) / 10;
+  return `${rounded} oz / ${ozToMl(oz)} ml`;
+}
+
 export function parseInputToOz(value: string, unit: VolumeUnit): number {
   const num = parseFloat(value);
   if (isNaN(num)) return 0;
