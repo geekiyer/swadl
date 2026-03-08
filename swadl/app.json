@@ -6,17 +6,19 @@
     "scheme": "swadl",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#080E1A"
+      "backgroundColor": "#FFF9F0"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.swadl.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Swadl needs camera access to take a photo for your baby's profile.",
+        "NSPhotoLibraryUsageDescription": "Swadl needs photo library access to choose a photo for your baby's profile."
       }
     },
     "android": {

@@ -12,6 +12,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import { colors } from "../constants/theme";
 import { useThemeColors } from "../lib/theme";
+import { useUnitStore, parseInputToOz, ozToMl } from "../lib/store";
+import { UnitToggle } from "./UnitToggle";
 import type { ActivityItem } from "../lib/queries";
 
 const TABLE_MAP: Record<ActivityItem["kind"], string> = {
@@ -63,6 +65,7 @@ function formatDate(dateStr: string): string {
 export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
   const tc = useThemeColors();
   const queryClient = useQueryClient();
+  const unit = useUnitStore((s) => s.unit);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -89,7 +92,13 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
     if (item.kind === "feed") {
       setFeedType((r.type as string) ?? "");
-      setAmountOz(r.amount_oz != null ? String(r.amount_oz) : "");
+      setAmountOz(
+        r.amount_oz != null
+          ? unit === "ml"
+            ? String(ozToMl(r.amount_oz as number))
+            : String(r.amount_oz)
+          : ""
+      );
       setDurationMin(r.duration_min != null ? String(r.duration_min) : "");
       // Parse notes: handle old JSON format and new plain text
       const rawNotes = (r.notes as string) ?? "";
@@ -122,7 +131,13 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
     } else if (item.kind === "sleep") {
       setSleepLocation((r.location as string) ?? "");
     } else if (item.kind === "pump") {
-      setPumpAmountOz(r.amount_oz != null ? String(r.amount_oz) : "");
+      setPumpAmountOz(
+        r.amount_oz != null
+          ? unit === "ml"
+            ? String(ozToMl(r.amount_oz as number))
+            : String(r.amount_oz)
+          : ""
+      );
       // Parse pump notes: handle old JSON format
       const rawNotes = (r.notes as string) ?? "";
       try {
@@ -136,7 +151,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
         setNotes(rawNotes);
       }
     }
-  }, [item]);
+  }, [item, unit]);
 
   if (!item) return null;
 
@@ -150,7 +165,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
     if (item.kind === "feed") {
       updates = {
         type: feedType,
-        amount_oz: amountOz.trim() ? parseFloat(amountOz) : null,
+        amount_oz: amountOz.trim() ? parseInputToOz(amountOz, unit) : null,
         duration_min: durationMin.trim() ? parseInt(durationMin, 10) : null,
         notes: notes.trim() || null,
       };
@@ -165,7 +180,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
       };
     } else if (item.kind === "pump") {
       updates = {
-        amount_oz: pumpAmountOz.trim() ? parseFloat(pumpAmountOz) : null,
+        amount_oz: pumpAmountOz.trim() ? parseInputToOz(pumpAmountOz, unit) : null,
         notes: notes.trim() || null,
       };
     }
@@ -285,9 +300,12 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
                 {(feedType === "bottle" || feedType === "solids") && (
                   <>
-                    <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
-                      Amount (oz)
-                    </Text>
+                    <View className="flex-row items-center justify-between mb-1">
+                      <Text className="text-[11px] font-body-bold text-text-secondary uppercase">
+                        Amount ({unit})
+                      </Text>
+                      <UnitToggle />
+                    </View>
                     <TextInput
                       className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                       style={{ fontSize: 16, height: 48 }}
@@ -360,9 +378,12 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
             {item.kind === "pump" && (
               <>
-                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
-                  Amount (oz)
-                </Text>
+                <View className="flex-row items-center justify-between mb-1">
+                  <Text className="text-[11px] font-body-bold text-text-secondary uppercase">
+                    Amount ({unit})
+                  </Text>
+                  <UnitToggle />
+                </View>
                 <TextInput
                   className="border border-border-main bg-raised-bg rounded-xl px-4 mb-4 text-text-primary"
                   style={{ fontSize: 16, height: 48 }}

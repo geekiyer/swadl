@@ -1,0 +1,55 @@
+{
+  "appName": "Swadl",
+  "subtitle": "Parenting Coordination Made Easy",
+
+  "description": "Swadl is not another baby tracker. It's a parenting coordination tool that reduces cognitive load, keeps caregivers in sync, and helps you stay on top of everything.\n\nWhether you're co-parenting, sharing duties with a nanny, or managing it all solo, Swadl gives you one place to log, track, and hand off — so nothing falls through the cracks.\n\nQUICK LOGGING\nLog feeds, diapers, sleep, and pump sessions in seconds. Track bottle amounts in both oz and ml. See time-since-last at a glance on your dashboard.\n\nCAREGIVER COORDINATION\nThree care modes — Together, Shifts, and Nanny — adapt to how your family works. Hand off with auto-generated briefings so the next caregiver knows exactly what happened.\n\nDAILY SUMMARIES & TRENDS\nDay and week views show feeding totals, diaper counts, sleep hours, and pump output. Share a formatted PDF report with your pediatrician in one tap.\n\nSMART CHORE MANAGEMENT\nPre-seeded recurring chores (sterilize bottles, wash pump parts, prep daycare bag) with animated completion. Swipe to mark done.\n\nBUILT FOR REAL PARENTS\nWarm, nursery-inspired design that feels handcrafted — not clinical. Dark mode for late-night feeds. Multi-baby support. Real-time sync across caregivers.\n\nPRIVACY FIRST\nYour family's data stays private. COPPA-compliant. No ads. No selling data. Delete your account and all data anytime.",
+
+  "shortDescription": "Coordinate parenting duties, log feeds, diapers, sleep & pumps, and share reports with your pediatrician.",
+
+  "keywords": "baby,parenting,tracker,feeding,diaper,sleep,pump,newborn,caregiver,nanny,coordination,breastfeeding,bottle,pediatrician",
+
+  "categories": {
+    "ios": {
+      "primary": "Health & Fitness",
+      "secondary": "Lifestyle"
+    },
+    "android": {
+      "category": "Parenting",
+      "contentRating": "Everyone"
+    }
+  },
+
+  "supportUrl": "mailto:swadl.support@gmail.com",
+  "privacyPolicyUrl": "TODO: Host privacy policy (e.g. Notion public page, GitHub Pages, or Netlify) and add URL here. Required by both Apple and Google.",
+
+  "ageRating": "4+",
+
+  "screenshots": {
+    "required": {
+      "iphone_6_7": {
+        "label": "iPhone 6.7\" (iPhone 15 Pro Max / 16 Pro Max)",
+        "resolution": "1290x2796",
+        "count": "5-6 screenshots"
+      },
+      "iphone_6_5": {
+        "label": "iPhone 6.5\" (iPhone 11 Pro Max / XS Max)",
+        "resolution": "1242x2688",
+        "count": "5-6 screenshots"
+      }
+    },
+    "recommended_scenes": [
+      "Dashboard with status cards and action grid",
+      "Quick log screen (feed or diaper)",
+      "Summary with PDF share",
+      "Trends with chart and text views",
+      "Chore manager with animated completion",
+      "Dark mode dashboard"
+    ]
+  },
+
+  "promotionalText": "Coordinate your parenting like a team. Log, track, hand off — all in one warm, beautiful app.",
+
+  "whatsNew": "Initial release! Log feeds, diapers, sleep, and pump sessions. Share PDF reports with your pediatrician. Coordinate with partners and caregivers in real time.",
+
+  "reviewNotes": "This app requires a Supabase backend. Test account credentials:\nEmail: test@swadl.app\nPassword: testpassword123\n\nThe app uses email confirmation for signup. For testing, you can use the test account above which has pre-seeded data."
+}

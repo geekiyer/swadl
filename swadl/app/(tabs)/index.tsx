@@ -173,9 +173,6 @@ export default function Dashboard() {
   return (
     <View style={{ flex: 1 }}>
       <NurseryBackground theme={tc.mode} />
-      <View style={{ position: 'absolute', right: 0, top: insets.top + 10, zIndex: 1 }} pointerEvents="none">
-        <NurseryMobileArt theme={tc.mode} screen="home" />
-      </View>
       <ScrollView
         style={{ flex: 1 }}
         refreshControl={
@@ -189,6 +186,9 @@ export default function Dashboard() {
         }
       >
         <View style={{ paddingHorizontal: 24, paddingTop: insets.top + 16, paddingBottom: 32 }}>
+          <View style={{ position: 'absolute', right: -24, top: insets.top + 10 }} pointerEvents="none">
+            <NurseryMobileArt theme={tc.mode} screen="home" />
+          </View>
           {/* Header: avatar + baby name */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10 }}>
             <BabyAvatar
