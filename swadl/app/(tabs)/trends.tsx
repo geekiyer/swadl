@@ -15,7 +15,7 @@ import Animated, {
   withDelay,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBabies, useTrends, type TrendDay } from "../../lib/queries";
 import { colors, shadows } from "../../constants/theme";
@@ -667,6 +667,12 @@ export default function Trends() {
 
   // revealKey changes when range or data changes, triggering bar animations
   const revealKey = `${range}-${trendData?.length ?? 0}`;
+
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ["trends"] });
+    }, [queryClient])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

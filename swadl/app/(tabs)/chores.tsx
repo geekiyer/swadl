@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { Swipeable } from "react-native-gesture-handler";
+import { useFocusEffect } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { Springs } from "../../constants/animation";
 import { Check, Plus } from "lucide-react-native";
 import {
@@ -198,9 +200,17 @@ function ChoreRow({
 }
 
 export default function Chores() {
+  const queryClient = useQueryClient();
   const tc = useThemeColors();
   const insets = useSafeAreaInsets();
   const { data: chores } = useAllChores();
+
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ["all-chores"] });
+      queryClient.invalidateQueries({ queryKey: ["next-tasks"] });
+    }, [queryClient])
+  );
   const { data: members } = useHouseholdMembers();
   const { data: profile } = useProfile();
   const { careMode } = useCareMode();

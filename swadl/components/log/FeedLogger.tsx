@@ -12,14 +12,19 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { useBabies } from "../../lib/queries";
 import { FORMULA_BRANDS } from "../../constants/formula-brands";
-import { useUnitStore, useFormulaBrandStore, parseInputToOz } from "../../lib/store";
+import {
+  useUnitStore,
+  useFormulaBrandStore,
+  useBreastSessionStore,
+  parseInputToOz,
+  type BreastSide,
+} from "../../lib/store";
 import { UnitToggle } from "../UnitToggle";
 import { TimePicker } from "./TimePicker";
 import { colors } from "../../constants/theme";
 import { useThemeColors } from "../../lib/theme";
 
 type FeedCategory = "breastfeed" | "bottle";
-type BreastSide = "breast_left" | "breast_right";
 type BottleContent = "formula" | "breastmilk";
 
 interface FeedLoggerProps {
@@ -32,13 +37,19 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
   const baby = babies?.[0];
   const queryClient = useQueryClient();
 
-  const [category, setCategory] = useState<FeedCategory | null>(null);
+  // Persisted breastfeed session
+  const breastSession = useBreastSessionStore((s) => s.session);
+  const startBreastSession = useBreastSessionStore((s) => s.start);
+  const switchBreastSide = useBreastSessionStore((s) => s.switchSide);
+  const clearBreastSession = useBreastSessionStore((s) => s.clear);
 
-  // Breastfeed state
-  const [side, setSide] = useState<BreastSide | null>(null);
-  const [timing, setTiming] = useState(false);
+  // Auto-resume: if there's an active breast session, go straight to breastfeed
+  const [category, setCategory] = useState<FeedCategory | null>(
+    breastSession ? "breastfeed" : null
+  );
+
+  // Breastfeed timer (derived from persisted session)
   const [elapsed, setElapsed] = useState(0);
-  const startTime = useRef<Date | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Bottle state
@@ -53,29 +64,24 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
   const unit = useUnitStore((s) => s.unit);
   const [saving, setSaving] = useState(false);
 
+  // Keep timer in sync with persisted session
   useEffect(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    if (breastSession) {
+      const startMs = new Date(breastSession.startedAt).getTime();
+      setElapsed(Math.floor((Date.now() - startMs) / 1000));
+      timerRef.current = setInterval(() => {
+        setElapsed(Math.floor((Date.now() - startMs) / 1000));
+      }, 1000);
+    } else {
+      setElapsed(0);
+    }
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
-
-  function startTimer() {
-    startTime.current = new Date();
-    setTiming(true);
-    setElapsed(0);
-    timerRef.current = setInterval(() => {
-      if (startTime.current) {
-        setElapsed(
-          Math.floor((Date.now() - startTime.current.getTime()) / 1000)
-        );
-      }
-    }, 1000);
-  }
-
-  function stopTimer() {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setTiming(false);
-  }
+  }, [breastSession?.startedAt]);
 
   function formatElapsed(secs: number) {
     const m = Math.floor(secs / 60);
@@ -84,9 +90,8 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
   }
 
   function resetAll() {
-    stopTimer();
+    clearBreastSession();
     setCategory(null);
-    setSide(null);
     setBottleContent(null);
     setFormulaBrand(null);
     setBrandSearch("");
@@ -96,7 +101,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
   }
 
   async function saveBreast() {
-    if (!baby || !side) return;
+    if (!baby || !breastSession) return;
     setSaving(true);
 
     const {
@@ -108,18 +113,23 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
       return;
     }
 
+    const durationSec = Math.floor(
+      (Date.now() - new Date(breastSession.startedAt).getTime()) / 1000
+    );
+
     const { error } = await supabase.from("feed_logs").insert({
       baby_id: baby.id,
       logged_by: session.user.id,
-      type: side,
-      duration_min: elapsed > 0 ? Math.ceil(elapsed / 60) : null,
-      started_at: startTime.current?.toISOString() ?? new Date().toISOString(),
+      type: breastSession.side,
+      duration_min: durationSec > 0 ? Math.ceil(durationSec / 60) : null,
+      started_at: breastSession.startedAt,
     });
 
     setSaving(false);
     if (error) {
       Alert.alert("Error", error.message);
     } else {
+      clearBreastSession();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["latest-feed"] }),
         queryClient.invalidateQueries({ queryKey: ["recent-activity"] }),
@@ -127,6 +137,17 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
       ]);
       onSuccess ? onSuccess() : router.back();
     }
+  }
+
+  function handleDiscardSession() {
+    Alert.alert(
+      "Discard Session",
+      "This will discard the current breastfeeding timer. Are you sure?",
+      [
+        { text: "Keep Timing", style: "cancel" },
+        { text: "Discard", style: "destructive", onPress: resetAll },
+      ]
+    );
   }
 
   async function saveBottle() {
@@ -197,78 +218,96 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     );
   }
 
-  // Breastfeed flow
+  // Breastfeed flow — single screen with Left/Right toggle + timer
   if (category === "breastfeed") {
-    // Pick side
-    if (!side) {
-      return (
-        <View>
-          <Text className="text-text-secondary mb-4">Which side?</Text>
-          <View className="flex-row gap-3">
-            <TouchableOpacity
-              className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1"
-              onPress={() => {
-                setSide("breast_left");
-                startTimer();
-              }}
-            >
-              <Text className="text-feed-primary font-body-semibold text-base">
-                Left
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1"
-              onPress={() => {
-                setSide("breast_right");
-                startTimer();
-              }}
-            >
-              <Text className="text-feed-primary font-body-semibold text-base">
-                Right
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity className="mt-4 py-3" onPress={resetAll}>
-            <Text className="text-text-secondary text-center">Back</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+    const activeSide = breastSession?.side ?? null;
+    const isTimerRunning = !!breastSession;
 
-    // Timer running
     return (
       <View>
-        <View className="items-center">
+        {/* Side selector */}
+        <Text className="text-text-secondary mb-3">
+          {isTimerRunning ? "Feeding on" : "Which side?"}
+        </Text>
+        <View className="flex-row gap-3 mb-6">
+          <TouchableOpacity
+            className={`rounded-2xl px-6 py-4 items-center flex-1 border ${
+              activeSide === "breast_left"
+                ? "bg-feed-primary border-feed-primary"
+                : "bg-card-bg border-border-main"
+            }`}
+            onPress={() => {
+              if (isTimerRunning) {
+                switchBreastSide("breast_left");
+              } else {
+                startBreastSession("breast_left");
+              }
+            }}
+          >
+            <Text
+              className={`font-body-semibold text-base ${
+                activeSide === "breast_left" ? "" : "text-text-secondary"
+              }`}
+              style={activeSide === "breast_left" ? { color: colors.textDark } : undefined}
+            >
+              Left
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`rounded-2xl px-6 py-4 items-center flex-1 border ${
+              activeSide === "breast_right"
+                ? "bg-feed-primary border-feed-primary"
+                : "bg-card-bg border-border-main"
+            }`}
+            onPress={() => {
+              if (isTimerRunning) {
+                switchBreastSide("breast_right");
+              } else {
+                startBreastSession("breast_right");
+              }
+            }}
+          >
+            <Text
+              className={`font-body-semibold text-base ${
+                activeSide === "breast_right" ? "" : "text-text-secondary"
+              }`}
+              style={activeSide === "breast_right" ? { color: colors.textDark } : undefined}
+            >
+              Right
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Timer display */}
+        <View className="items-center mb-6">
           <Text className="text-5xl mb-2 font-mono-bold text-text-primary" style={{ letterSpacing: -1, lineHeight: 60 }}>
             {formatElapsed(elapsed)}
           </Text>
-          <Text className="text-text-secondary mb-6">
-            {side === "breast_left" ? "Left breast" : "Right breast"}
-          </Text>
-
-          {timing ? (
-            <TouchableOpacity
-              className="bg-pump-primary rounded-2xl px-8 py-4 mb-4"
-              onPress={stopTimer}
-            >
-              <Text className="text-text-primary font-body-semibold text-base">
-                Stop Timer
-              </Text>
-            </TouchableOpacity>
-          ) : elapsed > 0 ? (
-            <TouchableOpacity
-              className="bg-feed-primary rounded-xl py-4 px-8 mb-4"
-              onPress={saveBreast}
-              disabled={saving}
-            >
-              <Text className="font-body-semibold text-base" style={{ color: colors.textDark }}>
-                {saving ? "Saving..." : "Save"}
-              </Text>
-            </TouchableOpacity>
-          ) : null}
+          {isTimerRunning && (
+            <Text className="text-text-secondary">
+              {activeSide === "breast_left" ? "Left breast" : "Right breast"}
+            </Text>
+          )}
         </View>
-        <TouchableOpacity className="mt-2 py-3" onPress={resetAll}>
-          <Text className="text-text-secondary text-center">Cancel</Text>
+
+        {/* Save button (only when timer is running) */}
+        {isTimerRunning && (
+          <TouchableOpacity
+            className="bg-feed-primary rounded-2xl py-4 mb-3"
+            onPress={saveBreast}
+            disabled={saving}
+          >
+            <Text className="text-center font-body-semibold text-base" style={{ color: colors.textDark }}>
+              {saving ? "Saving..." : `Save — ${formatElapsed(elapsed)}`}
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Discard / Back */}
+        <TouchableOpacity className="py-3" onPress={isTimerRunning ? handleDiscardSession : resetAll}>
+          <Text className="text-text-secondary text-center">
+            {isTimerRunning ? "Discard" : "Back"}
+          </Text>
         </TouchableOpacity>
       </View>
     );

@@ -41,11 +41,21 @@ function BackgroundProviders() {
   return null;
 }
 
+/** Wraps children with the NativeWind dark class without re-rendering the root layout */
+function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const themeMode = useThemeStore((s) => s.mode);
+  return (
+    <View className={themeMode === "dark" ? "dark flex-1" : "flex-1"}>
+      <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
+      {children}
+    </View>
+  );
+}
+
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const setSession = useAuthStore((s) => s.setSession);
-  const themeMode = useThemeStore((s) => s.mode);
   const [ready, setReady] = useState(false);
 
   const [fontsLoaded] = useFonts({
@@ -94,10 +104,9 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View className={themeMode === "dark" ? "dark flex-1" : "flex-1"}>
+      <ThemeProvider>
         <QueryClientProvider client={queryClient}>
           <BackgroundProviders />
-          <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="(auth)" />
@@ -109,7 +118,7 @@ export default function RootLayout() {
             <Stack.Screen name="terms" options={{ presentation: "modal" }} />
           </Stack>
         </QueryClientProvider>
-      </View>
+      </ThemeProvider>
       {showBrandedSplash && (
         <Animated.View
           exiting={FadeOut.duration(400)}

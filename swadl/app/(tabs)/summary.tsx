@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { useBabies, useSummary, type SummaryData } from "../../lib/queries";
@@ -108,6 +108,12 @@ export default function Summary() {
 
   const today = formatDate(new Date());
   const isToday = viewMode === "day" ? date === today : weekStart <= today && weekEnd >= today;
+
+  useFocusEffect(
+    useCallback(() => {
+      queryClient.invalidateQueries({ queryKey: ["summary"] });
+    }, [queryClient])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

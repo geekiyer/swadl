@@ -100,6 +100,43 @@ export const useFormulaBrandStore = create<FormulaBrandState>()(
 );
 
 // ============================================================
+// Active Breastfeed Session (persists across navigation)
+// ============================================================
+
+export type BreastSide = "breast_left" | "breast_right";
+
+interface BreastSession {
+  side: BreastSide;
+  startedAt: string; // ISO string
+}
+
+interface BreastSessionState {
+  session: BreastSession | null;
+  start: (side: BreastSide) => void;
+  switchSide: (side: BreastSide) => void;
+  clear: () => void;
+}
+
+export const useBreastSessionStore = create<BreastSessionState>()(
+  persist(
+    (set) => ({
+      session: null,
+      start: (side) =>
+        set({ session: { side, startedAt: new Date().toISOString() } }),
+      switchSide: (side) =>
+        set((state) =>
+          state.session ? { session: { ...state.session, side } } : {}
+        ),
+      clear: () => set({ session: null }),
+    }),
+    {
+      name: "breast-session-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+
+// ============================================================
 // Offline Queue
 // ============================================================
 

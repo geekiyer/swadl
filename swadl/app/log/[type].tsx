@@ -12,6 +12,7 @@ import {
 } from "../../components/LogConfirmation";
 import { colors } from "../../constants/theme";
 import { useThemeColors } from "../../lib/theme";
+import { useBreastSessionStore } from "../../lib/store";
 import type { LucideIcon } from "lucide-react-native";
 
 const LOG_META: Record<string, { title: string; subtitle: string; icon: LucideIcon; color: string }> = {
@@ -26,10 +27,15 @@ export default function QuickLog() {
   const confirmRef = useRef<LogConfirmationRef>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const navigated = useRef(false);
+  const breastSession = useBreastSessionStore((s) => s.session);
 
   const tc = useThemeColors();
   const meta = LOG_META[type ?? ""];
   const Icon = meta?.icon ?? Baby;
+
+  // Show "Done" for timer-based loggers (sleep, pump, or active breastfeed)
+  const hasActiveTimer =
+    type === "sleep" || type === "pump" || (type === "feed" && !!breastSession);
 
   function goBack() {
     if (navigated.current) return;
@@ -50,7 +56,7 @@ export default function QuickLog() {
     <View className="flex-1 bg-screen-bg pt-16 px-6">
       <TouchableOpacity onPress={() => router.back()} className="mb-6">
         <Text className="text-text-secondary text-base font-body-medium">
-          {type === "sleep" || type === "pump" ? "Done" : "Cancel"}
+          {hasActiveTimer ? "Done" : "Cancel"}
         </Text>
       </TouchableOpacity>
 
