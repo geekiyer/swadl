@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { View, Text, ScrollView, Pressable, Modal, FlatList, RefreshControl } from "react-native";
+import { View, Text, ScrollView, Pressable, Modal, FlatList, RefreshControl, Alert, ActionSheetIOS, Platform } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useFocusEffect } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,6 +24,7 @@ import {
   useActiveShift,
   useDashboardRealtime,
   useEnsureTogetherShift,
+  useUploadBabyAvatar,
 } from "../../lib/queries";
 import { useCareMode } from "../../lib/careMode";
 import { shadows, colors } from "../../constants/theme";
@@ -73,6 +75,74 @@ export default function Dashboard() {
   const { data: activeShift } = useActiveShift();
 
   const [refreshing, setRefreshing] = useState(false);
+  const uploadAvatar = useUploadBabyAvatar();
+
+  const pickAndUpload = useCallback(async (source: "camera" | "library") => {
+    if (!resolvedBabyId) return;
+
+    // Ensure permissions before launching picker
+    if (source === "camera") {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Needed", "Camera access is required to take a photo.");
+        return;
+      }
+    } else {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Needed", "Photo library access is required to choose a photo.");
+        return;
+      }
+    }
+
+    const opts: ImagePicker.ImagePickerOptions = {
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    };
+
+    const result = source === "camera"
+      ? await ImagePicker.launchCameraAsync(opts)
+      : await ImagePicker.launchImageLibraryAsync(opts);
+
+    if (result.canceled || !result.assets?.[0]) return;
+
+    uploadAvatar.mutate(
+      { babyId: resolvedBabyId, uri: result.assets[0].uri },
+      {
+        onError: (err) => {
+          Alert.alert("Upload Failed", (err as Error).message);
+        },
+      }
+    );
+  }, [resolvedBabyId, uploadAvatar]);
+
+  const handleAvatarPress = useCallback(() => {
+    if (!resolvedBabyId) return;
+
+    // Pre-request library permissions so picker opens faster on subsequent taps
+    ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    const options = ["Take Photo", "Choose from Library", "Cancel"];
+    const cancelIndex = 2;
+
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options, cancelButtonIndex: cancelIndex },
+        (index) => {
+          if (index === 0) pickAndUpload("camera");
+          else if (index === 1) pickAndUpload("library");
+        }
+      );
+    } else {
+      Alert.alert("Update Photo", undefined, [
+        { text: "Take Photo", onPress: () => pickAndUpload("camera") },
+        { text: "Choose from Library", onPress: () => pickAndUpload("library") },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    }
+  }, [resolvedBabyId, pickAndUpload]);
 
   useDashboardRealtime();
   useEnsureTogetherShift(careMode.mode);
@@ -125,7 +195,8 @@ export default function Dashboard() {
               avatarUrl={baby?.avatar_url}
               babyName={baby?.name}
               theme={tc.mode}
-              onPress={() => {/* TODO: image picker */}}
+              onPress={handleAvatarPress}
+              loading={uploadAvatar.isPending}
             />
             <View>
               {hasMultipleBabies ? (

@@ -7,9 +7,12 @@ import {
   Share,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
 import { useBabies, useSummary, type SummaryData } from "../../lib/queries";
 import { colors } from "../../constants/theme";
 import { useThemeColors } from "../../lib/theme";
@@ -112,49 +115,162 @@ export default function Summary() {
     setRefreshing(false);
   }, [queryClient]);
 
-  function buildShareText(s: SummaryData): string {
-    const header = viewMode === "day"
-      ? `${baby?.name ?? "Baby"} - ${displayDate(date)}`
-      : `${baby?.name ?? "Baby"} - ${displayDateRange(weekStart, weekEnd)}`;
-    const lines = [
-      header,
-      "",
-      "FEEDING",
-      `${s.feedCount} feeds · ${displayVolume(s.feedTotalOz, unit)} · ${s.feedTotalMin} min`,
-      ...Object.entries(s.feedByType).map(
-        ([type, count]) => `  ${type}: ${count}`
-      ),
-      s.avgTimeBetweenFeeds != null
-        ? `  Avg ${s.avgTimeBetweenFeeds} min between feeds`
-        : "",
-      s.avgOzPerBottle != null ? `  Avg ${displayVolume(s.avgOzPerBottle, unit)}/bottle` : "",
-      "",
-      "DIAPERS",
-      `${s.diaperCount} changes`,
-      ...Object.entries(s.diaperByType).map(
-        ([type, count]) => `  ${type}: ${count}`
-      ),
-      s.lowWetWarning ? "  Warning: Low wet diaper count" : "",
-      "",
-      "PUMPING",
-      `${s.pumpCount} sessions · ${displayVolume(s.pumpTotalOz, unit)} · ${s.pumpTotalMin} min`,
-      "",
-      "SLEEP",
-      `${Math.round(s.sleepTotalMin / 60 * 10) / 10} hrs total · ${s.napCount} nap(s)`,
-      `  Longest stretch: ${Math.round(s.longestStretchMin)} min`,
-      `  Night: ${Math.round(s.nightSleepMin)} min · Day: ${Math.round(s.daySleepMin)} min`,
-      "",
-      "Sent from Swadl",
-    ];
-    return lines.filter(Boolean).join("\n");
+  function getBabyAge(): string {
+    if (!baby?.date_of_birth) return "";
+    const dob = new Date(baby.date_of_birth + "T12:00:00");
+    const now = new Date();
+    const diffMs = now.getTime() - dob.getTime();
+    const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const months = Math.floor(totalDays / 30.44);
+    const weeks = Math.floor(totalDays / 7);
+    if (months >= 2) return `${months} months old`;
+    if (weeks >= 1) return `${weeks} week${weeks !== 1 ? "s" : ""} old`;
+    return `${totalDays} day${totalDays !== 1 ? "s" : ""} old`;
   }
+
+  function buildPdfHtml(s: SummaryData): string {
+    const babyName = baby?.name ?? "Baby";
+    const age = getBabyAge();
+    const dateLabel = viewMode === "day"
+      ? displayDate(date)
+      : displayDateRange(weekStart, weekEnd);
+
+    const feedTypeRows = Object.entries(s.feedByType)
+      .map(([type, count]) => `<tr><td style="padding:4px 12px;color:#6B5B4B;">${type}</td><td style="padding:4px 12px;text-align:right;">${count}</td></tr>`)
+      .join("");
+
+    const diaperTypeRows = Object.entries(s.diaperByType)
+      .map(([type, count]) => `<tr><td style="padding:4px 12px;color:#6B5B4B;">${type}</td><td style="padding:4px 12px;text-align:right;">${count}</td></tr>`)
+      .join("");
+
+    const activityRows = s.activityLog
+      .map((item) => {
+        const time = new Date(item.timestamp).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        return `<tr>
+          <td style="padding:6px 12px;color:#8A7A68;font-size:11px;white-space:nowrap;">${time}</td>
+          <td style="padding:6px 12px;font-size:12px;"><strong>${item.loggedBy}</strong> ${item.label}${item.detail ? ` <span style="color:#8A7A68;">· ${item.detail}</span>` : ""}</td>
+        </tr>`;
+      })
+      .join("");
+
+    const sleepHrs = Math.round((s.sleepTotalMin / 60) * 10) / 10;
+    const nightHrs = Math.round((s.nightSleepMin / 60) * 10) / 10;
+    const dayHrs = Math.round((s.daySleepMin / 60) * 10) / 10;
+    const longestHrs = Math.round((s.longestStretchMin / 60) * 10) / 10;
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: -apple-system, Helvetica, Arial, sans-serif; color: #3A2E22; margin: 0; padding: 32px; background: #FFF9F0; }
+  .header { margin-bottom: 24px; border-bottom: 2px solid #E8DDD0; padding-bottom: 16px; }
+  .header h1 { margin: 0; font-size: 24px; color: #3A2E22; }
+  .header p { margin: 4px 0 0; font-size: 14px; color: #8A7A68; }
+  .section { margin-bottom: 20px; }
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #8A7A68; margin-bottom: 8px; font-weight: 700; }
+  .card { background: #fff; border: 1px solid #E8DDD0; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .stat-label { color: #6B5B4B; font-size: 13px; }
+  .stat-value { font-weight: 600; font-size: 13px; }
+  .warning { background: #FFF3E6; border-left: 3px solid #E88A30; padding: 8px 12px; border-radius: 6px; margin-top: 8px; font-size: 12px; color: #E88A30; }
+  table { width: 100%; border-collapse: collapse; }
+  .activity-table td { border-top: 1px solid #F0E8DC; }
+  .footer { text-align: center; color: #C4B4A4; font-size: 11px; margin-top: 24px; }
+  .big-stat { font-size: 28px; font-weight: 700; color: #3A2E22; }
+  .big-label { font-size: 11px; color: #8A7A68; }
+  .stats-grid { display: flex; gap: 16px; margin-bottom: 12px; }
+  .stats-grid > div { flex: 1; text-align: center; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>${babyName}</h1>
+    <p>${dateLabel}${age ? ` · ${age}` : ""}</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Feeding</div>
+    <div class="card">
+      <div class="stats-grid">
+        <div><div class="big-stat">${s.feedCount}</div><div class="big-label">feeds</div></div>
+        <div><div class="big-stat">${displayVolume(s.feedTotalOz, unit).split(" ")[0]}</div><div class="big-label">${unit}</div></div>
+        <div><div class="big-stat">${s.feedTotalMin}</div><div class="big-label">min</div></div>
+      </div>
+      <table>${feedTypeRows}</table>
+      ${s.avgTimeBetweenFeeds != null ? `<div class="stat-row"><span class="stat-label">Avg between feeds</span><span class="stat-value">${s.avgTimeBetweenFeeds} min</span></div>` : ""}
+      ${s.avgOzPerBottle != null ? `<div class="stat-row"><span class="stat-label">Avg per bottle</span><span class="stat-value">${displayVolume(s.avgOzPerBottle, unit)}</span></div>` : ""}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Diapers</div>
+    <div class="card">
+      <div class="stats-grid">
+        <div><div class="big-stat">${s.diaperCount}</div><div class="big-label">changes</div></div>
+      </div>
+      <table>${diaperTypeRows}</table>
+      ${s.lowWetWarning ? `<div class="warning">Fewer than 6 wet diapers — consider checking hydration</div>` : ""}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Pumping</div>
+    <div class="card">
+      ${s.pumpCount > 0 ? `
+      <div class="stats-grid">
+        <div><div class="big-stat">${s.pumpCount}</div><div class="big-label">sessions</div></div>
+        <div><div class="big-stat">${displayVolume(s.pumpTotalOz, unit).split(" ")[0]}</div><div class="big-label">${unit}</div></div>
+        <div><div class="big-stat">${s.pumpTotalMin}</div><div class="big-label">min</div></div>
+      </div>
+      ` : `<p style="color:#8A7A68;font-size:13px;margin:0;">No pump sessions</p>`}
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Sleep</div>
+    <div class="card">
+      <div class="stats-grid">
+        <div><div class="big-stat">${sleepHrs}</div><div class="big-label">hours total</div></div>
+        <div><div class="big-stat">${s.napCount}</div><div class="big-label">naps</div></div>
+        <div><div class="big-stat">${longestHrs}h</div><div class="big-label">longest</div></div>
+      </div>
+      <div class="stat-row"><span class="stat-label">Night sleep (7PM–7AM)</span><span class="stat-value">${nightHrs} hrs</span></div>
+      <div class="stat-row"><span class="stat-label">Day sleep (7AM–7PM)</span><span class="stat-value">${dayHrs} hrs</span></div>
+    </div>
+  </div>
+
+  ${s.activityLog.length > 0 ? `
+  <div class="section">
+    <div class="section-title">Activity Log</div>
+    <div class="card" style="padding:0;">
+      <table class="activity-table">${activityRows}</table>
+    </div>
+  </div>
+  ` : ""}
+
+  <div class="footer">Generated by Swadl</div>
+</body>
+</html>`;
+  }
+
+  const [sharing, setSharing] = useState(false);
 
   async function handleShare() {
     if (!summary) return;
+    setSharing(true);
     try {
-      await Share.share({ message: buildShareText(summary) });
+      const html = buildPdfHtml(summary);
+      const { uri } = await Print.printToFileAsync({ html, base64: false });
+      await Sharing.shareAsync(uri, {
+        mimeType: "application/pdf",
+        dialogTitle: `${baby?.name ?? "Baby"} Summary`,
+        UTI: "com.adobe.pdf",
+      });
     } catch {
-      // cancelled
+      // cancelled or failed
+    } finally {
+      setSharing(false);
     }
   }
 
@@ -420,13 +536,21 @@ export default function Summary() {
               )}
             </View>
 
-            {/* Share */}
+            {/* Share as PDF */}
             <TouchableOpacity
-              className="border border-border-main rounded-2xl py-4"
+              style={{
+                borderWidth: 1,
+                borderColor: tc.border,
+                borderRadius: 16,
+                paddingVertical: 16,
+                backgroundColor: tc.cardBg,
+                opacity: sharing ? 0.6 : 1,
+              }}
               onPress={handleShare}
+              disabled={sharing}
             >
-              <Text className="text-center font-body-semibold text-base text-text-secondary">
-                Share for Pediatrician
+              <Text className="text-center font-body-semibold text-base" style={{ color: colors.feedPrimary }}>
+                {sharing ? "Generating PDF..." : "Share PDF Report"}
               </Text>
             </TouchableOpacity>
           </>

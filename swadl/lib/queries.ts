@@ -865,12 +865,61 @@ export function useUpdateBaby() {
       name?: string;
       date_of_birth?: string;
       feeding_method?: Baby["feeding_method"];
+      avatar_url?: string | null;
     }) => {
       const { error } = await supabase
         .from("babies")
         .update(updates)
         .eq("id", id);
       if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["babies"] });
+    },
+  });
+}
+
+// ============================================================
+// Upload Baby Avatar
+// ============================================================
+
+export function useUploadBabyAvatar() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ babyId, uri }: { babyId: string; uri: string }) => {
+      const ext = uri.split(".").pop()?.toLowerCase() ?? "jpg";
+      const fileName = `${babyId}.${ext}`;
+
+      // Read file as blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const arrayBuffer = await new Response(blob).arrayBuffer();
+
+      // Upload to private bucket (RLS controls access)
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, arrayBuffer, {
+          contentType: `image/${ext === "png" ? "png" : "jpeg"}`,
+          upsert: true,
+        });
+      if (uploadError) throw uploadError;
+
+      // Generate a signed URL (valid for 1 year)
+      const { data: signedData, error: signError } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365);
+      if (signError) throw signError;
+
+      const signedUrl = signedData.signedUrl;
+
+      // Store signed URL on the baby record
+      const { error: updateError } = await supabase
+        .from("babies")
+        .update({ avatar_url: signedUrl })
+        .eq("id", babyId);
+      if (updateError) throw updateError;
+
+      return signedUrl;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["babies"] });
