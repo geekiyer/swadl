@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
@@ -15,10 +16,13 @@ import { useThemeColors } from "../../lib/theme";
 import { useOnboardingStore } from "../../lib/store";
 import { CHORE_TEMPLATES } from "../../constants/chore-templates";
 
-interface SeededChore {
+interface EditableChore {
+  id: string;
   title: string;
+  description: string;
   category: string;
-  recurrence: { type: string; time?: string };
+  recurrence: { type: string; days?: number[]; time?: string };
+  enabled: boolean;
 }
 
 export default function InstantValue() {
@@ -26,8 +30,10 @@ export default function InstantValue() {
     useOnboardingStore();
   const tc = useThemeColors();
   const [loading, setLoading] = useState(true);
-  const [chores, setChores] = useState<SeededChore[]>([]);
+  const [chores, setChores] = useState<EditableChore[]>([]);
   const [starting, setStarting] = useState(false);
+  const [householdId, setHouseholdId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     setupHousehold();
@@ -38,17 +44,17 @@ export default function InstantValue() {
     if (!session) return;
 
     try {
-      const householdId = randomUUID();
+      const hId = randomUUID();
 
       const { error: householdErr } = await supabase
         .from("households")
-        .insert({ id: householdId, name: `${babyName}'s Family`, care_mode: careMode });
+        .insert({ id: hId, name: `${babyName}'s Family`, care_mode: careMode });
 
       if (householdErr) throw householdErr;
 
       const { error: profileErr } = await supabase.from("profiles").insert({
         id: session.user.id,
-        household_id: householdId,
+        household_id: hId,
         display_name: session.user.user_metadata?.display_name ?? session.user.email?.split("@")[0] ?? "Parent",
         role: "admin",
       });
@@ -56,7 +62,7 @@ export default function InstantValue() {
       if (profileErr) throw profileErr;
 
       const { error: babyErr } = await supabase.from("babies").insert({
-        household_id: householdId,
+        household_id: hId,
         name: babyName,
         date_of_birth: dateOfBirth,
         feeding_method: feedingMethod as "breast" | "bottle" | "combo" | "solids",
@@ -64,32 +70,11 @@ export default function InstantValue() {
 
       if (babyErr) throw babyErr;
 
-      const applicableChores = CHORE_TEMPLATES.filter(
-        (t) => !t.feedingMethods || t.feedingMethods.includes(feedingMethod as any)
-      );
-
-      const choreInserts = applicableChores.map((t) => ({
-        household_id: householdId,
-        title: t.title,
-        description: t.description,
-        category: t.category,
-        recurrence: t.recurrence,
-        is_template: true,
-      }));
-
-      if (choreInserts.length > 0) {
-        const { error: choreErr } = await supabase
-          .from("chores")
-          .insert(choreInserts);
-
-        if (choreErr) throw choreErr;
-      }
-
       if (partnerEmail) {
         const { data: inviteResult, error: inviteErr } = await supabase.functions.invoke("send-invite", {
           body: {
             email: partnerEmail,
-            household_id: householdId,
+            household_id: hId,
             household_name: `${babyName}'s Family`,
             invited_by_name: session.user.user_metadata?.display_name ?? session.user.email?.split("@")[0] ?? "Your partner",
             invited_by: session.user.id,
@@ -102,11 +87,21 @@ export default function InstantValue() {
         }
       }
 
+      setHouseholdId(hId);
+
+      // Prepare editable chores (not inserted yet)
+      const applicableChores = CHORE_TEMPLATES.filter(
+        (t) => !t.feedingMethods || t.feedingMethods.includes(feedingMethod as any)
+      );
+
       setChores(
         applicableChores.map((t) => ({
+          id: randomUUID(),
           title: t.title,
+          description: t.description,
           category: t.category,
           recurrence: t.recurrence,
+          enabled: true,
         }))
       );
     } catch (err: any) {
@@ -116,25 +111,50 @@ export default function InstantValue() {
     }
   }
 
+  function toggleChore(id: string) {
+    setChores((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, enabled: !c.enabled } : c))
+    );
+  }
+
+  function updateTitle(id: string, title: string) {
+    setChores((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, title } : c))
+    );
+  }
+
   async function handleStartShift() {
+    if (!householdId) return;
     setStarting(true);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("household_id")
-        .eq("id", session.user.id)
-        .single();
+      // Insert only enabled chores
+      const enabledChores = chores.filter((c) => c.enabled && c.title.trim());
+      if (enabledChores.length > 0) {
+        const choreInserts = enabledChores.map((c) => ({
+          household_id: householdId,
+          title: c.title.trim(),
+          description: c.description,
+          category: c.category,
+          recurrence: c.recurrence,
+          is_template: true,
+        }));
 
-      if (profile) {
-        await supabase.from("caregiver_shifts").insert({
-          household_id: profile.household_id,
-          caregiver_id: session.user.id,
-        });
+        const { error: choreErr } = await supabase
+          .from("chores")
+          .insert(choreInserts);
+
+        if (choreErr) throw choreErr;
       }
+
+      // Start first shift
+      await supabase.from("caregiver_shifts").insert({
+        household_id: householdId,
+        caregiver_id: session.user.id,
+      });
 
       reset();
       router.replace("/(tabs)");
@@ -143,6 +163,8 @@ export default function InstantValue() {
       setStarting(false);
     }
   }
+
+  const enabledCount = chores.filter((c) => c.enabled).length;
 
   if (loading) {
     return (
@@ -159,26 +181,62 @@ export default function InstantValue() {
         Step 3 of 3
       </Text>
       <Text className="text-2xl text-text-primary font-display mb-2" style={{ letterSpacing: -0.5 }}>
-        You're all set!
+        Customize your chores
       </Text>
       <Text className="text-text-secondary font-body mb-6">
-        We've created {chores.length} recurring tasks based on {babyName}'s
-        needs. Here's what's on your plate:
+        We've suggested {chores.length} recurring tasks for {babyName}.
+        Toggle off any you don't need, or tap to rename.
       </Text>
 
       <FlatList
         data={chores}
-        keyExtractor={(item) => item.title}
+        keyExtractor={(item) => item.id}
         className="flex-1 mb-4"
         renderItem={({ item }) => (
-          <View className="flex-row items-center bg-card-bg border border-border-main rounded-xl p-3 mb-2">
-            <View className="w-8 h-8 rounded-lg bg-raised-bg items-center justify-center mr-3">
-              <Text className="text-feed-primary text-sm font-body-bold">
-                {item.category.charAt(0).toUpperCase()}
-              </Text>
-            </View>
+          <View
+            className={`flex-row items-center bg-card-bg border rounded-xl p-3 mb-2 ${
+              item.enabled ? "border-border-main" : "border-border-main opacity-50"
+            }`}
+          >
+            {/* Toggle */}
+            <TouchableOpacity
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                borderWidth: 2,
+                borderColor: item.enabled ? colors.feedPrimary : tc.border,
+                backgroundColor: item.enabled ? colors.feedPrimary : "transparent",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 12,
+              }}
+              onPress={() => toggleChore(item.id)}
+            >
+              {item.enabled && (
+                <Text style={{ color: colors.charcoal, fontSize: 14, fontFamily: "Nunito_700Bold" }}>
+                  ✓
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Title (tappable to edit) */}
             <View className="flex-1">
-              <Text className="text-base font-body-semibold text-text-primary">{item.title}</Text>
+              {editingId === item.id ? (
+                <TextInput
+                  className="text-text-primary font-body-semibold"
+                  style={{ fontSize: 16, height: 28, padding: 0 }}
+                  value={item.title}
+                  onChangeText={(t) => updateTitle(item.id, t)}
+                  onBlur={() => setEditingId(null)}
+                  autoFocus
+                  selectTextOnFocus
+                />
+              ) : (
+                <TouchableOpacity onPress={() => setEditingId(item.id)}>
+                  <Text className="text-base font-body-semibold text-text-primary">{item.title}</Text>
+                </TouchableOpacity>
+              )}
               <Text className="text-base text-text-secondary font-body">
                 {item.recurrence.type === "daily" ? "Daily" : "Weekly"}
                 {item.recurrence.time ? ` at ${item.recurrence.time}` : ""}
@@ -197,7 +255,11 @@ export default function InstantValue() {
           className={`text-center font-body-semibold text-base ${starting ? "text-text-secondary" : ""}`}
           style={!starting ? { color: colors.charcoal } : undefined}
         >
-          {starting ? "Starting..." : "Start My First Shift"}
+          {starting
+            ? "Starting..."
+            : enabledCount > 0
+              ? `Start with ${enabledCount} chore${enabledCount === 1 ? "" : "s"}`
+              : "Start without chores"}
         </Text>
       </TouchableOpacity>
     </View>
