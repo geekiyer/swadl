@@ -256,10 +256,10 @@ export default function InstantValue() {
           style={!starting ? { color: colors.charcoal } : undefined}
         >
           {starting
-            ? "Starting..."
+            ? "Setting up..."
             : enabledCount > 0
-              ? `Start with ${enabledCount} chore${enabledCount === 1 ? "" : "s"}`
-              : "Start without chores"}
+              ? `Let's Go with ${enabledCount} chore${enabledCount === 1 ? "" : "s"}`
+              : "Let's Go"}
         </Text>
       </TouchableOpacity>
     </View>

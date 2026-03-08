@@ -62,6 +62,7 @@ interface ChoreRowProps {
   item: ChoreWithStatus;
   isTogether: boolean;
   isOwnChore: boolean;
+  hasMultipleMembers: boolean;
   onComplete: (item: ChoreWithStatus) => void;
   onSelfClaim: (item: ChoreWithStatus) => void;
   onAssign: (item: ChoreWithStatus) => void;
@@ -73,6 +74,7 @@ function ChoreRow({
   item,
   isTogether,
   isOwnChore,
+  hasMultipleMembers,
   onComplete,
   onSelfClaim,
   onAssign,
@@ -164,28 +166,30 @@ function ChoreRow({
             </View>
           </View>
 
-          {/* Assign / Claim button */}
-          {isTogether ? (
-            <TouchableOpacity
-              className="px-3 py-1.5 rounded-md bg-raised-bg"
-              onPress={() => onSelfClaim(item)}
-              disabled={isOwnChore}
-            >
-              <Text
-                className={`text-sm font-body-medium ${
-                  isOwnChore ? "text-success" : "text-feed-primary"
-                }`}
+          {/* Assign / Claim button — only when multiple members */}
+          {hasMultipleMembers && (
+            isTogether ? (
+              <TouchableOpacity
+                className="px-3 py-1.5 rounded-md bg-raised-bg"
+                onPress={() => onSelfClaim(item)}
+                disabled={isOwnChore}
               >
-                {isOwnChore ? "Mine" : "I got it"}
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              className="px-3 py-1.5 rounded-md bg-raised-bg"
-              onPress={() => onAssign(item)}
-            >
-              <Text className="text-sm text-text-secondary">Assign</Text>
-            </TouchableOpacity>
+                <Text
+                  className={`text-sm font-body-medium ${
+                    isOwnChore ? "text-success" : "text-feed-primary"
+                  }`}
+                >
+                  {isOwnChore ? "Mine" : "On it"}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                className="px-3 py-1.5 rounded-md bg-raised-bg"
+                onPress={() => onAssign(item)}
+              >
+                <Text className="text-sm text-text-secondary">Assign</Text>
+              </TouchableOpacity>
+            )
           )}
         </Pressable>
       </Animated.View>
@@ -361,7 +365,7 @@ export default function Chores() {
             className="bg-feed-primary justify-center px-5"
             onPress={() => handleSelfClaim(item)}
           >
-            <Text className="font-body-semibold text-base" style={{ color: colors.charcoal }}>I got it</Text>
+            <Text className="font-body-semibold text-base" style={{ color: colors.charcoal }}>On it</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-danger justify-center px-5"
@@ -388,6 +392,7 @@ export default function Chores() {
         item={item}
         isTogether={isTogether}
         isOwnChore={item.assigned_to === profile?.id}
+        hasMultipleMembers={(members?.length ?? 0) > 1}
         onComplete={handleComplete}
         onSelfClaim={handleSelfClaim}
         onAssign={setAssigningChore}
