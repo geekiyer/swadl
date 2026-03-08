@@ -202,6 +202,29 @@ supabase functions deploy compute-next-tasks
 | Authentication > Redirect URLs | `swadl://`, `exp+swadl://` |
 | Email confirmation | Enabled |
 
+## Website
+
+The marketing website is at [swadl.vercel.app](https://swadl.vercel.app) (custom domain: `www.swadl.app`).
+
+| | |
+|---|---|
+| Framework | Next.js 16 (Turbopack) |
+| Styling | Inline styles with CSS custom properties |
+| Fonts | Baloo 2 (display), Nunito (body), JetBrains Mono (mono) |
+| Hosting | Vercel |
+| Pages | Landing, Privacy Policy, Terms of Service |
+
+```bash
+cd website
+npm install
+npm run dev    # http://localhost:3000
+```
+
+Deploy via Vercel CLI:
+```bash
+vercel --prod
+```
+
 ---
 
 <p align="center">
