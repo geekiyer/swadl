@@ -18,10 +18,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBabies, useTrends, type TrendDay } from "../../lib/queries";
-import { colors } from "../../constants/theme";
+import { colors, shadows } from "../../constants/theme";
 import { useThemeColors } from "../../lib/theme";
 import { NurseryMobileArt } from "../../components/NurseryMobileArt";
+import { BottleIcon } from "../../components/icons/BottleIcon";
+import { MoonIcon } from "../../components/icons/MoonIcon";
+import { DiaperIcon } from "../../components/icons/DiaperIcon";
+import { PumpIcon } from "../../components/icons/PumpIcon";
 import { Timings, STAGGER_MS } from "../../constants/animation";
+import { BarChart3, FileText } from "lucide-react-native";
 
 const RANGES = [
   { key: 7, label: "7 days" },
@@ -469,6 +474,180 @@ function PumpChart({ data, revealKey }: { data: TrendDay[]; revealKey: string })
   );
 }
 
+function SummaryStatCard({
+  icon,
+  title,
+  stats,
+  theme,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  stats: { label: string; value: string }[];
+  theme: 'light' | 'dark';
+}) {
+  const tc = useThemeColors();
+  return (
+    <View
+      style={{
+        backgroundColor: tc.cardBg,
+        borderWidth: 1,
+        borderColor: tc.border,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        ...shadows.sm,
+      }}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 }}>
+        {icon}
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Baloo2_700Bold",
+            color: tc.textPrimary,
+          }}
+        >
+          {title}
+        </Text>
+      </View>
+      <View style={{ gap: 8 }}>
+        {stats.map((s) => (
+          <View
+            key={s.label}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 13,
+                fontFamily: "Nunito_400Regular",
+                color: tc.textSecondary,
+              }}
+            >
+              {s.label}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "JetBrainsMono_400Regular",
+                color: tc.textPrimary,
+              }}
+            >
+              {s.value}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function formatHrsMin(hrs: number): string {
+  const totalMin = Math.round(hrs * 60);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  if (h === 0) return `${m}m`;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+function TextSummaryView({ data, range, theme }: { data: TrendDay[]; range: number; theme: 'light' | 'dark' }) {
+  const tc = useThemeColors();
+  const days = data.length || 1;
+
+  // Feeding stats
+  const totalFeedOz = data.reduce((s, d) => s + d.feedOz, 0);
+  const totalFeedCount = data.reduce((s, d) => s + d.feedCount, 0);
+  const avgFeedOz = totalFeedOz / days;
+  const avgFeedCount = totalFeedCount / days;
+  const hasOz = totalFeedOz > 0;
+
+  // Sleep stats
+  const totalNightHrs = data.reduce((s, d) => s + d.nightSleepHrs, 0);
+  const totalNapHrs = data.reduce((s, d) => s + d.napHrs, 0);
+  const totalSleepHrs = totalNightHrs + totalNapHrs;
+  const avgSleepHrs = totalSleepHrs / days;
+  const avgNightHrs = totalNightHrs / days;
+  const avgNapHrs = totalNapHrs / days;
+
+  // Diaper stats
+  const totalDiapers = data.reduce((s, d) => s + d.diaperCount, 0);
+  const totalWet = data.reduce((s, d) => s + d.diaperWet, 0);
+  const totalDirty = data.reduce((s, d) => s + d.diaperDirty, 0);
+  const avgDiapers = totalDiapers / days;
+
+  // Pump stats
+  const totalPumpOz = data.reduce((s, d) => s + d.pumpOz, 0);
+  const totalPumpCount = data.reduce((s, d) => s + d.pumpCount, 0);
+  const avgPumpOz = totalPumpOz / days;
+  const hasPumpOz = totalPumpOz > 0;
+
+  const rangeLabel = `${range}-day`;
+
+  return (
+    <View>
+      <SummaryStatCard
+        icon={<BottleIcon size={24} theme={theme} />}
+        title="Feeding"
+        theme={theme}
+        stats={[
+          { label: `${rangeLabel} total feeds`, value: `${totalFeedCount}` },
+          { label: "Avg feeds / day", value: avgFeedCount.toFixed(1) },
+          ...(hasOz
+            ? [
+                { label: `Total intake`, value: `${totalFeedOz.toFixed(1)} oz / ${Math.round(totalFeedOz * 29.5735)} ml` },
+                { label: "Avg intake / day", value: `${avgFeedOz.toFixed(1)} oz / ${Math.round(avgFeedOz * 29.5735)} ml` },
+              ]
+            : []),
+        ]}
+      />
+
+      <SummaryStatCard
+        icon={<MoonIcon size={24} theme={theme} />}
+        title="Sleep"
+        theme={theme}
+        stats={[
+          { label: `${rangeLabel} total sleep`, value: formatHrsMin(totalSleepHrs) },
+          { label: "Avg sleep / day", value: formatHrsMin(avgSleepHrs) },
+          { label: "Avg night sleep", value: formatHrsMin(avgNightHrs) },
+          { label: "Avg nap time", value: formatHrsMin(avgNapHrs) },
+        ]}
+      />
+
+      <SummaryStatCard
+        icon={<DiaperIcon size={24} theme={theme} />}
+        title="Diapers"
+        theme={theme}
+        stats={[
+          { label: `${rangeLabel} total`, value: `${totalDiapers}` },
+          { label: "Avg / day", value: avgDiapers.toFixed(1) },
+          { label: "Total wet", value: `${totalWet}` },
+          { label: "Total dirty", value: `${totalDirty}` },
+        ]}
+      />
+
+      {(totalPumpCount > 0) && (
+        <SummaryStatCard
+          icon={<PumpIcon size={24} theme={theme} />}
+          title="Pumping"
+          theme={theme}
+          stats={[
+            { label: `${rangeLabel} sessions`, value: `${totalPumpCount}` },
+            ...(hasPumpOz
+              ? [
+                  { label: "Total pumped", value: `${totalPumpOz.toFixed(1)} oz / ${Math.round(totalPumpOz * 29.5735)} ml` },
+                  { label: "Avg / day", value: `${avgPumpOz.toFixed(1)} oz / ${Math.round(avgPumpOz * 29.5735)} ml` },
+                ]
+              : []),
+          ]}
+        />
+      )}
+    </View>
+  );
+}
+
 export default function Trends() {
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
@@ -477,6 +656,7 @@ export default function Trends() {
   const tc = useThemeColors();
 
   const [range, setRange] = useState<7 | 14 | 30>(7);
+  const [viewMode, setViewMode] = useState<"chart" | "text">("chart");
   const [refreshing, setRefreshing] = useState(false);
 
   // Pre-fetch all ranges so switching is instant
@@ -513,25 +693,51 @@ export default function Trends() {
         <View style={{ position: 'relative', minHeight: 60 }}>
           <NurseryMobileArt theme={tc.mode} screen="trends" />
         </View>
-        {/* Range Selector */}
-        <View className="flex-row bg-raised-bg rounded-lg p-1 mb-5 border border-border-main">
-          {RANGES.map((r) => (
-            <TouchableOpacity
-              key={r.key}
-              className={`flex-1 py-2 rounded-md items-center ${
-                range === r.key ? "bg-card-bg" : ""
-              }`}
-              onPress={() => setRange(r.key as 7 | 14 | 30)}
-            >
-              <Text
-                className={`text-sm font-body-medium ${
-                  range === r.key ? "text-feed-primary" : "text-text-secondary"
+        {/* Range Selector + View Toggle */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 20 }}>
+          <View className="flex-row bg-raised-bg rounded-lg p-1 border border-border-main" style={{ flex: 1 }}>
+            {RANGES.map((r) => (
+              <TouchableOpacity
+                key={r.key}
+                className={`flex-1 py-2 rounded-md items-center ${
+                  range === r.key ? "bg-card-bg" : ""
                 }`}
+                onPress={() => setRange(r.key as 7 | 14 | 30)}
               >
-                {r.label}
-              </Text>
+                <Text
+                  className={`text-sm font-body-medium ${
+                    range === r.key ? "text-feed-primary" : "text-text-secondary"
+                  }`}
+                >
+                  {r.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View className="flex-row bg-raised-bg rounded-lg p-1 border border-border-main">
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                borderRadius: 6,
+                backgroundColor: viewMode === "chart" ? tc.cardBg : "transparent",
+              }}
+              onPress={() => setViewMode("chart")}
+            >
+              <BarChart3 size={18} color={viewMode === "chart" ? colors.feedPrimary : tc.textSecondary} />
             </TouchableOpacity>
-          ))}
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 10,
+                paddingVertical: 8,
+                borderRadius: 6,
+                backgroundColor: viewMode === "text" ? tc.cardBg : "transparent",
+              }}
+              onPress={() => setViewMode("text")}
+            >
+              <FileText size={18} color={viewMode === "text" ? colors.feedPrimary : tc.textSecondary} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {isLoading ? (
@@ -539,16 +745,20 @@ export default function Trends() {
             <ActivityIndicator size="large" color={colors.feedPrimary} />
           </View>
         ) : trendData && trendData.length > 0 ? (
-          <>
-            <FeedingChart data={trendData} revealKey={revealKey} />
-            <PumpChart data={trendData} revealKey={revealKey} />
-            <SleepChart data={trendData} revealKey={revealKey} />
-            <DiaperChart data={trendData} revealKey={revealKey} />
+          viewMode === "chart" ? (
+            <>
+              <FeedingChart data={trendData} revealKey={revealKey} />
+              <PumpChart data={trendData} revealKey={revealKey} />
+              <SleepChart data={trendData} revealKey={revealKey} />
+              <DiaperChart data={trendData} revealKey={revealKey} />
 
-            <Text className="text-xs text-text-secondary text-center mt-2">
-              Tap a bar to view that day's summary
-            </Text>
-          </>
+              <Text className="text-xs text-text-secondary text-center mt-2">
+                Tap a bar to view that day's summary
+              </Text>
+            </>
+          ) : (
+            <TextSummaryView data={trendData} range={range} theme={tc.mode} />
+          )
         ) : (
           <View className="py-20 items-center">
             <Text className="text-text-secondary">
