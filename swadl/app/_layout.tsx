@@ -92,9 +92,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (ready && fontsLoaded) {
-      // Hide native splash immediately, show our branded overlay
+      // Hide the plain native splash immediately — our branded overlay is already visible
       SplashScreen.hideAsync();
-      // Keep branded splash visible briefly, then fade out
       const timer = setTimeout(() => setShowBrandedSplash(false), 800);
       return () => clearTimeout(timer);
     }

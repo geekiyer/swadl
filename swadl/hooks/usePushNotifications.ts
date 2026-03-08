@@ -1,20 +1,25 @@
 import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
-import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { supabase } from "../lib/supabase";
 
-// Configure how notifications are displayed when app is in foreground
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+let Notifications: typeof import("expo-notifications") | null = null;
+try {
+  Notifications = require("expo-notifications");
+  Notifications?.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+} catch {
+  // expo-notifications not available (Expo Go SDK 53+)
+}
 
 async function registerForPushNotifications(): Promise<string | null> {
-  // Push notifications don't work on simulators
+  if (!Notifications) return null;
+
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
       name: "Default",
@@ -65,23 +70,23 @@ async function savePushToken(token: string) {
 }
 
 export function usePushNotifications() {
-  const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
+  const notificationListener = useRef<{ remove(): void } | undefined>();
+  const responseListener = useRef<{ remove(): void } | undefined>();
 
   useEffect(() => {
+    if (!Notifications) return;
+
     registerForPushNotifications().then((token) => {
       if (token) {
         savePushToken(token);
       }
     });
 
-    // Listen for incoming notifications while app is in foreground
     notificationListener.current =
       Notifications.addNotificationReceivedListener((_notification) => {
         // Could update React Query cache here if needed
       });
 
-    // Listen for user tapping on a notification
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((_response) => {
         // Could navigate to relevant screen based on response.notification.request.content.data
