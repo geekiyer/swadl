@@ -214,7 +214,7 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
               onPress={() => setLocation(loc.key)}
             >
               <Text
-                className={`text-sm font-body-medium ${
+                className={`text-base font-body-medium ${
                   location === loc.key ? "" : "text-text-secondary"
                 }`}
                 style={location === loc.key ? { color: colors.textDark } : undefined}
@@ -264,7 +264,7 @@ export function SleepLogger({ onSuccess }: SleepLoggerProps) {
               onPress={() => setLocation(loc.key)}
             >
               <Text
-                className={`text-sm font-body-medium ${
+                className={`text-base font-body-medium ${
                   location === loc.key ? "" : "text-text-secondary"
                 }`}
                 style={location === loc.key ? { color: colors.textDark } : undefined}

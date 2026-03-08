@@ -14,6 +14,7 @@ import { colors } from "../constants/theme";
 import { useThemeColors } from "../lib/theme";
 import { useUnitStore, parseInputToOz, ozToMl } from "../lib/store";
 import { UnitToggle } from "./UnitToggle";
+import { FORMULA_BRANDS } from "../constants/formula-brands";
 import type { ActivityItem } from "../lib/queries";
 
 const TABLE_MAP: Record<ActivityItem["kind"], string> = {
@@ -73,6 +74,9 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
   const [feedType, setFeedType] = useState("");
   const [amountOz, setAmountOz] = useState("");
   const [durationMin, setDurationMin] = useState("");
+  const [bottleContent, setBottleContent] = useState<"formula" | "breastmilk" | "">("");
+  const [formulaBrand, setFormulaBrand] = useState("");
+  const [brandSearch, setBrandSearch] = useState("");
 
   // Diaper fields
   const [diaperType, setDiaperType] = useState("");
@@ -100,17 +104,18 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
           : ""
       );
       setDurationMin(r.duration_min != null ? String(r.duration_min) : "");
-      // Parse notes: handle old JSON format and new plain text
+      // Parse notes: handle JSON format with bottle content + brand
       const rawNotes = (r.notes as string) ?? "";
       try {
         const parsed = JSON.parse(rawNotes);
-        // Old JSON format — convert to readable text
-        const parts: string[] = [];
-        if (parsed.brand) parts.push(`Formula: ${parsed.brand}`);
-        else if (parsed.content) parts.push(parsed.content === "formula" ? "Formula" : "Breastmilk");
-        if (parsed.text) parts.push(parsed.text);
-        setNotes(parts.join(" — "));
+        setBottleContent(parsed.content === "formula" || parsed.content === "breastmilk" ? parsed.content : "");
+        setFormulaBrand(parsed.brand ?? "");
+        setBrandSearch(parsed.brand ?? "");
+        setNotes(parsed.text ?? "");
       } catch {
+        setBottleContent("");
+        setFormulaBrand("");
+        setBrandSearch("");
         setNotes(rawNotes);
       }
     } else if (item.kind === "diaper") {
@@ -163,11 +168,21 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
     let updates: Record<string, unknown> = {};
 
     if (item.kind === "feed") {
+      // Build structured notes for bottle feeds
+      let feedNotes: string | null = null;
+      if (feedType === "bottle" && bottleContent) {
+        const noteObj: Record<string, string> = { content: bottleContent };
+        if (bottleContent === "formula" && formulaBrand) noteObj.brand = formulaBrand;
+        if (notes.trim()) noteObj.text = notes.trim();
+        feedNotes = JSON.stringify(noteObj);
+      } else {
+        feedNotes = notes.trim() || null;
+      }
       updates = {
         type: feedType,
         amount_oz: amountOz.trim() ? parseInputToOz(amountOz, unit) : null,
         duration_min: durationMin.trim() ? parseInt(durationMin, 10) : null,
-        notes: notes.trim() || null,
+        notes: feedNotes,
       };
     } else if (item.kind === "diaper") {
       updates = {
@@ -257,7 +272,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
             onPress={() => onChange(o.key)}
           >
             <Text
-              className={`text-sm font-body-medium ${
+              className={`text-base font-body-medium ${
                 value !== o.key ? "text-text-secondary" : ""
               }`}
               style={value === o.key ? { color: colors.charcoal } : undefined}
@@ -282,14 +297,14 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
               <Text className="text-text-secondary text-base">Cancel</Text>
             </TouchableOpacity>
           </View>
-          <Text className="text-xs text-text-secondary font-mono mb-5">
+          <Text className="text-sm text-text-secondary font-mono mb-5">
             {formatDate(item.timestamp)} at {formatTime(item.timestamp)}
           </Text>
 
           <ScrollView showsVerticalScrollIndicator={false}>
             {item.kind === "feed" && (
               <>
-                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+                <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
                   Type
                 </Text>
                 <OptionRow
@@ -301,7 +316,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
                 {(feedType === "bottle" || feedType === "solids") && (
                   <>
                     <View className="flex-row items-center justify-between mb-1">
-                      <Text className="text-[11px] font-body-bold text-text-secondary uppercase">
+                      <Text className="text-[13px] font-body-bold text-text-secondary uppercase">
                         Amount ({unit})
                       </Text>
                       <UnitToggle />
@@ -318,10 +333,86 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
                   </>
                 )}
 
+                {feedType === "bottle" && (
+                  <>
+                    <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
+                      Content
+                    </Text>
+                    <OptionRow
+                      options={[
+                        { key: "formula", label: "Formula" },
+                        { key: "breastmilk", label: "Breastmilk" },
+                      ]}
+                      value={bottleContent}
+                      onChange={(v) => {
+                        setBottleContent(v as "formula" | "breastmilk");
+                        if (v !== "formula") {
+                          setFormulaBrand("");
+                          setBrandSearch("");
+                        }
+                      }}
+                    />
+
+                    {bottleContent === "formula" && (
+                      <>
+                        <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
+                          Formula Brand
+                        </Text>
+                        <TextInput
+                          className="border border-border-main bg-raised-bg rounded-xl px-4 mb-2 text-text-primary"
+                          style={{ fontSize: 16, height: 48 }}
+                          value={brandSearch}
+                          onChangeText={(t) => {
+                            setBrandSearch(t);
+                            if (!t.trim()) setFormulaBrand("");
+                          }}
+                          placeholderTextColor={colors.textPlaceholder}
+                          placeholder="Search brand..."
+                        />
+                        {brandSearch.length >= 1 && !formulaBrand && (
+                          <View className="border border-border-main bg-raised-bg rounded-xl mb-4 max-h-36 overflow-hidden">
+                            <ScrollView nestedScrollEnabled>
+                              {FORMULA_BRANDS.filter((b) =>
+                                b.toLowerCase().includes(brandSearch.toLowerCase())
+                              ).map((brand) => (
+                                <TouchableOpacity
+                                  key={brand}
+                                  className="px-4 py-2.5 border-b border-border-main"
+                                  onPress={() => {
+                                    setFormulaBrand(brand);
+                                    setBrandSearch(brand);
+                                  }}
+                                >
+                                  <Text className="text-text-primary text-base">
+                                    {brand}
+                                  </Text>
+                                </TouchableOpacity>
+                              ))}
+                            </ScrollView>
+                          </View>
+                        )}
+                        {formulaBrand ? (
+                          <TouchableOpacity
+                            className="mb-4"
+                            onPress={() => {
+                              setFormulaBrand("");
+                              setBrandSearch("");
+                            }}
+                          >
+                            <Text className="text-feed-primary text-base">
+                              Change brand
+                            </Text>
+                          </TouchableOpacity>
+                        ) : null}
+                      </>
+                    )}
+                  </>
+                )}
+
                 {(feedType === "breast_left" ||
                   feedType === "breast_right") && (
                   <>
-                    <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+                    <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
                       Duration (minutes)
                     </Text>
                     <TextInput
@@ -336,7 +427,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
                   </>
                 )}
 
-                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+                <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
                   Notes
                 </Text>
                 <TextInput
@@ -352,7 +443,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
             {item.kind === "diaper" && (
               <>
-                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+                <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
                   Type
                 </Text>
                 <OptionRow
@@ -365,7 +456,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
 
             {item.kind === "sleep" && (
               <>
-                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+                <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
                   Location
                 </Text>
                 <OptionRow
@@ -379,7 +470,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
             {item.kind === "pump" && (
               <>
                 <View className="flex-row items-center justify-between mb-1">
-                  <Text className="text-[11px] font-body-bold text-text-secondary uppercase">
+                  <Text className="text-[13px] font-body-bold text-text-secondary uppercase">
                     Amount ({unit})
                   </Text>
                   <UnitToggle />
@@ -394,7 +485,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
                   placeholder="e.g. 4.5"
                 />
 
-                <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+                <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
                   Notes
                 </Text>
                 <TextInput
@@ -423,7 +514,7 @@ export function EditLogModal({ item, visible, onClose }: EditLogModalProps) {
               onPress={handleDelete}
               disabled={deleting}
             >
-              <Text className="text-danger text-center text-sm">
+              <Text className="text-danger text-center text-base">
                 {deleting ? "Deleting..." : "Delete This Entry"}
               </Text>
             </TouchableOpacity>

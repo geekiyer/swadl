@@ -32,7 +32,7 @@ export default function HouseholdSetup() {
 
   return (
     <ScrollView className="flex-1 bg-screen-bg" contentContainerClassName="px-6 pt-16 pb-10">
-      <Text className="text-xs text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
+      <Text className="text-sm text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
         Step 2 of 3
       </Text>
       <Text className="text-2xl text-text-primary font-display mb-2" style={{ letterSpacing: -0.5 }}>
@@ -43,7 +43,7 @@ export default function HouseholdSetup() {
       </Text>
 
       {/* Care Mode Selector */}
-      <Text className="text-xs font-body-semibold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+      <Text className="text-sm font-body-semibold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
         Care Mode
       </Text>
       <View className="mb-6">
@@ -66,14 +66,14 @@ export default function HouseholdSetup() {
             </View>
             <View className="flex-1">
               <Text className="text-base font-body-semibold text-text-primary">{mode.label}</Text>
-              <Text className="text-sm text-text-secondary font-body mt-0.5">{mode.desc}</Text>
+              <Text className="text-base text-text-secondary font-body mt-0.5">{mode.desc}</Text>
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Partner Email */}
-      <Text className="text-xs font-body-semibold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+      <Text className="text-sm font-body-semibold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
         Partner / Caregiver Email
       </Text>
       <TextInput

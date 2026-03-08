@@ -101,13 +101,13 @@ function DailyBriefingView() {
                 <Baby size={20} strokeWidth={1.5} color={colors.feedPrimary} />
               </View>
               <View className="flex-1">
-                <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
                   Feeding
                 </Text>
                 <Text className="text-2xl text-text-primary font-display mt-0.5" style={{ letterSpacing: -1 }}>
                   {totals.feeds} feed{totals.feeds !== 1 ? "s" : ""}
                 </Text>
-                <Text className="text-sm text-text-secondary mt-0.5">
+                <Text className="text-base text-text-secondary mt-0.5">
                   {totals.feedBreakdown}
                   {totals.totalOz > 0 ? ` · ${displayVolume(totals.totalOz, unit)}` : ""}
                   {totals.totalFeedMin > 0 ? ` · ${totals.totalFeedMin} min` : ""}
@@ -124,13 +124,13 @@ function DailyBriefingView() {
                 <Moon size={20} strokeWidth={1.5} color={colors.sleepPrimary} />
               </View>
               <View className="flex-1">
-                <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
                   Sleep
                 </Text>
                 <Text className="text-2xl text-text-primary font-display mt-0.5" style={{ letterSpacing: -1 }}>
                   {totals.naps} nap{totals.naps !== 1 ? "s" : ""}
                 </Text>
-                <Text className="text-sm text-text-secondary mt-0.5">
+                <Text className="text-base text-text-secondary mt-0.5">
                   ~{totals.totalSleepMin} min total
                   {totals.currentlySleeping ? " · Currently sleeping" : ""}
                 </Text>
@@ -146,13 +146,13 @@ function DailyBriefingView() {
                 <Droplets size={20} strokeWidth={1.5} color={colors.diaperPrimary} />
               </View>
               <View className="flex-1">
-                <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
                   Diapers
                 </Text>
                 <Text className="text-2xl text-text-primary font-display mt-0.5" style={{ letterSpacing: -1 }}>
                   {totals.diapers} change{totals.diapers !== 1 ? "s" : ""}
                 </Text>
-                <Text className="text-sm text-text-secondary mt-0.5">
+                <Text className="text-base text-text-secondary mt-0.5">
                   {totals.diaperBreakdown}
                 </Text>
               </View>
@@ -168,13 +168,13 @@ function DailyBriefingView() {
                   <Heart size={20} strokeWidth={1.5} color={colors.pumpPrimary} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+                  <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
                     Pumping
                   </Text>
                   <Text className="text-2xl text-text-primary font-display mt-0.5" style={{ letterSpacing: -1 }}>
                     {totals.pumpSessions} session{totals.pumpSessions !== 1 ? "s" : ""}
                   </Text>
-                  <Text className="text-sm text-text-secondary mt-0.5">
+                  <Text className="text-base text-text-secondary mt-0.5">
                     {totals.pumpTotalOz > 0 ? displayVolume(totals.pumpTotalOz, unit) : ""}
                     {totals.pumpTotalOz > 0 && totals.pumpTotalMin > 0 ? " · " : ""}
                     {totals.pumpTotalMin > 0 ? `${totals.pumpTotalMin} min` : ""}
@@ -187,7 +187,7 @@ function DailyBriefingView() {
 
         {/* Next Tasks */}
         <View>
-          <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+          <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
             Remaining Tasks
           </Text>
           {nextTasks && nextTasks.length > 0 ? (
@@ -209,7 +209,7 @@ function DailyBriefingView() {
                     {recurrence?.time && (
                       <View className="flex-row items-center mt-0.5">
                         <Clock size={12} strokeWidth={1.5} color={colors.textSecondary} />
-                        <Text className="text-sm text-text-secondary ml-1">
+                        <Text className="text-base text-text-secondary ml-1">
                           {recurrence.time as string}
                         </Text>
                       </View>
@@ -323,7 +323,7 @@ function ShiftHandoffView() {
         )}
 
         <View className="mt-5">
-          <Text className="text-[11px] text-text-secondary uppercase font-body-semibold tracking-[1.5px] mb-2">
+          <Text className="text-[13px] text-text-secondary uppercase font-body-semibold tracking-[1.5px] mb-2">
             Next Tasks
           </Text>
           {briefing?.nextTasks && briefing.nextTasks.length > 0 ? (
@@ -336,7 +336,7 @@ function ShiftHandoffView() {
                 <View className="flex-1">
                   <Text className="text-base font-body-medium text-text-primary">{task.title}</Text>
                   {task.time && (
-                    <Text className="text-sm text-text-secondary">{task.time}</Text>
+                    <Text className="text-base text-text-secondary">{task.time}</Text>
                   )}
                 </View>
               </View>

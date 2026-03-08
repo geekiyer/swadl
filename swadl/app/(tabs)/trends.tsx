@@ -169,7 +169,7 @@ function ChartEmpty({ label, hint }: { label: string; hint: string }) {
   const tc = useThemeColors();
   return (
     <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-      <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-1">{label}</Text>
+      <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-1">{label}</Text>
       <View style={{ height: CHART_HEIGHT, position: "relative" }}>
         {/* Ghost bars */}
         <View style={{ height: CHART_HEIGHT, flexDirection: "row", alignItems: "flex-end", gap: 4, paddingHorizontal: 8 }}>
@@ -191,7 +191,7 @@ function ChartEmpty({ label, hint }: { label: string; hint: string }) {
           style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "center", alignItems: "center" }}
         >
           <View className="bg-card-bg/90 rounded-xl px-5 py-3 border border-border-main">
-            <Text className="text-text-secondary font-body-medium text-sm text-center">{hint}</Text>
+            <Text className="text-text-secondary font-body-medium text-base text-center">{hint}</Text>
           </View>
         </View>
       </View>
@@ -220,10 +220,10 @@ function FeedingChart({ data, revealKey }: { data: TrendDay[]; revealKey: string
 
   return (
     <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-      <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-1">
+      <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-1">
         Feeding Trend
       </Text>
-      <Text className="text-xs text-text-secondary mb-3">
+      <Text className="text-sm text-text-secondary mb-3">
         Daily {hasOz ? "oz (bottle)" : "feed count"}
       </Text>
 
@@ -276,11 +276,11 @@ function FeedingChart({ data, revealKey }: { data: TrendDay[]; revealKey: string
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm bg-feed-primary" />
-          <Text className="text-xs text-text-secondary">Daily</Text>
+          <Text className="text-sm text-text-secondary">Daily</Text>
         </View>
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-1 rounded-sm bg-pump-primary opacity-60" />
-          <Text className="text-xs text-text-secondary">Rolling avg</Text>
+          <Text className="text-sm text-text-secondary">Rolling avg</Text>
         </View>
       </View>
     </View>
@@ -299,10 +299,10 @@ function SleepChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }
 
   return (
     <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-      <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-1">
+      <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-1">
         Sleep Trend
       </Text>
-      <Text className="text-xs text-text-secondary mb-3">
+      <Text className="text-sm text-text-secondary mb-3">
         Night vs. nap hours per day
       </Text>
 
@@ -342,11 +342,11 @@ function SleepChart({ data, revealKey }: { data: TrendDay[]; revealKey: string }
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: tc.border }} />
-          <Text className="text-xs text-text-secondary">Night</Text>
+          <Text className="text-sm text-text-secondary">Night</Text>
         </View>
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.sleepPrimary }} />
-          <Text className="text-xs text-text-secondary">Naps</Text>
+          <Text className="text-sm text-text-secondary">Naps</Text>
         </View>
       </View>
     </View>
@@ -361,10 +361,10 @@ function DiaperChart({ data, revealKey }: { data: TrendDay[]; revealKey: string 
 
   return (
     <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-      <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-1">
+      <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-1">
         Diaper Trend
       </Text>
-      <Text className="text-xs text-text-secondary mb-3">Daily diaper count</Text>
+      <Text className="text-sm text-text-secondary mb-3">Daily diaper count</Text>
 
       <View style={{ height: CHART_HEIGHT }} className="flex-row items-end gap-0.5">
         {data.map((day, i) => {
@@ -404,11 +404,11 @@ function DiaperChart({ data, revealKey }: { data: TrendDay[]; revealKey: string 
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.diaperPrimary }} />
-          <Text className="text-xs text-text-secondary">Wet</Text>
+          <Text className="text-sm text-text-secondary">Wet</Text>
         </View>
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#92400e" }} />
-          <Text className="text-xs text-text-secondary">Dirty</Text>
+          <Text className="text-sm text-text-secondary">Dirty</Text>
         </View>
       </View>
     </View>
@@ -427,10 +427,10 @@ function PumpChart({ data, revealKey }: { data: TrendDay[]; revealKey: string })
 
   return (
     <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-      <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-1">
+      <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-1">
         Pump Trend
       </Text>
-      <Text className="text-xs text-text-secondary mb-3">
+      <Text className="text-sm text-text-secondary mb-3">
         Daily {hasOz ? "oz pumped" : "pump sessions"}
       </Text>
 
@@ -467,7 +467,7 @@ function PumpChart({ data, revealKey }: { data: TrendDay[]; revealKey: string })
       <View className="flex-row items-center mt-2 gap-3">
         <View className="flex-row items-center gap-1">
           <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.pumpPrimary }} />
-          <Text className="text-xs text-text-secondary">Daily</Text>
+          <Text className="text-sm text-text-secondary">Daily</Text>
         </View>
       </View>
     </View>
@@ -502,7 +502,7 @@ function SummaryStatCard({
         {icon}
         <Text
           style={{
-            fontSize: 14,
+            fontSize: 16,
             fontFamily: "Baloo2_700Bold",
             color: tc.textPrimary,
           }}
@@ -522,7 +522,7 @@ function SummaryStatCard({
           >
             <Text
               style={{
-                fontSize: 13,
+                fontSize: 15,
                 fontFamily: "Nunito_400Regular",
                 color: tc.textSecondary,
               }}
@@ -531,7 +531,7 @@ function SummaryStatCard({
             </Text>
             <Text
               style={{
-                fontSize: 14,
+                fontSize: 16,
                 fontFamily: "JetBrainsMono_400Regular",
                 color: tc.textPrimary,
               }}
@@ -704,7 +704,7 @@ export default function Trends() {
                 onPress={() => setRange(r.key as 7 | 14 | 30)}
               >
                 <Text
-                  className={`text-sm font-body-medium ${
+                  className={`text-base font-body-medium ${
                     range === r.key ? "text-feed-primary" : "text-text-secondary"
                   }`}
                 >
@@ -751,7 +751,7 @@ export default function Trends() {
               <PumpChart data={trendData} revealKey={revealKey} />
               <SleepChart data={trendData} revealKey={revealKey} />
 
-              <Text className="text-xs text-text-secondary text-center mt-2">
+              <Text className="text-sm text-text-secondary text-center mt-2">
                 Tap a bar to view that day's summary
               </Text>
             </>

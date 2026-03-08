@@ -174,7 +174,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
           onPress={() => setCategory("breastfeed")}
         >
           <Text className="text-feed-primary font-body-bold text-lg">Breastfeed</Text>
-          <Text className="text-text-secondary text-sm mt-1">
+          <Text className="text-text-secondary text-base mt-1">
             Timer for left or right
           </Text>
         </TouchableOpacity>
@@ -183,7 +183,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
           onPress={() => setCategory("bottle")}
         >
           <Text className="text-pump-primary font-body-bold text-lg">Bottle</Text>
-          <Text className="text-text-secondary text-sm mt-1">
+          <Text className="text-text-secondary text-base mt-1">
             Formula or breastmilk
           </Text>
         </TouchableOpacity>
@@ -358,7 +358,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
     return (
       <View>
         <View className="flex-row justify-between items-center mb-4">
-          <Text className="text-sm text-text-secondary">
+          <Text className="text-base text-text-secondary">
             {bottleContent === "formula"
               ? `Formula - ${formulaBrand}`
               : "Breastmilk"}{" "}
@@ -367,7 +367,7 @@ export function FeedLogger({ onSuccess }: FeedLoggerProps) {
           <UnitToggle />
         </View>
 
-        <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+        <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
           Amount ({unit})
         </Text>
         <TextInput

@@ -148,7 +148,7 @@ export function TaskItem({
               <View className="flex-1">
                 <Text
                   style={{
-                    fontSize: 14,
+                    fontSize: 16,
                     fontFamily: 'Nunito_600SemiBold',
                     color: isCompleted ? tc.textMuted : tc.textPrimary,
                     textDecorationLine: isCompleted ? 'line-through' : 'none',
@@ -158,10 +158,10 @@ export function TaskItem({
                 </Text>
                 <View className="flex-row mt-0.5">
                   {time && (
-                    <Text style={{ fontSize: 12, color: tc.textSecondary, fontFamily: 'JetBrainsMono_400Regular' }}>{time}</Text>
+                    <Text style={{ fontSize: 14, color: tc.textSecondary, fontFamily: 'JetBrainsMono_400Regular' }}>{time}</Text>
                   )}
                   {assignee && (
-                    <Text style={{ fontSize: 12, color: colors.feedPrimary, fontFamily: 'Nunito_500Medium', marginLeft: 8 }}>
+                    <Text style={{ fontSize: 14, color: colors.feedPrimary, fontFamily: 'Nunito_500Medium', marginLeft: 8 }}>
                       {assignee}
                     </Text>
                   )}

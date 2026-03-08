@@ -49,7 +49,7 @@ function MoodButton({
         <Text className="text-xl">{mood.icon}</Text>
         <Text
           style={{
-            fontSize: 10,
+            fontSize: 12,
             marginTop: 4,
             fontFamily: 'Nunito_600SemiBold',
             color: selected ? colors.feedPrimary : tc.textSecondary,

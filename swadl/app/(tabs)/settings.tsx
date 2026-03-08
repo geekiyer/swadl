@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import Constants from "expo-constants";
 import { supabase } from "../../lib/supabase";
 import {
   useProfile,
@@ -261,7 +262,7 @@ export default function Settings() {
       <ScrollView style={{ flex: 1 }}>
       <View style={{ paddingHorizontal: 24, paddingTop: insets.top + 16, paddingBottom: 40 }}>
         {/* Baby Profile */}
-        <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2 mt-4" style={{ letterSpacing: 2 }}>
+        <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2 mt-4" style={{ letterSpacing: 2 }}>
           Baby Profile
         </Text>
         <TouchableOpacity
@@ -273,17 +274,17 @@ export default function Settings() {
               <Text className="text-lg font-body-semibold text-text-primary">
                 {baby?.name ?? "—"}
               </Text>
-              <Text className="text-sm text-text-secondary mt-0.5">
+              <Text className="text-base text-text-secondary mt-0.5">
                 Born {baby?.date_of_birth ?? "—"} ·{" "}
                 {baby?.feeding_method ?? "—"}
               </Text>
             </View>
-            <Text className="text-feed-primary text-sm">Edit</Text>
+            <Text className="text-feed-primary text-base">Edit</Text>
           </View>
         </TouchableOpacity>
 
         {/* Your Profile */}
-        <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+        <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
           Your Profile
         </Text>
         <TouchableOpacity
@@ -295,22 +296,22 @@ export default function Settings() {
               <Text className="text-base font-body-medium text-text-primary">
                 {profile?.display_name ?? "—"}
               </Text>
-              <Text className="text-sm text-text-secondary mt-0.5">
+              <Text className="text-base text-text-secondary mt-0.5">
                 Role: {profile?.role ?? "—"}
               </Text>
             </View>
-            <Text className="text-feed-primary text-sm">Edit</Text>
+            <Text className="text-feed-primary text-base">Edit</Text>
           </View>
         </TouchableOpacity>
 
         {/* Household Members */}
         <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+          <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
             Household Members
           </Text>
           {isAdmin && (
             <TouchableOpacity onPress={() => setShowInvite(true)}>
-              <Text className="text-feed-primary text-sm">+ Invite</Text>
+              <Text className="text-feed-primary text-base">+ Invite</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -333,26 +334,26 @@ export default function Settings() {
                   {member.display_name}
                   {member.id === profile?.id ? " (you)" : ""}
                 </Text>
-                <Text className="text-sm text-text-secondary mt-0.5">
+                <Text className="text-base text-text-secondary mt-0.5">
                   {member.role}
                 </Text>
               </View>
               {isAdmin && member.id !== profile?.id && (
-                <Text className="text-feed-primary text-sm">Change role</Text>
+                <Text className="text-feed-primary text-base">Change role</Text>
               )}
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Appearance */}
-        <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+        <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
           Appearance
         </Text>
         <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-6">
           <View className="flex-row justify-between items-center">
             <View>
               <Text className="text-base font-body-medium text-text-primary">Dark Mode</Text>
-              <Text className="text-sm text-text-secondary mt-0.5">
+              <Text className="text-base text-text-secondary mt-0.5">
                 {themeMode === "dark" ? "On" : "Off"}
               </Text>
             </View>
@@ -375,7 +376,7 @@ export default function Settings() {
         {/* Care Mode */}
         {isAdmin && (
           <>
-            <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+            <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
               Care Mode
             </Text>
             <View className="bg-card-bg border border-border-main rounded-2xl overflow-hidden mb-6">
@@ -392,13 +393,13 @@ export default function Settings() {
                     <Text className="text-base font-body-medium text-text-primary">
                       {cm.label}
                     </Text>
-                    <Text className="text-sm text-text-secondary mt-0.5">
+                    <Text className="text-base text-text-secondary mt-0.5">
                       {cm.desc}
                     </Text>
                   </View>
                   {careMode.mode === cm.key && (
                     <View className="w-5 h-5 rounded-full bg-feed-primary items-center justify-center">
-                      <Text className="text-xs font-body-bold" style={{ color: colors.charcoal }}>
+                      <Text className="text-sm font-body-bold" style={{ color: colors.charcoal }}>
                         {"\u2713"}
                       </Text>
                     </View>
@@ -410,14 +411,14 @@ export default function Settings() {
         )}
 
         {/* Notification Preferences */}
-        <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+        <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
           Notifications
         </Text>
         <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-6">
           <View className="flex-row items-center justify-between mb-3">
             <View>
               <Text className="text-base font-body-medium text-text-primary">Chore Assignments</Text>
-              <Text className="text-sm text-text-secondary">When a chore is assigned to you</Text>
+              <Text className="text-base text-text-secondary">When a chore is assigned to you</Text>
             </View>
             <Switch
               value={notifyAssignments}
@@ -429,7 +430,7 @@ export default function Settings() {
           <View className="flex-row items-center justify-between mb-3">
             <View>
               <Text className="text-base font-body-medium text-text-primary">Chore Reminders</Text>
-              <Text className="text-sm text-text-secondary">Upcoming chore due reminders</Text>
+              <Text className="text-base text-text-secondary">Upcoming chore due reminders</Text>
             </View>
             <Switch
               value={notifyReminders}
@@ -441,7 +442,7 @@ export default function Settings() {
           <View className="flex-row items-center justify-between">
             <View>
               <Text className="text-base font-body-medium text-text-primary">Shift Changes</Text>
-              <Text className="text-sm text-text-secondary">When a caregiver starts or ends a shift</Text>
+              <Text className="text-base text-text-secondary">When a caregiver starts or ends a shift</Text>
             </View>
             <Switch
               value={notifyShiftChanges}
@@ -453,7 +454,7 @@ export default function Settings() {
         </View>
 
         {/* Legal */}
-        <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+        <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
           Legal
         </Text>
         <View className="bg-card-bg border border-border-main rounded-2xl overflow-hidden mb-6">
@@ -462,14 +463,14 @@ export default function Settings() {
             onPress={() => router.push("/privacy")}
           >
             <Text className="text-base font-body-medium text-text-primary">Privacy Policy</Text>
-            <Text className="text-text-secondary text-sm">→</Text>
+            <Text className="text-text-secondary text-base">→</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="flex-row justify-between items-center p-4 border-t border-border-main"
             onPress={() => router.push("/terms")}
           >
             <Text className="text-base font-body-medium text-text-primary">Terms of Service</Text>
-            <Text className="text-text-secondary text-sm">→</Text>
+            <Text className="text-text-secondary text-base">→</Text>
           </TouchableOpacity>
         </View>
 
@@ -492,14 +493,27 @@ export default function Settings() {
           {deleting ? (
             <View className="flex-row items-center justify-center">
               <ActivityIndicator size="small" color={tc.textSecondary} />
-              <Text className="text-text-secondary text-center text-sm ml-2">Deleting account...</Text>
+              <Text className="text-text-secondary text-center text-base ml-2">Deleting account...</Text>
             </View>
           ) : (
-            <Text className="text-text-secondary text-center text-sm">
+            <Text className="text-text-secondary text-center text-base">
               Delete Account
             </Text>
           )}
         </TouchableOpacity>
+
+        <Text
+          style={{
+            fontFamily: "JetBrainsMono_400Regular",
+            fontSize: 12,
+            color: tc.textPlaceholder,
+            textAlign: "center",
+            marginTop: 24,
+            marginBottom: 8,
+          }}
+        >
+          Swadl v{Constants.expoConfig?.version ?? "1.0.0"}
+        </Text>
       </View>
 
       {/* Edit Baby Modal */}
@@ -518,7 +532,7 @@ export default function Settings() {
             <View className="bg-card-bg rounded-t-2xl px-6 pt-6 pb-10">
               <Text className="text-lg font-body-bold text-text-primary mb-4">Edit Baby Profile</Text>
 
-              <Text className="text-xs text-text-secondary uppercase font-body-bold mb-1" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm text-text-secondary uppercase font-body-bold mb-1" style={{ letterSpacing: 2 }}>
                 Name
               </Text>
               <TextInput
@@ -528,7 +542,7 @@ export default function Settings() {
                 onChangeText={setBabyName}
               />
 
-              <Text className="text-xs text-text-secondary uppercase font-body-bold mb-1" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm text-text-secondary uppercase font-body-bold mb-1" style={{ letterSpacing: 2 }}>
                 Date of Birth
               </Text>
               <TextInput
@@ -540,7 +554,7 @@ export default function Settings() {
                 placeholderTextColor={tc.textSecondary}
               />
 
-              <Text className="text-xs text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Feeding Method
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-6">
@@ -555,7 +569,7 @@ export default function Settings() {
                     onPress={() => setBabyFeeding(opt.key)}
                   >
                     <Text
-                      className={`text-sm ${
+                      className={`text-base ${
                         babyFeeding === opt.key
                           ? "font-body-medium"
                           : "text-text-secondary"
@@ -662,10 +676,10 @@ export default function Settings() {
               >
                 <View>
                   <Text className="text-base font-body-medium text-text-primary">{role.label}</Text>
-                  <Text className="text-sm text-text-secondary">{role.desc}</Text>
+                  <Text className="text-base text-text-secondary">{role.desc}</Text>
                 </View>
                 {editingMember?.role === role.key && (
-                  <Text className="text-feed-primary text-sm font-body-medium">
+                  <Text className="text-feed-primary text-base font-body-medium">
                     Current
                   </Text>
                 )}
@@ -712,7 +726,7 @@ export default function Settings() {
                 autoFocus
               />
 
-              <Text className="text-xs text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Role
               </Text>
               <View className="mb-6">
@@ -734,8 +748,8 @@ export default function Settings() {
                       )}
                     </View>
                     <View>
-                      <Text className="text-sm font-body-medium text-text-primary">{role.label}</Text>
-                      <Text className="text-xs text-text-secondary">{role.desc}</Text>
+                      <Text className="text-base font-body-medium text-text-primary">{role.label}</Text>
+                      <Text className="text-sm text-text-secondary">{role.desc}</Text>
                     </View>
                   </TouchableOpacity>
                 ))}

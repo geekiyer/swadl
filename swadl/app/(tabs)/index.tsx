@@ -234,7 +234,7 @@ export default function Dashboard() {
                 onStartShouldSetResponder={() => true}
               >
                 <Text
-                  style={{ fontSize: 11, color: tc.textSecondary, fontFamily: 'Baloo2_700Bold', letterSpacing: 2, textTransform: 'uppercase', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8 }}
+                  style={{ fontSize: 13, color: tc.textSecondary, fontFamily: 'Baloo2_700Bold', letterSpacing: 2, textTransform: 'uppercase', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8 }}
                 >
                   Select Baby
                 </Text>
@@ -298,7 +298,7 @@ export default function Dashboard() {
                 onPress={() => router.push(item.route as any)}
               >
                 <item.Icon size={36} theme={tc.mode} />
-                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 12, color: item.color, letterSpacing: 0.3, marginTop: 3 }}>
+                <Text style={{ fontFamily: 'Baloo2_700Bold', fontSize: 14, color: item.color, letterSpacing: 0.3, marginTop: 3 }}>
                   {item.label}
                 </Text>
               </Pressable>
@@ -309,11 +309,11 @@ export default function Dashboard() {
           {isTogether ? (
             <View className="mb-5">
               <View className="flex-row items-center justify-between mb-2">
-                <Text style={{ fontSize: 11, color: tc.textMuted, fontFamily: 'Baloo2_700Bold', letterSpacing: 2, textTransform: 'uppercase' }}>
+                <Text style={{ fontSize: 13, color: tc.textMuted, fontFamily: 'Baloo2_700Bold', letterSpacing: 2, textTransform: 'uppercase' }}>
                   Recent Activity
                 </Text>
                 <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }} onPress={() => router.push("/briefing")}>
-                  <Text style={{ fontSize: 12, color: colors.feedPrimary, fontFamily: 'Nunito_800ExtraBold' }}>Daily Briefing</Text>
+                  <Text style={{ fontSize: 14, color: colors.feedPrimary, fontFamily: 'Nunito_800ExtraBold' }}>Daily Briefing</Text>
                   <ChevronRight size={12} color={colors.feedPrimary} strokeWidth={3} />
                 </Pressable>
               </View>
@@ -325,7 +325,7 @@ export default function Dashboard() {
               onPress={() => router.push("/briefing")}
             >
               <View>
-                <Text style={{ fontSize: 11, color: colors.feedPrimary, fontFamily: 'Baloo2_700Bold', letterSpacing: 2, textTransform: 'uppercase' }}>
+                <Text style={{ fontSize: 13, color: colors.feedPrimary, fontFamily: 'Baloo2_700Bold', letterSpacing: 2, textTransform: 'uppercase' }}>
                   On Shift
                 </Text>
                 <Text style={{ fontSize: 16, fontFamily: 'Nunito_600SemiBold', color: tc.textPrimary, marginTop: 2 }}>

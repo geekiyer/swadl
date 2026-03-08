@@ -155,7 +155,7 @@ export default function InstantValue() {
 
   return (
     <View className="flex-1 bg-screen-bg px-6 pt-16">
-      <Text className="text-xs text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
+      <Text className="text-sm text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
         Step 3 of 3
       </Text>
       <Text className="text-2xl text-text-primary font-display mb-2" style={{ letterSpacing: -0.5 }}>
@@ -173,13 +173,13 @@ export default function InstantValue() {
         renderItem={({ item }) => (
           <View className="flex-row items-center bg-card-bg border border-border-main rounded-xl p-3 mb-2">
             <View className="w-8 h-8 rounded-lg bg-raised-bg items-center justify-center mr-3">
-              <Text className="text-feed-primary text-xs font-body-bold">
+              <Text className="text-feed-primary text-sm font-body-bold">
                 {item.category.charAt(0).toUpperCase()}
               </Text>
             </View>
             <View className="flex-1">
               <Text className="text-base font-body-semibold text-text-primary">{item.title}</Text>
-              <Text className="text-sm text-text-secondary font-body">
+              <Text className="text-base text-text-secondary font-body">
                 {item.recurrence.type === "daily" ? "Daily" : "Weekly"}
                 {item.recurrence.time ? ` at ${item.recurrence.time}` : ""}
               </Text>

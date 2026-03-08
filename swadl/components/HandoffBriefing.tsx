@@ -18,7 +18,7 @@ export function HandoffBriefing({ points }: HandoffBriefingProps) {
           key={index}
           className={`${index > 0 ? "mt-3 pt-3 border-t border-border-main" : ""}`}
         >
-          <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+          <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
             {point.label}
           </Text>
           <Text className="text-base mt-1 text-text-primary font-body">{point.summary}</Text>

@@ -88,15 +88,15 @@ export function ActivityFeed({ babyId }: { babyId: string | undefined }) {
           >
             <CategoryIcon kind={item.kind} theme={tc.mode} />
             <View style={{ flex: 1, minWidth: 0 }}>
-              <Text style={{ fontSize: 13, lineHeight: 17 }}>
+              <Text style={{ fontSize: 15, lineHeight: 20 }}>
                 <Text style={{ fontFamily: 'Nunito_800ExtraBold', color: tc.textPrimary }}>{item.loggedBy}</Text>
                 <Text style={{ fontFamily: 'Nunito_400Regular', color: tc.textBody }}> {item.label}</Text>
               </Text>
               {item.detail ? (
-                <Text style={{ fontSize: 11, color: tc.textDetail, fontFamily: 'Nunito_400Regular', marginTop: 1 }}>{item.detail}</Text>
+                <Text style={{ fontSize: 13, color: tc.textDetail, fontFamily: 'Nunito_400Regular', marginTop: 1 }}>{item.detail}</Text>
               ) : null}
             </View>
-            <Text style={{ fontSize: 10, letterSpacing: -0.3, color: tc.textPlaceholder, fontFamily: 'JetBrainsMono_400Regular' }}>{timeLabel(item.timestamp)}</Text>
+            <Text style={{ fontSize: 12, letterSpacing: -0.3, color: tc.textPlaceholder, fontFamily: 'JetBrainsMono_400Regular' }}>{timeLabel(item.timestamp)}</Text>
           </TouchableOpacity>
         ))}
       </View>

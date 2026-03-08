@@ -112,7 +112,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
             disabled={saving}
           >
             <Text className="text-feed-primary font-body-semibold text-base">Wet</Text>
-            <Text className="text-text-secondary text-xs mt-1">Pee only</Text>
+            <Text className="text-text-secondary text-sm mt-1">Pee only</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
@@ -122,7 +122,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
             <Text className="text-feed-primary font-body-semibold text-base">
               Dirty
             </Text>
-            <Text className="text-text-secondary text-xs mt-1">Poop</Text>
+            <Text className="text-text-secondary text-sm mt-1">Poop</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
@@ -132,7 +132,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
             <Text className="text-pump-primary font-body-semibold text-base">
               Both
             </Text>
-            <Text className="text-text-secondary text-xs mt-1">Wet + Poop</Text>
+            <Text className="text-text-secondary text-sm mt-1">Wet + Poop</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-card-bg border border-border-main rounded-2xl px-6 py-5 items-center flex-1 min-w-[140px]"
@@ -140,7 +140,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
             disabled={saving}
           >
             <Text className="text-text-secondary font-body-semibold text-base">Dry</Text>
-            <Text className="text-text-secondary text-xs mt-1">Just a check</Text>
+            <Text className="text-text-secondary text-sm mt-1">Just a check</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -156,7 +156,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       </Text>
 
       {/* Poop Color */}
-      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+      <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
         Poop Color
       </Text>
       <View className="flex-row flex-wrap gap-2 mb-5">
@@ -173,7 +173,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
               style={{ backgroundColor: c.color }}
             />
             <Text
-              className={`text-sm ${poopColor === c.key ? "text-feed-primary font-body-medium" : "text-text-secondary"}`}
+              className={`text-base ${poopColor === c.key ? "text-feed-primary font-body-medium" : "text-text-secondary"}`}
             >
               {c.label}
             </Text>
@@ -182,7 +182,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
       </View>
 
       {/* Consistency */}
-      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+      <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
         Consistency
       </Text>
       <View className="flex-row flex-wrap gap-2 mb-5">
@@ -199,7 +199,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
             }
           >
             <Text
-              className={`text-sm ${consistency === c.key ? "text-feed-primary font-body-medium" : "text-text-secondary"}`}
+              className={`text-base ${consistency === c.key ? "text-feed-primary font-body-medium" : "text-text-secondary"}`}
             >
               {c.label}
             </Text>
@@ -212,7 +212,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
         <View className="flex-row items-center justify-between mb-3">
           <View>
             <Text className="text-base font-body-medium text-text-primary">Diaper Rash</Text>
-            <Text className="text-sm text-text-secondary">
+            <Text className="text-base text-text-secondary">
               Redness or irritation
             </Text>
           </View>
@@ -226,7 +226,7 @@ export function DiaperLogger({ onSuccess }: DiaperLoggerProps) {
         <View className="flex-row items-center justify-between">
           <View>
             <Text className="text-base font-body-medium text-text-primary">Blowout</Text>
-            <Text className="text-sm text-text-secondary">
+            <Text className="text-base text-text-secondary">
               Leaked out of the diaper
             </Text>
           </View>

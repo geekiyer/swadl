@@ -305,7 +305,7 @@ export default function Summary() {
             onPress={() => setViewMode("day")}
           >
             <Text
-              className={`text-sm font-body-semibold ${
+              className={`text-base font-body-semibold ${
                 viewMode === "day" ? "" : "text-text-secondary"
               }`}
               style={viewMode === "day" ? { color: colors.charcoal } : undefined}
@@ -320,7 +320,7 @@ export default function Summary() {
             onPress={() => setViewMode("week")}
           >
             <Text
-              className={`text-sm font-body-semibold ${
+              className={`text-base font-body-semibold ${
                 viewMode === "week" ? "" : "text-text-secondary"
               }`}
               style={viewMode === "week" ? { color: colors.charcoal } : undefined}
@@ -368,40 +368,40 @@ export default function Summary() {
           <>
             {/* Feeding Summary */}
             <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Feeding
               </Text>
               <View className="flex-row justify-between mb-2">
                 <View className="items-center flex-1">
                   <Text className="text-2xl text-text-primary font-mono-bold">{summary.feedCount}</Text>
-                  <Text className="text-xs text-text-secondary font-body">feeds</Text>
+                  <Text className="text-sm text-text-secondary font-body">feeds</Text>
                 </View>
                 <View className="items-center flex-1">
                   <Text className="text-2xl text-text-primary font-mono-bold">
                     {displayVolume(summary.feedTotalOz, unit).split(" ")[0]}
                   </Text>
-                  <Text className="text-xs text-text-secondary font-body">{unit}</Text>
+                  <Text className="text-sm text-text-secondary font-body">{unit}</Text>
                 </View>
                 <View className="items-center flex-1">
                   <Text className="text-2xl text-text-primary font-mono-bold">
                     {summary.feedTotalMin}
                   </Text>
-                  <Text className="text-xs text-text-secondary font-body">min</Text>
+                  <Text className="text-sm text-text-secondary font-body">min</Text>
                 </View>
               </View>
               <View className="border-t border-border-main pt-2 mt-1">
                 {Object.entries(summary.feedByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-text-secondary font-body">
+                  <Text key={type} className="text-base text-text-secondary font-body">
                     {type}: {count}
                   </Text>
                 ))}
                 {summary.avgTimeBetweenFeeds != null && (
-                  <Text className="text-sm text-text-secondary font-body">
+                  <Text className="text-base text-text-secondary font-body">
                     Avg {summary.avgTimeBetweenFeeds} min between feeds
                   </Text>
                 )}
                 {summary.avgOzPerBottle != null && (
-                  <Text className="text-sm text-text-secondary font-body">
+                  <Text className="text-base text-text-secondary font-body">
                     Avg {displayVolume(summary.avgOzPerBottle, unit)} per bottle
                   </Text>
                 )}
@@ -410,7 +410,7 @@ export default function Summary() {
 
             {/* Diaper Summary */}
             <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Diapers
               </Text>
               <Text className="text-2xl text-text-primary font-mono-bold mb-1">
@@ -418,14 +418,14 @@ export default function Summary() {
               </Text>
               <View className="flex-row flex-wrap gap-x-4">
                 {Object.entries(summary.diaperByType).map(([type, count]) => (
-                  <Text key={type} className="text-sm text-text-secondary font-body">
+                  <Text key={type} className="text-base text-text-secondary font-body">
                     {type}: {count}
                   </Text>
                 ))}
               </View>
               {summary.lowWetWarning && (
                 <View className="bg-raised-bg rounded-lg p-2 mt-2 border-l-[3px] border-feed-primary">
-                  <Text className="text-sm text-feed-primary font-body">
+                  <Text className="text-base text-feed-primary font-body">
                     Fewer than 6 wet diapers — consider checking hydration
                   </Text>
                 </View>
@@ -434,7 +434,7 @@ export default function Summary() {
 
             {/* Pump Summary */}
             <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Pumping
               </Text>
               {summary.pumpCount > 0 ? (
@@ -443,29 +443,29 @@ export default function Summary() {
                     <Text className="text-2xl text-text-primary font-mono-bold">
                       {summary.pumpCount}
                     </Text>
-                    <Text className="text-xs text-text-secondary font-body">sessions</Text>
+                    <Text className="text-sm text-text-secondary font-body">sessions</Text>
                   </View>
                   <View className="items-center flex-1">
                     <Text className="text-2xl text-text-primary font-mono-bold">
                       {displayVolume(summary.pumpTotalOz, unit).split(" ")[0]}
                     </Text>
-                    <Text className="text-xs text-text-secondary font-body">{unit}</Text>
+                    <Text className="text-sm text-text-secondary font-body">{unit}</Text>
                   </View>
                   <View className="items-center flex-1">
                     <Text className="text-2xl text-text-primary font-mono-bold">
                       {summary.pumpTotalMin}
                     </Text>
-                    <Text className="text-xs text-text-secondary font-body">min</Text>
+                    <Text className="text-sm text-text-secondary font-body">min</Text>
                   </View>
                 </View>
               ) : (
-                <Text className="text-sm text-text-secondary font-body">No pump sessions</Text>
+                <Text className="text-base text-text-secondary font-body">No pump sessions</Text>
               )}
             </View>
 
             {/* Sleep Summary */}
             <View className="bg-card-bg border border-border-main rounded-2xl p-4 mb-4">
-              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Sleep
               </Text>
               <View className="flex-row justify-between mb-2">
@@ -473,24 +473,24 @@ export default function Summary() {
                   <Text className="text-2xl text-text-primary font-mono-bold">
                     {Math.round((summary.sleepTotalMin / 60) * 10) / 10}
                   </Text>
-                  <Text className="text-xs text-text-secondary font-body">hours</Text>
+                  <Text className="text-sm text-text-secondary font-body">hours</Text>
                 </View>
                 <View className="items-center flex-1">
                   <Text className="text-2xl text-text-primary font-mono-bold">{summary.napCount}</Text>
-                  <Text className="text-xs text-text-secondary font-body">naps</Text>
+                  <Text className="text-sm text-text-secondary font-body">naps</Text>
                 </View>
                 <View className="items-center flex-1">
                   <Text className="text-2xl text-text-primary font-mono-bold">
                     {summary.longestStretchMin}
                   </Text>
-                  <Text className="text-xs text-text-secondary font-body">min longest</Text>
+                  <Text className="text-sm text-text-secondary font-body">min longest</Text>
                 </View>
               </View>
               <View className="border-t border-border-main pt-2 mt-1">
-                <Text className="text-sm text-text-secondary font-body">
+                <Text className="text-base text-text-secondary font-body">
                   Night (7PM-7AM): {Math.round(summary.nightSleepMin)} min
                 </Text>
-                <Text className="text-sm text-text-secondary font-body">
+                <Text className="text-base text-text-secondary font-body">
                   Day (7AM-7PM): {Math.round(summary.daySleepMin)} min
                 </Text>
               </View>
@@ -498,7 +498,7 @@ export default function Summary() {
 
             {/* Activity Log */}
             <View className="mb-4">
-              <Text className="text-[11px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-[13px] text-text-secondary uppercase font-body-bold mb-2" style={{ letterSpacing: 2 }}>
                 Activity Log
               </Text>
               {summary.activityLog.length > 0 ? (
@@ -515,15 +515,15 @@ export default function Summary() {
                         style={{ backgroundColor: DOT_COLORS[item.kind] ?? tc.textSecondary }}
                       />
                       <View className="flex-1">
-                        <Text className="text-sm font-body-medium text-text-primary">
+                        <Text className="text-base font-body-medium text-text-primary">
                           {item.label}
                         </Text>
-                        <Text className="text-xs text-text-secondary font-body">
+                        <Text className="text-sm text-text-secondary font-body">
                           {item.loggedBy}
                           {item.detail ? ` \u00B7 ${item.detail}` : ""}
                         </Text>
                       </View>
-                      <Text className="text-xs text-text-secondary font-mono">
+                      <Text className="text-sm text-text-secondary font-mono">
                         {formatTime(item.timestamp)}
                       </Text>
                     </View>

@@ -68,7 +68,7 @@ export default function QuickLog() {
           >
             {meta?.title ?? "Log"}
           </Text>
-          <Text className="text-sm text-text-secondary font-body">
+          <Text className="text-base text-text-secondary font-body">
             {meta?.subtitle ?? ""}
           </Text>
         </View>

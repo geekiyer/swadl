@@ -49,7 +49,7 @@ const CATEGORIES = [
 
 const RECURRENCE_OPTIONS = [
   { key: "daily", label: "Daily" },
-  { key: "every-x-days", label: "Every X Days" },
+  { key: "every-x-days", label: "Custom" },
   { key: "weekly", label: "Weekly" },
   { key: "one-time", label: "One-time" },
 ] as const;
@@ -146,18 +146,18 @@ function ChoreRow({
               {item.title}
             </Text>
             <View className="flex-row items-center mt-0.5">
-              <Text className="text-xs text-text-secondary">
+              <Text className="text-sm text-text-secondary">
                 {recurrence?.type === "daily"
                   ? "Daily"
                   : recurrence?.type === "every-x-days"
-                    ? `Every ${recurrence.interval_days} days`
+                    ? `Every ${recurrence.interval_days} day${Number(recurrence.interval_days) === 1 ? "" : "s"}`
                     : recurrence?.type === "weekly"
                       ? "Weekly"
                       : "One-time"}
                 {recurrence?.time ? ` at ${recurrence.time}` : ""}
               </Text>
               {item.assignee_name && (
-                <Text className="text-xs text-feed-primary ml-2">
+                <Text className="text-sm text-feed-primary ml-2">
                   {item.assignee_name}
                 </Text>
               )}
@@ -172,7 +172,7 @@ function ChoreRow({
               disabled={isOwnChore}
             >
               <Text
-                className={`text-xs font-body-medium ${
+                className={`text-sm font-body-medium ${
                   isOwnChore ? "text-success" : "text-feed-primary"
                 }`}
               >
@@ -184,7 +184,7 @@ function ChoreRow({
               className="px-3 py-1.5 rounded-md bg-raised-bg"
               onPress={() => onAssign(item)}
             >
-              <Text className="text-xs text-text-secondary">Assign</Text>
+              <Text className="text-sm text-text-secondary">Assign</Text>
             </TouchableOpacity>
           )}
         </Pressable>
@@ -361,13 +361,13 @@ export default function Chores() {
             className="bg-feed-primary justify-center px-5"
             onPress={() => handleSelfClaim(item)}
           >
-            <Text className="font-body-semibold text-sm" style={{ color: colors.charcoal }}>I got it</Text>
+            <Text className="font-body-semibold text-base" style={{ color: colors.charcoal }}>I got it</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-danger justify-center px-5"
             onPress={() => handleDelete(item)}
           >
-            <Text className="font-body-semibold text-sm" style={{ color: colors.white }}>Delete</Text>
+            <Text className="font-body-semibold text-base" style={{ color: colors.white }}>Delete</Text>
           </TouchableOpacity>
         </View>
       );
@@ -377,7 +377,7 @@ export default function Chores() {
         className="bg-danger justify-center px-6"
         onPress={() => handleDelete(item)}
       >
-        <Text className="font-body-semibold text-sm" style={{ color: colors.white }}>Delete</Text>
+        <Text className="font-body-semibold text-base" style={{ color: colors.white }}>Delete</Text>
       </TouchableOpacity>
     );
   }
@@ -433,7 +433,7 @@ export default function Chores() {
         renderItem={renderChoreItem}
         renderSectionHeader={({ section: { title } }) => (
           <View className="bg-raised-bg px-4 py-2">
-            <Text className="text-[11px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
+            <Text className="text-[13px] text-text-secondary uppercase font-body-bold" style={{ letterSpacing: 2 }}>
               {title}
             </Text>
           </View>
@@ -533,7 +533,7 @@ export default function Chores() {
               <Text className="text-lg font-body-bold text-text-primary mb-4">Add Chore</Text>
 
               {/* Title */}
-              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                 Title
               </Text>
               <TextInput
@@ -547,7 +547,7 @@ export default function Chores() {
               />
 
               {/* Category */}
-              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Category
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-4">
@@ -562,7 +562,7 @@ export default function Chores() {
                     onPress={() => setNewCategory(cat.key)}
                   >
                     <Text
-                      className={`text-sm ${
+                      className={`text-base ${
                         newCategory === cat.key
                           ? "font-body-medium"
                           : "text-text-secondary"
@@ -576,14 +576,14 @@ export default function Chores() {
               </View>
 
               {/* Recurrence */}
-              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Recurrence
               </Text>
               <View className="flex-row gap-2 mb-4">
                 {RECURRENCE_OPTIONS.map((opt) => (
                   <TouchableOpacity
                     key={opt.key}
-                    className={`px-4 py-2 rounded-xl border flex-1 items-center ${
+                    className={`px-2 py-2 rounded-xl border flex-1 items-center justify-center ${
                       newRecurrence === opt.key
                         ? "bg-feed-primary border-feed-primary"
                         : "border-border-main bg-raised-bg"
@@ -591,7 +591,7 @@ export default function Chores() {
                     onPress={() => setNewRecurrence(opt.key)}
                   >
                     <Text
-                      className={`text-sm ${
+                      className={`text-base ${
                         newRecurrence === opt.key
                           ? "font-body-medium"
                           : "text-text-secondary"
@@ -607,7 +607,7 @@ export default function Chores() {
               {/* Interval days (for every-x-days) */}
               {newRecurrence === "every-x-days" && (
                 <>
-                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-sm font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Every how many days?
                   </Text>
                   <TextInput
@@ -625,7 +625,7 @@ export default function Chores() {
               {/* Time (optional) */}
               {newRecurrence !== "one-time" && (
                 <>
-                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-sm font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Time (optional)
                   </Text>
                   <TextInput
@@ -679,7 +679,7 @@ export default function Chores() {
             <ScrollView className="bg-card-bg rounded-t-2xl px-6 pt-6 pb-10 max-h-[85%]">
               <Text className="text-lg font-body-bold text-text-primary mb-4">Edit Chore</Text>
 
-              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                 Title
               </Text>
               <TextInput
@@ -689,7 +689,7 @@ export default function Chores() {
                 onChangeText={setEditTitle}
               />
 
-              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Category
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-4">
@@ -704,7 +704,7 @@ export default function Chores() {
                     onPress={() => setEditCategory(cat.key)}
                   >
                     <Text
-                      className={`text-sm ${
+                      className={`text-base ${
                         editCategory === cat.key
                           ? "font-body-medium"
                           : "text-text-secondary"
@@ -717,14 +717,14 @@ export default function Chores() {
                 ))}
               </View>
 
-              <Text className="text-xs font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+              <Text className="text-sm font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
                 Recurrence
               </Text>
               <View className="flex-row gap-2 mb-4">
                 {RECURRENCE_OPTIONS.map((opt) => (
                   <TouchableOpacity
                     key={opt.key}
-                    className={`px-4 py-2 rounded-xl border flex-1 items-center ${
+                    className={`px-2 py-2 rounded-xl border flex-1 items-center justify-center ${
                       editRecurrence === opt.key
                         ? "bg-feed-primary border-feed-primary"
                         : "border-border-main bg-raised-bg"
@@ -732,7 +732,7 @@ export default function Chores() {
                     onPress={() => setEditRecurrence(opt.key)}
                   >
                     <Text
-                      className={`text-sm ${
+                      className={`text-base ${
                         editRecurrence === opt.key
                           ? "font-body-medium"
                           : "text-text-secondary"
@@ -747,7 +747,7 @@ export default function Chores() {
 
               {editRecurrence === "every-x-days" && (
                 <>
-                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-sm font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Every how many days?
                   </Text>
                   <TextInput
@@ -762,7 +762,7 @@ export default function Chores() {
 
               {editRecurrence !== "one-time" && (
                 <>
-                  <Text className="text-xs font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+                  <Text className="text-sm font-body-bold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
                     Time (optional)
                   </Text>
                   <TextInput

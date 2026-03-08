@@ -12,7 +12,7 @@ export default function TermsOfService() {
         <Text className="text-2xl font-display text-text-primary mb-1">
           Terms of Service
         </Text>
-        <Text className="text-sm text-text-secondary font-mono mb-8">
+        <Text className="text-base text-text-secondary font-mono mb-8">
           Effective Date: March 7, 2026
         </Text>
 
@@ -143,7 +143,7 @@ function Section({
       <Text className="text-base font-body-semibold text-text-primary mb-2">
         {title}
       </Text>
-      <Text className="text-sm text-text-secondary leading-5 font-body">{children}</Text>
+      <Text className="text-base text-text-secondary leading-5 font-body">{children}</Text>
     </View>
   );
 }

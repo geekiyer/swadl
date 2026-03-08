@@ -179,7 +179,7 @@ export function LogHistoryModal({ kind, babyId, visible, onClose }: LogHistoryMo
               <Pressable onPress={onClose} hitSlop={12}>
                 <Text
                   style={{
-                    fontSize: 14,
+                    fontSize: 16,
                     fontFamily: "Nunito_600SemiBold",
                     color: tc.textSecondary,
                   }}
@@ -206,7 +206,7 @@ export function LogHistoryModal({ kind, babyId, visible, onClose }: LogHistoryMo
                     <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 6 }}>
                       <Text
                         style={{
-                          fontSize: 11,
+                          fontSize: 13,
                           fontFamily: "Baloo2_700Bold",
                           color: tc.textMuted,
                           letterSpacing: 2,
@@ -218,7 +218,7 @@ export function LogHistoryModal({ kind, babyId, visible, onClose }: LogHistoryMo
                       {group.summary ? (
                         <Text
                           style={{
-                            fontSize: 11,
+                            fontSize: 13,
                             fontFamily: "JetBrainsMono_400Regular",
                             color: colors.feedPrimary,
                           }}
@@ -245,7 +245,7 @@ export function LogHistoryModal({ kind, babyId, visible, onClose }: LogHistoryMo
                           onPress={() => setEditItem(entry)}
                         >
                           <View style={{ flex: 1, minWidth: 0 }}>
-                            <Text style={{ fontSize: 13, lineHeight: 18 }}>
+                            <Text style={{ fontSize: 15, lineHeight: 18 }}>
                               <Text
                                 style={{
                                   fontFamily: "Nunito_700Bold",
@@ -266,7 +266,7 @@ export function LogHistoryModal({ kind, babyId, visible, onClose }: LogHistoryMo
                             {entry.detail ? (
                               <Text
                                 style={{
-                                  fontSize: 11,
+                                  fontSize: 13,
                                   color: tc.textDetail,
                                   fontFamily: "Nunito_400Regular",
                                   marginTop: 2,
@@ -278,7 +278,7 @@ export function LogHistoryModal({ kind, babyId, visible, onClose }: LogHistoryMo
                           </View>
                           <Text
                             style={{
-                              fontSize: 11,
+                              fontSize: 13,
                               color: tc.textPlaceholder,
                               fontFamily: "JetBrainsMono_400Regular",
                               marginLeft: 10,

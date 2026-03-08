@@ -37,7 +37,7 @@ export default function BabyInfo() {
 
   return (
     <View className="flex-1 bg-screen-bg px-6 pt-16">
-      <Text className="text-xs text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
+      <Text className="text-sm text-feed-primary font-body-semibold mb-2 uppercase" style={{ letterSpacing: 3 }}>
         Step 1 of 3
       </Text>
       <Text className="text-2xl text-text-primary font-display mb-2" style={{ letterSpacing: -0.5 }}>
@@ -47,7 +47,7 @@ export default function BabyInfo() {
         We'll use this to personalize your experience.
       </Text>
 
-      <Text className="text-xs font-body-semibold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+      <Text className="text-sm font-body-semibold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
         Baby's Name
       </Text>
       <TextInput
@@ -60,7 +60,7 @@ export default function BabyInfo() {
         autoFocus
       />
 
-      <Text className="text-xs font-body-semibold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
+      <Text className="text-sm font-body-semibold text-text-secondary uppercase mb-1" style={{ letterSpacing: 2 }}>
         Date of Birth
       </Text>
       <TextInput
@@ -73,7 +73,7 @@ export default function BabyInfo() {
         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "default"}
       />
 
-      <Text className="text-xs font-body-semibold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+      <Text className="text-sm font-body-semibold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
         Feeding Method
       </Text>
       <View className="flex-row flex-wrap gap-2 mb-8">
@@ -120,7 +120,7 @@ export default function BabyInfo() {
           router.replace("/(auth)/login");
         }}
       >
-        <Text className="text-text-secondary text-center text-sm font-body">
+        <Text className="text-text-secondary text-center text-base font-body">
           Sign out
         </Text>
       </TouchableOpacity>

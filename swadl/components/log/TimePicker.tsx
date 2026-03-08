@@ -60,7 +60,7 @@ export function TimePicker({ value, onChange, label = "When" }: TimePickerProps)
 
   return (
     <View className="mb-4">
-      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
+      <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2" style={{ letterSpacing: 2 }}>
         {label}
       </Text>
       <View className="flex-row gap-2">

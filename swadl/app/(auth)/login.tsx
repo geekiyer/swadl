@@ -79,7 +79,7 @@ export default function Login() {
       <Text className="text-5xl text-center mb-1 text-text-primary font-display-black" style={{ letterSpacing: -2 }}>
         swad<Text className="text-feed-primary">l</Text>
       </Text>
-      <Text className="text-xs text-text-secondary text-center mb-8 font-body-semibold uppercase" style={{ letterSpacing: 4 }}>
+      <Text className="text-sm text-text-secondary text-center mb-8 font-body-semibold uppercase" style={{ letterSpacing: 4 }}>
         Parenting, coordinated
       </Text>
 
@@ -117,7 +117,7 @@ export default function Login() {
         onPress={handleForgotPassword}
         disabled={resetSending}
       >
-        <Text className="text-text-secondary text-sm">
+        <Text className="text-text-secondary text-base">
           {resetSending ? "Sending..." : "Forgot password?"}
         </Text>
       </TouchableOpacity>

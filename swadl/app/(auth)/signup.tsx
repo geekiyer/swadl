@@ -77,7 +77,7 @@ export default function Signup() {
         <Text className="text-base text-feed-primary text-center mb-8 font-body-semibold">
           {email}
         </Text>
-        <Text className="text-sm text-text-secondary text-center mb-8 font-body">
+        <Text className="text-base text-text-secondary text-center mb-8 font-body">
           Tap the link in the email to verify your account, then come back and sign in.
         </Text>
 

@@ -172,7 +172,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
   if (step === "setup") {
     return (
       <View>
-        <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+        <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
           Pump Type
         </Text>
         <View className="flex-row flex-wrap gap-2 mb-5">
@@ -187,7 +187,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
               onPress={() => setPumpType(pt.key)}
             >
               <Text
-                className={`text-sm font-body-medium ${
+                className={`text-base font-body-medium ${
                   pumpType === pt.key ? "text-text-primary" : "text-text-secondary"
                 }`}
               >
@@ -197,7 +197,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
           ))}
         </View>
 
-        <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-2">
+        <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-2">
           Side
         </Text>
         <View className="flex-row gap-2 mb-8">
@@ -212,7 +212,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
               onPress={() => setSide(s.key)}
             >
               <Text
-                className={`text-sm font-body-medium ${
+                className={`text-base font-body-medium ${
                   side === s.key ? "text-text-primary" : "text-text-secondary"
                 }`}
               >
@@ -268,7 +268,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
             router.back();
           }}
         >
-          <Text className="text-text-secondary text-center text-sm">Discard</Text>
+          <Text className="text-text-secondary text-center text-base">Discard</Text>
         </TouchableOpacity>
       </View>
     );
@@ -289,7 +289,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
       {showBothSides ? (
         <View className="flex-row gap-3 mt-3 mb-4">
           <View className="flex-1">
-            <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+            <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
               Left ({unit})
             </Text>
             <TextInput
@@ -303,7 +303,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
             />
           </View>
           <View className="flex-1">
-            <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+            <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
               Right ({unit})
             </Text>
             <TextInput
@@ -318,7 +318,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
         </View>
       ) : (
         <View className="mt-3 mb-4">
-          <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+          <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
             Amount ({unit})
           </Text>
           <TextInput
@@ -333,7 +333,7 @@ export function PumpLogger({ onSuccess }: PumpLoggerProps) {
         </View>
       )}
 
-      <Text className="text-[11px] font-body-bold text-text-secondary uppercase mb-1">
+      <Text className="text-[13px] font-body-bold text-text-secondary uppercase mb-1">
         Notes (optional)
       </Text>
       <TextInput

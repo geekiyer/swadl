@@ -59,11 +59,11 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 }
               }}
             >
-              <Icon size={22} strokeWidth={2} color={tintColor} />
+              <Icon size={24} strokeWidth={2} color={tintColor} />
               <Text
                 style={{
                   fontFamily: "Nunito_800ExtraBold",
-                  fontSize: 9,
+                  fontSize: 13,
                   marginTop: 2,
                   color: tintColor,
                 }}

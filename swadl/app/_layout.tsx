@@ -1,6 +1,7 @@
 import "../global.css";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, Text, Image } from "react-native";
+import Animated, { FadeOut } from "react-native-reanimated";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useOfflineSync } from "../hooks/useOfflineSync";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import { useThemeStore } from "../lib/theme";
+import { colors } from "../constants/theme";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -76,9 +78,15 @@ export default function RootLayout() {
     return () => subscription.unsubscribe();
   }, [setSession]);
 
+  const [showBrandedSplash, setShowBrandedSplash] = useState(true);
+
   useEffect(() => {
     if (ready && fontsLoaded) {
+      // Hide native splash immediately, show our branded overlay
       SplashScreen.hideAsync();
+      // Keep branded splash visible briefly, then fade out
+      const timer = setTimeout(() => setShowBrandedSplash(false), 800);
+      return () => clearTimeout(timer);
     }
   }, [ready, fontsLoaded]);
 
@@ -102,6 +110,48 @@ export default function RootLayout() {
           </Stack>
         </QueryClientProvider>
       </View>
+      {showBrandedSplash && (
+        <Animated.View
+          exiting={FadeOut.duration(400)}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: colors.cream,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          pointerEvents="none"
+        >
+          <Image
+            source={require("../assets/splash-icon.png")}
+            style={{ width: 120, height: 120, marginBottom: 12 }}
+            resizeMode="contain"
+          />
+          <Text
+            style={{
+              fontFamily: "Baloo2_800ExtraBold",
+              fontSize: 42,
+              color: colors.charcoal,
+              letterSpacing: -1,
+            }}
+          >
+            Swadl
+          </Text>
+          <Text
+            style={{
+              fontFamily: "Nunito_500Medium",
+              fontSize: 14,
+              color: colors.textSecondary,
+              marginTop: 4,
+            }}
+          >
+            Parenting, coordinated.
+          </Text>
+        </Animated.View>
+      )}
     </GestureHandlerRootView>
   );
 }

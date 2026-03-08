@@ -50,7 +50,7 @@ export function StatusCard({ type, label, value, onPress }: StatusCardProps) {
         </View>
         <Text
           style={{
-            fontSize: 8,
+            fontSize: 10,
             color: tc.textMuted,
             fontFamily: 'Nunito_800ExtraBold',
             letterSpacing: 1,
@@ -61,8 +61,8 @@ export function StatusCard({ type, label, value, onPress }: StatusCardProps) {
         </Text>
         <Text
           style={{
-            fontSize: 13,
-            lineHeight: 18,
+            fontSize: 15,
+            lineHeight: 20,
             color: tc.textPrimary,
             fontFamily: 'Baloo2_700Bold',
             marginTop: 2,
